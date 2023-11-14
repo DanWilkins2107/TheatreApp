@@ -12,13 +12,16 @@ export default function HomeScreen({ navigation }) {
             })
             .catch((error) => {
                 console.log("Sign Out Error", error);
-								alert("sign out failed:", error.message)
+                alert("sign out failed:", error.message);
             });
     };
 
     return (
         <View className="flex-1 mx-10 justify-center">
-						<Text className="text-center text-3xl font-extrabold">Welcome {auth.currentUser.displayName}</Text>
+            <Text className="text-center text-3xl font-extrabold">
+                Welcome{" "}
+                {auth.currentUser.displayName ? auth.currentUser.displayName.split(" ")[0] : ""}
+            </Text>
             <Button title="Log Out" onPress={handleSignOut} />
         </View>
     );
