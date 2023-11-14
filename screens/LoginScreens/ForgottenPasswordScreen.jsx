@@ -8,6 +8,8 @@ export default function ForgottenPasswordScreen({ navigation }) {
             </Text>
             <Button title = "Back to Login"
                 onPress = {() => navigation.navigate("Login")} />
+            <Button title = "TEMPORARY: Go to User Dashboard"
+                onPress = {() => navigation.navigate("UserDashboard")} />
         </View>
     )
 }
