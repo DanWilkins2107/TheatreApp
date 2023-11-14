@@ -2,9 +2,8 @@
 module.exports = {
     content: [
         "./App.js",
-        "./screens/LoginScreens/LoginScreen.jsx",
-        "./screens/LoginScreens/SignUpScreen.jsx",
-        "./screens/LoginScreens/ForgottenPasswordScreen.jsx",
+        "./screens/**/*.jsx",
+        "./components/*.jsx",
     ], //Add other files to watch here
     theme: {
         extend: {},
