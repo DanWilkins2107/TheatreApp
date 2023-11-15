@@ -17,15 +17,14 @@ export default function SignUpScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [passwordMissmatch, setPasswordMismatch] = useState(false);
+    const [isPasswordMatching, setIsPasswordMatching] = useState(false);
     const [loading, setLoading] = useState(false);
     const auth = firebase_auth;
 
     const handleSignUp = async () => {
         setLoading(true);
 
-        if (passwordMissmatch) {
-            console.log("Passwords do not match");
+        if (isPasswordMatching) {
             alert("Passwords do not match");
             return;
         }
@@ -33,9 +32,7 @@ export default function SignUpScreen({ navigation }) {
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile( response.user, {displayName: `${firstName} ${lastName}`} );
-            console.log(response);
         } catch (error) {
-            console.log(error);
             alert(`Sign up failed: ${error.message}`);
         } finally {
             setLoading(false);
@@ -49,17 +46,13 @@ export default function SignUpScreen({ navigation }) {
                     className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
                     value={firstName}
                     placeholder="First Name"
-                    autoCapitalize="words"
                     onChangeText={(text) => setFirstName(text.replace(/\s/g, ""))}
-                    blurOnSubmit={false}
                 />
                 <TextInput
                     className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
                     value={lastName}
                     placeholder="Last Name"
-                    autoCapitalize="words"
                     onChangeText={(text) => setLastName(text.replace(/\s/g, ""))}
-                    blurOnSubmit={false}
                 />
                 <TextInput
                     className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
@@ -67,7 +60,6 @@ export default function SignUpScreen({ navigation }) {
                     placeholder="Email"
                     autoCapitalize="none"
                     onChangeText={(text) => setEmail(text.replace(/\s/g, ""))}
-                    blurOnSubmit={false}
                 />
                 <TextInput
                     className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
@@ -76,23 +68,21 @@ export default function SignUpScreen({ navigation }) {
                     autoCapitalize="none"
                     secureTextEntry={true}
                     onChangeText={(text) => setPassword(text.replace(/\s/g, ""))}
-                    blurOnSubmit={false}
                 />
                 <TextInput
                     className={`px-5 py-2 my-1 bg-slate-100 rounded-xl border-2 ${
-                        passwordMissmatch ? "border-red-500" : ""
+                        isPasswordMatching ? "border-red-500" : ""
                     }`}
                     value={confirmPassword}
                     placeholder="Confirm Password"
                     autoCapitalize="none"
                     secureTextEntry={true}
-                    returnKeyType="go"
                     onChangeText={(text) => {
                         setConfirmPassword(text.replace(/\s/g, ""));
-                        setPasswordMismatch(password != text.replace(/\s/g, ""));
+                        setIsPasswordMatching(password != text.replace(/\s/g, ""));
                     }}
                 />
-                {passwordMissmatch ? (
+                {isPasswordMatching ? (
                     <Text className="text-red-500 text-center">Passwords do not match</Text>
                 ) : (
                     <></>

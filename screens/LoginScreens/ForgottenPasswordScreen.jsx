@@ -1,5 +1,5 @@
 import { Text, View, Button, TextInput, KeyboardAvoidingView, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/FormButton.jsx";

@@ -1,8 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text } from "react-native";
 import { onAuthStateChanged } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SignUpScreen from "./screens/LoginScreens/SignUpScreen";
 import ForgottenPasswordScreen from "./screens/LoginScreens/ForgottenPasswordScreen";
 import LoginScreen from "./screens/LoginScreens/LoginScreen";
@@ -17,7 +16,6 @@ export default function App() {
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
-            console.log("User state changed. Current user is: ", user);
             setUser(user);
         });
     }, []);
