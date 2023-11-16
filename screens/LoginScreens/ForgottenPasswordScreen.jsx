@@ -40,8 +40,6 @@ export default function ForgottenPasswordScreen({ navigation }) {
                     <ActivityIndicator size="large" color="#f1f5f9" />
                 ) : (
                     <FormButton
-                        blockClassName="bg-slate-700 justify-center w-40 h-10 self-center rounded-xl m-5"
-                        textClassName="text-white text-center text-lg font-extrabold"
                         title="Send Reset Link"
                         onPress={handlePasswordReset}
                     />

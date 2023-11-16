@@ -53,8 +53,6 @@ export default function LoginScreen({ navigation }) {
                 ) : (
                     <>
                         <FormButton
-                            blockClassName="bg-slate-700 justify-center w-32 h-10 self-center rounded-xl m-5"
-                            textClassName="text-white text-center text-lg font-extrabold"
                             title="Login"
                             onPress={handleLogin}
                         />
