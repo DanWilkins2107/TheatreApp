@@ -1,14 +1,13 @@
 import {
-    Text,
     View,
     Button,
-    TextInput,
     KeyboardAvoidingView,
     Image,
     ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import FormField from "../../components/FormField.jsx";
 import FormButton from "../../components/FormButton.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 
@@ -21,10 +20,8 @@ export default function LoginScreen({ navigation }) {
     const handleLogin = async () => {
         setLoading(true);
         try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
+            await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-            console.log(error);
             alert(`Sign in failed: ${error.message}`);
         } finally {
             setLoading(false);
@@ -38,20 +35,17 @@ export default function LoginScreen({ navigation }) {
                     className="self-center w-64 h-64"
                     source={require("../../assets/logo.png")}
                 />
-                <TextInput
-                    className="px-5 py-2 my-1 mt-10 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={email}
                     placeholder="Email"
                     autoCapitalize="none"
                     onChangeText={(text) => setEmail(text.replace(/\s/g, ""))}
                 />
-                <TextInput
-                    className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={password}
                     placeholder="Password"
                     autoCapitalize="none"
-                    returnKeyType="go"
-                    secureTextEntry={true}
+                    secureTextEntry
                     onChangeText={(text) => setPassword(text.replace(/\s/g, ""))}
                 />
                 {loading ? (

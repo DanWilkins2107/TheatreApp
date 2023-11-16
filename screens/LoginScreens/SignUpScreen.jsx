@@ -2,12 +2,12 @@ import {
     Text,
     View,
     Button,
-    TextInput,
     KeyboardAvoidingView,
     ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import FormField from "../../components/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/FormButton.jsx";
 
@@ -31,7 +31,7 @@ export default function SignUpScreen({ navigation }) {
 
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile( response.user, {displayName: `${firstName} ${lastName}`} );
+            await updateProfile(response.user, { displayName: `${firstName} ${lastName}` });
         } catch (error) {
             alert(`Sign up failed: ${error.message}`);
         } finally {
@@ -42,41 +42,35 @@ export default function SignUpScreen({ navigation }) {
     return (
         <View className="flex-1 mx-10 justify-center">
             <KeyboardAvoidingView behavior="position">
-                <TextInput
-                    className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={firstName}
-                    placeholder="First Name"
+                    placeholder="FirstName"
                     onChangeText={(text) => setFirstName(text.replace(/\s/g, ""))}
                 />
-                <TextInput
-                    className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={lastName}
                     placeholder="Last Name"
                     onChangeText={(text) => setLastName(text.replace(/\s/g, ""))}
                 />
-                <TextInput
-                    className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={email}
                     placeholder="Email"
                     autoCapitalize="none"
                     onChangeText={(text) => setEmail(text.replace(/\s/g, ""))}
                 />
-                <TextInput
-                    className="px-5 py-2 my-1 bg-slate-100 rounded-xl border-2"
+                <FormField
                     value={password}
                     placeholder="Password"
                     autoCapitalize="none"
-                    secureTextEntry={true}
+                    secureTextEntry
                     onChangeText={(text) => setPassword(text.replace(/\s/g, ""))}
                 />
-                <TextInput
-                    className={`px-5 py-2 my-1 bg-slate-100 rounded-xl border-2 ${
-                        isPasswordMatching ? "border-red-500" : ""
-                    }`}
+                <FormField
+                    extraClassName={isPasswordMatching ? "border-red-500" : ""}
                     value={confirmPassword}
                     placeholder="Confirm Password"
                     autoCapitalize="none"
-                    secureTextEntry={true}
+                    secureTextEntry
                     onChangeText={(text) => {
                         setConfirmPassword(text.replace(/\s/g, ""));
                         setIsPasswordMatching(password != text.replace(/\s/g, ""));
