@@ -7,6 +7,7 @@ import ForgottenPasswordScreen from "./screens/LoginScreens/ForgottenPasswordScr
 import LoginScreen from "./screens/LoginScreens/LoginScreen";
 import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import { firebase_auth } from "./firebase.config.js";
+import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,10 @@ export default function App() {
                             name="Home"
                             component={HomeScreen}
                             options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="UserDashboard"
+                            component={UserDashboardScreen}
                         />
                     </>
                 ) : (

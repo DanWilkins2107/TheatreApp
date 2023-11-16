@@ -20,6 +20,7 @@ export default function HomeScreen({ navigation }) {
                 {auth.currentUser.displayName ? auth.currentUser.displayName.split(" ")[0] : ""}
             </Text>
             <Button title="Log Out" onPress={handleSignOut} />
+            <Button title="Go to Dashboard (Temp)" onPress={() => navigation.navigate("UserDashboard")} />
         </View>
     );
 }
