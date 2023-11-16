@@ -1,10 +1,4 @@
-import {
-    View,
-    Button,
-    KeyboardAvoidingView,
-    Image,
-    ActivityIndicator,
-} from "react-native";
+import { View, Button, KeyboardAvoidingView, Image, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import FormField from "../../components/FormField.jsx";
@@ -31,10 +25,12 @@ export default function LoginScreen({ navigation }) {
     return (
         <View className="flex-1 mx-10 justify-center">
             <KeyboardAvoidingView behavior="position">
-                <Image
-                    className="self-center w-64 h-64"
-                    source={require("../../assets/logo.png")}
-                />
+                <View className="m-5">
+                    <Image
+                        className="self-center w-64 h-64"
+                        source={require("../../assets/logo.png")}
+                    />
+                </View>
                 <FormField
                     value={email}
                     placeholder="Email"
@@ -49,13 +45,12 @@ export default function LoginScreen({ navigation }) {
                     onChangeText={(text) => setPassword(text.replace(/\s/g, ""))}
                 />
                 {loading ? (
-                    <ActivityIndicator size="large" color="#f1f5f9" />
+                    <View className="h-20">
+                        <ActivityIndicator size="large" color="#f1f5f9" />
+                    </View>
                 ) : (
                     <>
-                        <FormButton
-                            title="Login"
-                            onPress={handleLogin}
-                        />
+                        <FormButton title="Login" onPress={handleLogin} />
                         <Button
                             title="Forgotten Password"
                             onPress={() => navigation.navigate("ForgottenPassword")}

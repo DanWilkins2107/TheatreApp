@@ -6,14 +6,11 @@ export default function HomeScreen({ navigation }) {
     const auth = firebase_auth;
 
     const handleSignOut = () => {
-        signOut(auth)
-            .then(() => {
-                console.log("Signed Out");
-            })
-            .catch((error) => {
-                console.log("Sign Out Error", error);
-                alert("sign out failed:", error.message);
-            });
+        try {
+            signOut(auth);
+        } catch (error) {
+            alert("sign out failed:", error.message);
+        }
     };
 
     return (

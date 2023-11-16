@@ -9,7 +9,9 @@ export default function FormButton(props) {
             onPress={props.onPress}
         >
             <Text
-                className={`text-white text-center text-lg font-extrabold ${props.textClassName || ""}`}
+                className={`text-white text-center text-lg font-extrabold ${
+                    props.textClassName || ""
+                }`}
             >
                 {props.title}
             </Text>

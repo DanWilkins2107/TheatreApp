@@ -21,7 +21,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <View className="flex-1 mx-10 justify-center">
@@ -39,10 +39,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
                 {loading ? (
                     <ActivityIndicator size="large" color="#f1f5f9" />
                 ) : (
-                    <FormButton
-                        title="Send Reset Link"
-                        onPress={handlePasswordReset}
-                    />
+                    <FormButton title="Send Reset Link" onPress={handlePasswordReset} />
                 )}
                 <Button title="Back to Login" onPress={() => navigation.navigate("Login")} />
             </KeyboardAvoidingView>

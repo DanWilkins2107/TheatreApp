@@ -1,10 +1,4 @@
-import {
-    Text,
-    View,
-    Button,
-    KeyboardAvoidingView,
-    ActivityIndicator,
-} from "react-native";
+import { Text, View, Button, KeyboardAvoidingView, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import FormField from "../../components/FormField.jsx";
@@ -85,10 +79,7 @@ export default function SignUpScreen({ navigation }) {
                     <ActivityIndicator size="large" color="#f1f5f9" />
                 ) : (
                     <>
-                        <FormButton
-                            title="Create Account"
-                            onPress={handleSignUp}
-                        />
+                        <FormButton title="Create Account" onPress={handleSignUp} />
                         <Button
                             title="Back to Login"
                             onPress={() => navigation.navigate("Login")}
