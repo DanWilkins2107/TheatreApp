@@ -1,8 +1,8 @@
 import { View, Button, KeyboardAvoidingView, Image, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import FormField from "../../components/FormField.jsx";
-import FormButton from "../../components/FormButton.jsx";
+import FormField from "../../components/Form/FormField.jsx";
+import FormButton from "../../components/Form/FormButton.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 
 export default function LoginScreen({ navigation }) {

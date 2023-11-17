@@ -1,9 +1,9 @@
 import { Text, View, Button, KeyboardAvoidingView, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import FormField from "../../components/FormField.jsx";
+import FormField from "../../components/Form/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
-import FormButton from "../../components/FormButton.jsx";
+import FormButton from "../../components/Form/FormButton.jsx";
 
 export default function ForgottenPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
