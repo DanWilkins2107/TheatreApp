@@ -9,8 +9,6 @@ import { firebase_auth } from "./firebase.config.js";
 import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
 import UserProfileScreen from "./screens/UserScreens/UserProfile.jsx";
-import CreateProductionScreen from "./screens/ProductionScreens/CreateProduction.jsx";
-import JoinProductionScreen from "./screens/ProductionScreens/JoinProduction.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,22 +33,6 @@ export default function App() {
                             component={UserDashboardScreen}
                             options={({ navigation }) => ({
                                 headerTitle: () => <Header navigation={navigation} firstScreen />,
-                                headerBackVisible: false
-                              })}
-                        />
-                        <Stack.Screen
-                            name="CreateProduction"
-                            component={CreateProductionScreen}
-                            options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} />,
-                                headerBackVisible: false
-                              })}
-                        />
-                        <Stack.Screen
-                            name="JoinProduction"
-                            component={JoinProductionScreen}
-                            options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} />,
                                 headerBackVisible: false
                               })}
                         />
