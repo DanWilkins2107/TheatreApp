@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export default function CreateProduction({ navigation }) {
+export default function CreateProductionScreen({ navigation }) {
     return (
         <View>
             <Text>Create Production</Text>

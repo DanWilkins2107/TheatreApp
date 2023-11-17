@@ -4,6 +4,7 @@ module.exports = {
         "./App.js",
         "./screens/**/*.jsx",
         "./components/*.jsx",
+        "./components/**/*.jsx",
     ], //Add other files to watch here
     theme: {
         extend: {},

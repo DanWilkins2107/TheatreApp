@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export default function JoinProduction({ navigation }) {
+export default function JoinProductionScreen({ navigation }) {
     return (
         <View>
             <Text>JoinProduction</Text>
