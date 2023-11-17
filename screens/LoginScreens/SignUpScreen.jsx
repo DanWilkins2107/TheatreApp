@@ -38,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
             <KeyboardAvoidingView behavior="position">
                 <FormField
                     value={firstName}
-                    placeholder="FirstName"
+                    placeholder="First Name"
                     onChangeText={(text) => setFirstName(text.replace(/\s/g, ""))}
                 />
                 <FormField
