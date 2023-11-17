@@ -9,6 +9,7 @@ import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import { firebase_auth } from "./firebase.config.js";
 import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
+import UserProfileScreen from "./screens/UserScreens/UserProfile.jsx";
 import CreateProductionScreen from "./screens/ProductionScreens/CreateProduction.jsx";
 import JoinProductionScreen from "./screens/ProductionScreens/JoinProduction.jsx";
 
@@ -26,18 +27,17 @@ export default function App() {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={user ? "Home" : "Login"}>
+            <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}
+            >
                 {user ? (
                     <>
                         <Stack.Screen
-                            name="Home"
-                            component={HomeScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
                             name="UserDashboard"
                             component={UserDashboardScreen}
-                            options={{headerBackVisible:false, headerTitle: () => <Header />}}
+                            options={({ navigation }) => ({
+                                headerTitle: () => <Header navigation={navigation} firstScreen />,
+                                headerBackVisible: false
+                              })}
                         />
                         <Stack.Screen
                             name="CreateProduction"
@@ -46,6 +46,14 @@ export default function App() {
                         <Stack.Screen
                             name="JoinProduction"
                             component={JoinProductionScreen}
+                        />
+                        <Stack.Screen
+                            name="UserProfile"
+                            component={UserProfileScreen}
+                            options={({ navigation }) => ({
+                                headerTitle: () => <Header navigation={navigation} />,
+                                headerBackVisible: false
+                              })}
                         />
                     </>
                 ) : (

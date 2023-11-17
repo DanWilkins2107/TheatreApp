@@ -2,7 +2,7 @@ import { Button, Text, View } from "react-native";
 import { signOut } from "firebase/auth";
 import { firebase_auth } from "../../firebase.config.js";
 
-export default function HomeScreen({ navigation }) {
+export default function UserProfileScreen({ navigation }) {
     const auth = firebase_auth;
 
     const handleSignOut = () => {
@@ -20,7 +20,6 @@ export default function HomeScreen({ navigation }) {
                 {auth.currentUser.displayName ? auth.currentUser.displayName.split(" ")[0] : ""}
             </Text>
             <Button title="Log Out" onPress={handleSignOut} />
-            <Button title="Go to Dashboard (Temp)" onPress={() => navigation.navigate("UserDashboard")} />
         </View>
     );
 }
