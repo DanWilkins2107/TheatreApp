@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import SignUpScreen from "./screens/LoginScreens/SignUpScreen";
 import ForgottenPasswordScreen from "./screens/LoginScreens/ForgottenPasswordScreen";
 import LoginScreen from "./screens/LoginScreens/LoginScreen";
-import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import { firebase_auth } from "./firebase.config.js";
 import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
@@ -42,10 +41,18 @@ export default function App() {
                         <Stack.Screen
                             name="CreateProduction"
                             component={CreateProductionScreen}
+                            options={({ navigation }) => ({
+                                headerTitle: () => <Header navigation={navigation} />,
+                                headerBackVisible: false
+                              })}
                         />
                         <Stack.Screen
                             name="JoinProduction"
                             component={JoinProductionScreen}
+                            options={({ navigation }) => ({
+                                headerTitle: () => <Header navigation={navigation} />,
+                                headerBackVisible: false
+                              })}
                         />
                         <Stack.Screen
                             name="UserProfile"
