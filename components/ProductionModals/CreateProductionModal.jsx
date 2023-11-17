@@ -5,7 +5,7 @@ import { useState } from "react";
 import GeneralModal from "../GeneralModal/GeneralModal";
 
 export default function CreateProductionModal({ closeModal }) {
-    const [name, setname] = useState("");
+    const [name, setName] = useState("");
     return (
         <GeneralModal closeModal={closeModal}>
             <View className="flex flex-col p-3 h-full">
@@ -14,7 +14,7 @@ export default function CreateProductionModal({ closeModal }) {
                 <Text className="text-lg font-semibold text-center">
                     Enter the name for your production.
                 </Text>
-                <FormField value={name} placeholder="Name" onChangeText={(name) => setCode(name)} />
+                <FormField value={name} placeholder="Name" onChangeText={(name) => setName(name)} />
                 <View className="flex-1" />
                 <FormButton title="Create" onPress={() => alert("Created")} />
             </View>
