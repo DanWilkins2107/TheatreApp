@@ -10,6 +10,9 @@ import CreateProductionModal from "../../components/ProductionModals/CreateProdu
 
 export default function UserDashboardScreen({ navigation }) {
     let [modal, setModal] = useState(null);
+    let [createName, setCreateName] = useState("");
+    let [joinCode, setJoinCode] = useState("");
+
     return (
         <>
             <Modal
@@ -20,7 +23,7 @@ export default function UserDashboardScreen({ navigation }) {
                     setModal(null);
                 }}
             >
-                <JoinProductionModal closeModal={() => setModal(null)} />
+                <JoinProductionModal closeModal={() => setModal(null)} code={joinCode} setCode={setJoinCode}/>
             </Modal>
             <Modal
                 animationType="fade"
@@ -30,7 +33,7 @@ export default function UserDashboardScreen({ navigation }) {
                     setModal(null);
                 }}
             >
-                <CreateProductionModal closeModal={() => setModal(null)} />
+                <CreateProductionModal closeModal={() => setModal(null)} name={createName} setName={setCreateName}/>
             </Modal>
             <View className="flex-col p-4 gap h-[95%] z-10">
                 <View className="flex-row justify-around mb-10">
