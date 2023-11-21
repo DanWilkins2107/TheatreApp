@@ -64,7 +64,7 @@ export default function UserProfileScreen({ navigation }) {
 
     return (
         <View className="flex flex-col h-full">
-            <View className="w-max bg-white flex-row justify-left rounded-3xl px-4 m-2 border-2 align-middle items-center">
+            <View className="w-max bg-white flex-row rounded-3xl px-4 m-2 border-2 align-middle items-center">
                 <TouchableOpacity
                     className="m-3 rounded-full bg-purple-300"
                     onPress={() => {
@@ -98,6 +98,12 @@ export default function UserProfileScreen({ navigation }) {
                     </Text>
                 </View>
             </View>
+            {/* <View className="flex flex-col bg-white mx-2 rounded-3xl justify-center items-center">
+                <View className="flex-row w-max p-2 items-center">
+                    <Text className="text-2xl font-extrabold">Email: </Text>
+                    <Text className="text-2xl">{auth.currentUser.email}</Text>
+                </View>
+            </View> */}
             <View className="">
                 <Button title="Log Out" color="red" onPress={handleSignOut} />
             </View>
