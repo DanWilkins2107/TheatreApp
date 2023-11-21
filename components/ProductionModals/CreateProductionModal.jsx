@@ -23,10 +23,17 @@ export default function CreateProductionModal({ closeModal }) {
                 if (!data) {
                     set(ref(db, "productions/" + playCode), {
                         playName: name,
-                        admins: [auth.currentUser.uid],
-                        participants: [auth.currentUser.uid],
+                        admins: {
+                            [auth.currentUser.uid]: Date.now(),
+                        },
+                        participants: {
+                            [auth.currentUser.uid]: Date.now(),
+                        },
                         teams: [],
                         budgets: [],
+                    });
+                    set(ref(db, "users/" + auth.currentUser.uid + "/productions/"), {
+                        [playCode]: Date.now(),
                     });
                 } else {
                     CreateProduction();

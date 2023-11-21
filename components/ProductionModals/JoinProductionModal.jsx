@@ -4,7 +4,7 @@ import FormButton from "../Form/FormButton";
 import { useState } from "react";
 import GeneralModal from "../GeneralModal/GeneralModal";
 import { firebase_auth, firebase_db } from "../../firebase.config";
-import { get, ref, set, child } from "firebase/database";
+import { get, ref, set, child, push } from "firebase/database";
 
 export default function JoinProductionModal({ closeModal }) {
     const [code, setCode] = useState("");
@@ -12,16 +12,17 @@ export default function JoinProductionModal({ closeModal }) {
     const db = firebase_db;
     const auth = firebase_auth;
     const JoinProduction = () => {
+        setErrorText("");
         const dbRef = ref(db);
         get(child(dbRef, `/productions/${code}`))
             .then((snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    if (data.participants.includes(auth.currentUser.uid)) {
+                    if (data.participants && data.participants[auth.currentUser.uid]) {
                         setErrorText("You are already in this production");
                     } else {
-                        data.participants.push(auth.currentUser.uid);
-                        set(ref(db, "productions/" + code), data);
+                        set(ref(db, "productions/" + code + "/participants/" + auth.currentUser.uid), Date.now());
+                        set(ref(db, "users/" + auth.currentUser.uid + "/productions/" + code), Date.now());
                     }
                 } else {
                     setErrorText("Invalid code entered: Production not found");
