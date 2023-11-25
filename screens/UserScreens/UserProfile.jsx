@@ -1,24 +1,23 @@
-import { Button, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { signOut, updateProfile } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { launchImageLibraryAsync, getMediaLibraryPermissionsAsync } from "expo-image-picker";
-import { firebase_auth, storage } from "../../firebase.config.js";
+import { ScrollView, Modal } from "react-native";
+import { signOut } from "firebase/auth";
 import { useState } from "react";
+import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
+import UserDetailsModal from "../../components/ProfileElements/UserDetailsModal.jsx";
+
+import {
+    faCircleExclamation,
+    faCircleInfo,
+    faPhone,
+    faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
+import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx";
+import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
+import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
+import { firebase_auth } from "../../firebase.config.js";
 
 export default function UserProfileScreen({ navigation }) {
-    const [userName, setUserName] = useState("");
-    const [profileURL, setProfileURL] = useState(firebase_auth.currentUser.photoURL || null);
-    const [loading, setLoading] = useState(false);
-    const auth = firebase_auth;
-    const db = firebase_db;
-    
-    useEffect(() => {
-        get(child(ref(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
-            setUserName(snapshot.exists() ? [snapshot.val().firstName, snapshot.val().lastName] : "Anonymous");
-        });
-    }, []);
-    const storageRef = ref(storage);
-
+    let [modal, setModal] = useState(null);
+    let auth = firebase_auth;
     const handleSignOut = () => {
         try {
             signOut(auth);
@@ -27,86 +26,59 @@ export default function UserProfileScreen({ navigation }) {
         }
     };
 
-    const handleProfileChange = async () => {
-        launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
-            setLoading(true);
-            if (!response.canceled) {
-                fetch(response.assets[0].uri).then((image) => {
-                    image.blob().then((blob) => {
-                        uploadBytes(
-                            ref(
-                                storageRef,
-                                "images/" +
-                                    auth.currentUser.uid +
-                                    response.assets[0].fileName.substring(
-                                        response.assets[0].fileName.lastIndexOf(".")
-                                    )
-                            ),
-                            blob
-                        ).then((snapshot) => {
-                            getDownloadURL(snapshot.ref)
-                                .then((url) => {
-                                    updateProfile(auth.currentUser, {
-                                        photoURL: url,
-                                    });
-                                    setProfileURL(url);
-                                    setLoading(false);
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                });
-                        });
-                    });
-                });
-            }
-        });
-    };
+    const modals = [
+        { name: "UserDetails", component: <UserDetailsModal closeModal={() => {setModal(null)}}/> },
+        { name: "ContactInformation", component: <ContactInformationModal closeModal={() => {setModal(null)}}/> },
+        { name: "ReportError", component: <ReportErrorModal closeModal={() => {setModal(null)}}/> },
+    ];
 
     return (
-        <View className="flex flex-col h-full">
-            <View className="w-max bg-white flex-row rounded-3xl px-4 m-2 border-2 align-middle items-center">
-                <TouchableOpacity
-                    className="m-3 rounded-full bg-purple-300"
-                    onPress={() => {
-                        handleProfileChange();
+        <>
+            {modals.map((item) => {
+                return (
+                    <Modal
+                        key={item.name}
+                        animationType="fade"
+                        transparent={true}
+                        visible={modal === item.name}
+                        onRequestClose={() => {
+                            setModal(null);
+                        }}
+                    >
+                        {item.component}
+                    </Modal>
+                );
+            })}
+            <ScrollView className="flex flex-col h-full">
+                <ProfilePicture />
+                <ProfilePanel
+                    icon={faCircleInfo}
+                    text="User Details"
+                    onClick={() => {
+                        setModal("UserDetails");
                     }}
-                >
-                    {loading ? (
-                        <View className="w-28 h-28 rounded-full border-2 items-center justify-center">
-                            <ActivityIndicator size="large" color="#f1f5f9" />
-                        </View>
-                    ) : profileURL ? (
-                        <Image
-                            className="w-28 h-28 rounded-full border-2"
-                            source={{
-                                uri: profileURL,
-                            }}
-                            resizeMode="cover"
-                        />
-                    ) : (
-                        <View className="w-28 h-28 rounded-full border-2 items-center justify-center">
-                            <Text className="font-extrabold text-4xl p-0 m-0">
-                                {auth.currentUser.displayName.split(" ")[0][0]}
-                                {auth.currentUser.displayName.split(" ")[1][0]}
-                            </Text>
-                        </View>
-                    )}
-                </TouchableOpacity>
-                <View className="w-[212] flex-col">
-                    <Text className="ml-4 text-xl font-extrabold text-ellipsis" numberOfLines={1}>
-                        {auth.currentUser.displayName}
-                    </Text>
-                </View>
-            </View>
-            {/* <View className="flex flex-col bg-white mx-2 rounded-3xl justify-center items-center">
-                <View className="flex-row w-max p-2 items-center">
-                    <Text className="text-2xl font-extrabold">Email: </Text>
-                    <Text className="text-2xl">{auth.currentUser.email}</Text>
-                </View>
-            </View> */}
-            <View className="">
-                <Button title="Log Out" color="red" onPress={handleSignOut} />
-            </View>
-        </View>
+                />
+                <ProfilePanel
+                    icon={faPhone}
+                    text="Contact Information"
+                    onClick={() => {
+                        setModal("ContactInformation");
+                    }}
+                />
+                <ProfilePanel
+                    icon={faCircleExclamation}
+                    text="Report Error"
+                    onClick={() => {
+                        setModal("ReportError");
+                    }}
+                />
+                <ProfilePanel
+                    backgroundColor="bg-red-300"
+                    icon={faRightFromBracket}
+                    text="Sign Out"
+                    onClick={handleSignOut}
+                />
+            </ScrollView>
+        </>
     );
 }
