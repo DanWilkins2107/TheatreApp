@@ -1,8 +1,9 @@
 import { Text, View, Button, KeyboardAvoidingView, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { ref, set } from "firebase/database";
+import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import FormField from "../../components/Form/FormField.jsx";
-import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/Form/FormButton.jsx";
 
 export default function SignUpScreen({ navigation }) {
@@ -14,18 +15,23 @@ export default function SignUpScreen({ navigation }) {
     const [isPasswordMatching, setIsPasswordMatching] = useState(false);
     const [loading, setLoading] = useState(false);
     const auth = firebase_auth;
+    const db = firebase_db;
 
     const handleSignUp = async () => {
-        setLoading(true);
-
         if (isPasswordMatching) {
             alert("Passwords do not match");
             return;
         }
 
         try {
+            setLoading(true);
             const response = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(response.user, { displayName: `${firstName} ${lastName}` });
+            set(ref(db, "users/" + response.user.uid), {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+            });
         } catch (error) {
             alert(`Sign up failed: ${error.message}`);
         } finally {

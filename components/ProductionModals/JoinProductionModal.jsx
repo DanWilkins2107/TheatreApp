@@ -11,6 +11,7 @@ export default function JoinProductionModal({ closeModal }) {
     const [errorText, setErrorText] = useState("");
     const db = firebase_db;
     const auth = firebase_auth;
+
     const JoinProduction = () => {
         setErrorText("");
         const dbRef = ref(db);
@@ -23,6 +24,7 @@ export default function JoinProductionModal({ closeModal }) {
                     } else {
                         set(ref(db, "productions/" + code + "/participants/" + auth.currentUser.uid), Date.now());
                         set(ref(db, "users/" + auth.currentUser.uid + "/productions/" + code), Date.now());
+                        closeModal();
                     }
                 } else {
                     setErrorText("Invalid code entered: Production not found");
@@ -41,7 +43,7 @@ export default function JoinProductionModal({ closeModal }) {
                 <Text className="text-lg font-semibold text-center">
                     Enter the code for the production you wish to join.
                 </Text>
-                <FormField value={code} placeholder="Code" onChangeText={(text) => setCode(text)} />
+                <FormField value={code} placeholder="Code" autoCapitalize="none" onChangeText={(text) => setCode(text)} />
                 <View className="flex-1" />
                 <FormButton title="Join" onPress={() => JoinProduction()} />
                 <Text className="text-red-500 text-center">{errorText}</Text>

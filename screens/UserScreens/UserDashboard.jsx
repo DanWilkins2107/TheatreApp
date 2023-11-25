@@ -1,17 +1,49 @@
 import { Modal, View, Text, ScrollView } from "react-native";
-import CreateAndJoinButtons from "../../components/UserDashboard/CreateAndJoin";
-import ProductionButton from "../../components/UserDashboard/ProductionButton";
+import { useState, useEffect } from "react";
+import { onValue, get, ref, child, set } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
-import { mockProductions } from "../../MockData/MockProductions";
-import { useState } from "react";
+import { firebase_auth, firebase_db } from "../../firebase.config.js";
+import CreateAndJoinButtons from "../../components/UserDashboard/CreateAndJoin";
+import ProductionButton from "../../components/UserDashboard/ProductionButton";
 import JoinProductionModal from "../../components/ProductionModals/JoinProductionModal";
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 
+//TODO:
+// - order by time joined
+// - order participants by last action/ time joined
+
 export default function UserDashboardScreen({ navigation }) {
-    let [modal, setModal] = useState(null);
-    let [createName, setCreateName] = useState("");
-    let [joinCode, setJoinCode] = useState("");
+    const [modal, setModal] = useState(null);
+    const [createName, setCreateName] = useState("");
+    const [joinCode, setJoinCode] = useState("");
+    const [productions, setProductions] = useState([]);
+    const auth = firebase_auth;
+    const db = firebase_db;
+
+    useEffect(() => {
+        onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
+            if (!userSnapshot.exists()) return;
+            const userData = userSnapshot.val();
+
+            const newProds = await Promise.all(
+                Object.keys(userData).map(async (productionCode) => {
+                    return get(child(ref(db), `productions/${productionCode}`))
+                        .then((playSnapshot) => {
+                            if (!playSnapshot.exists()) return;
+                            const playData = playSnapshot.val();
+                            return { ...playData, playCode: playSnapshot.key };
+                        })
+                        .catch((error) => {
+                            console.log("uh oh: ", error.message);
+                            return null;
+                        });
+                })
+            );
+
+            setProductions(newProds.sort((a, b) => b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]));
+        });
+    }, []);
 
     return (
         <>
@@ -23,7 +55,11 @@ export default function UserDashboardScreen({ navigation }) {
                     setModal(null);
                 }}
             >
-                <JoinProductionModal closeModal={() => setModal(null)} code={joinCode} setCode={setJoinCode}/>
+                <JoinProductionModal
+                    closeModal={() => setModal(null)}
+                    code={joinCode}
+                    setCode={setJoinCode}
+                />
             </Modal>
             <Modal
                 animationType="fade"
@@ -33,7 +69,11 @@ export default function UserDashboardScreen({ navigation }) {
                     setModal(null);
                 }}
             >
-                <CreateProductionModal closeModal={() => setModal(null)} name={createName} setName={setCreateName}/>
+                <CreateProductionModal
+                    closeModal={() => setModal(null)}
+                    name={createName}
+                    setName={setCreateName}
+                />
             </Modal>
             <View className="flex-col p-4 gap h-[95%] z-10">
                 <View className="flex-row justify-around mb-10">
@@ -60,8 +100,8 @@ export default function UserDashboardScreen({ navigation }) {
                     </Text>
                 </View>
                 <ScrollView className="flex-col space-y-12 grow">
-                    {mockProductions.map((production) => {
-                        return <ProductionButton production={production} key={production.name} />;
+                    {productions.map((production, index) => {
+                        return <ProductionButton production={production} key={index} />;
                     })}
                 </ScrollView>
             </View>

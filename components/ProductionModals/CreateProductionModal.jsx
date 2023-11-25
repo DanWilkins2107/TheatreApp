@@ -32,9 +32,11 @@ export default function CreateProductionModal({ closeModal }) {
                         teams: [],
                         budgets: [],
                     });
-                    set(ref(db, "users/" + auth.currentUser.uid + "/productions/"), {
-                        [playCode]: Date.now(),
-                    });
+                    set(
+                        ref(db, "users/" + auth.currentUser.uid + "/productions/" + playCode),
+                        Date.now()
+                    );
+                    closeModal();
                 } else {
                     CreateProduction();
                 }
