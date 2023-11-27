@@ -10,7 +10,6 @@ import JoinProductionModal from "../../components/ProductionModals/JoinProductio
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 
 //TODO:
-// - order by time joined
 // - order participants by last action/ time joined
 
 export default function UserDashboardScreen({ navigation }) {
@@ -41,7 +40,12 @@ export default function UserDashboardScreen({ navigation }) {
                 })
             );
 
-            setProductions(newProds.sort((a, b) => b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]));
+            setProductions(
+                newProds.sort(
+                    (a, b) =>
+                        b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]
+                )
+            );
         });
     }, []);
 
@@ -100,9 +104,15 @@ export default function UserDashboardScreen({ navigation }) {
                     </Text>
                 </View>
                 <ScrollView className="flex-col space-y-12 grow">
-                    {productions.map((production, index) => {
-                        return <ProductionButton production={production} key={index} />;
-                    })}
+                    {productions.length === 0 ? (
+                        <Text className="text-center text-2xl my-6 font-bold">
+                            No productions yet...
+                        </Text>
+                    ) : (
+                        productions.map((production, index) => {
+                            return <ProductionButton production={production} key={index} />;
+                        })
+                    )}
                 </ScrollView>
             </View>
         </>

@@ -12,11 +12,21 @@ export default function CreateProductionModal({ closeModal }) {
     const db = firebase_db;
     const auth = firebase_auth;
 
+    const generatePlayCode = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let code = "";
+
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return code;
+    };
+
     const CreateProduction = () => {
         setErrorText("");
         const dbRef = ref(db);
-        playCodeValid = false;
-        const playCode = Math.random().toString(36).substring(7);
+        const playCode = generatePlayCode();
         get(child(dbRef, `/productions/${playCode}`))
             .then((snapshot) => {
                 const data = snapshot.val();
