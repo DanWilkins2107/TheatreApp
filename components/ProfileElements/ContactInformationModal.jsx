@@ -1,21 +1,63 @@
-import { View, Text } from "react-native";
-import GenericModal from "../GeneralModal/GeneralModal.jsx";
-import { firebase_auth } from "../../firebase.config.js";
-import { useState } from "react";
-import FormField from "../Form/FormField.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft, faUser } from "@fortawesome/free-solid-svg-icons";
-import { TouchableOpacity } from "react-native-web";
+import { View } from "react-native";
+import GeneralModal from "../GeneralModal/GeneralModal.jsx";
+import { firebase_auth, firebase_db } from "../../firebase.config.js";
+import { useState, useEffect } from "react";
+import EditInfo from "../Form/EditInfo.jsx";
+``;
+import { set, ref, get } from "firebase/database";
+import LoadingWheel from "../Loading/LoadingWheel.jsx";
+
 
 export default function ContactInformationModal(props) {
-    let auth = firebase_auth;
-    const [editingEmail, setEditingEmail] = useState(false);
-    const [editingPhoneNumber, setEditingPhoneNumber] = useState(false);
+    const db = firebase_db;
+    const auth = firebase_auth;
+    const [loading, setLoading] = useState(true);
+    const [initialContactNo, setInitialContactNo] = useState("");
+    const [contactNo, setContactNo] = useState("");
+    const [initialEmail, setInitialEmail] = useState(auth.currentUser.email);
     const [email, setEmail] = useState(auth.currentUser.email);
-    const [phoneNumber, setPhoneNumber] = useState(auth.currentUser.phoneNumber);
+    useEffect(() => {
+        const userRef = ref(db, "users/" + auth.currentUser.uid);
+        get(userRef).then((userSnapshot) => {
+            if (!userSnapshot.exists()) return;
+            const userData = userSnapshot.val();
+            setContactNo(userData.contactNo);
+            setInitialContactNo(userData.contactNo);
+            setLoading(false);
+        });
+    });
     return (
-        <GenericModal closeModal={props.closeModal}>
-            <Text>Works</Text>
-        </GenericModal>
+        <GeneralModal closeModal={props.closeModal}>
+            {loading ? (
+                <LoadingWheel />
+            ) : (
+                <View className="flex flex-col items-center h-full">
+                    <EditInfo
+                        title="Contact Number"
+                        variableToEdit={contactNo}
+                        initialValue={initialContactNo}
+                        onChangeFunction={(text) => {
+                            setContactNo(text);
+                        }}
+                        onSubmitFunction={() => {
+                            set(ref(db, "users/" + auth.currentUser.uid + "/contactNumber"), contactNo);
+                            setInitialContactNo(contactNo);
+                        }}
+                    />
+                    <View className="h-8"></View>
+                    <EditInfo
+                        title="Email"
+                        variableToEdit={email}
+                        initialValue={initialEmail}
+                        onChangeFunction={(text) => {
+                            setEmail(text);
+                        }}
+                        onSubmitFunction={async () => {
+                            await updateProfile(response.user, { email: `${email}`});
+                        }}
+                    />
+                </View>
+            )}
+        </GeneralModal>
     );
 }

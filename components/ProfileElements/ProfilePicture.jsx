@@ -3,7 +3,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, storage } from "../../firebase.config.js";
 import { useState } from "react";
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import LoadingWheel from "../Loading/LoadingWheel.jsx";
 
 export default function ProfilePicture() {
     const [profileURL, setProfileURL] = useState(firebase_auth.currentUser.photoURL || null);
@@ -56,7 +57,7 @@ export default function ProfilePicture() {
             >
                 {loading ? (
                     <View className="w-28 h-28 rounded-full border-2 items-center justify-center">
-                        <ActivityIndicator size="large" color="#f1f5f9" />
+                        <LoadingWheel />
                     </View>
                 ) : profileURL ? (
                     <Image

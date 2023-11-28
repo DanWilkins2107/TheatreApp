@@ -1,10 +1,11 @@
-import { Text, View, Button, KeyboardAvoidingView, ActivityIndicator } from "react-native";
+import { Text, View, Button, KeyboardAvoidingView } from "react-native";
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
+import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 
 export default function SignUpScreen({ navigation }) {
     const [firstName, setFirstName] = useState("");
@@ -82,7 +83,7 @@ export default function SignUpScreen({ navigation }) {
                     <></>
                 )}
                 {loading ? (
-                    <ActivityIndicator size="large" color="#f1f5f9" />
+                    <LoadingWheel />
                 ) : (
                     <>
                         <FormButton title="Create Account" onPress={handleSignUp} />
