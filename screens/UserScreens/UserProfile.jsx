@@ -1,13 +1,13 @@
 import { View, TouchableOpacity, Text, ScrollView, Modal } from "react-native";
 import { signOut } from "firebase/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { get, child, ref as dbRef } from "firebase/database";
 import { launchImageLibraryAsync } from "expo-image-picker";
-import { firebase_auth, storage } from "../../firebase.config.js";
+import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
 import UserDetailsModal from "../../components/ProfileElements/UserDetailsModal.jsx";
-
 import {
     faCircleExclamation,
     faCircleInfo,
@@ -21,10 +21,19 @@ import ContactInformationModal from "../../components/ProfileElements/ContactInf
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
+
 export default function UserProfileScreen({ navigation }) {
+    const [userName, setUserName] = useState("");
     let [modal, setModal] = useState(null);
     let auth = firebase_auth;
+    let db = firebase_db;
     const storageRef = ref(storage);
+
+    useEffect(() => {
+        get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
+            setUserName(snapshot.exists() ? [snapshot.val().firstName, snapshot.val().lastName] : "Anonymous");
+        });
+    }, []);
 
     const handleSignOut = () => {
         try {
@@ -137,9 +146,8 @@ export default function UserProfileScreen({ navigation }) {
                             className="z-10"
                             loading={loading}
                             profileURL={profileURL}
-                            displayName={auth.currentUser.displayName}
+                            displayName={`${userName[0]} ${userName[1]}`}
                         />
-                        {/* Add a circle on the bottom right corner */}
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
                             <FontAwesomeIcon icon={(faPencil)} size={25}/>
                         </View>
@@ -150,7 +158,7 @@ export default function UserProfileScreen({ navigation }) {
                             className="ml-4 text-xl font-extrabold text-ellipsis"
                             numberOfLines={1}
                         >
-                            {auth.currentUser.displayName}
+                            {`${userName[0]} ${userName[1]}`}
                         </Text>
                     </View>
                 </View>
