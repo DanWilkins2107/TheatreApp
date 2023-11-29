@@ -4,10 +4,10 @@ import FormField from "../Form/FormField.jsx";
 export default function EditInfo(props) {
     return (
         <View className="w-10/12 flex flex-col gap-2">
-            <Text className="text-2xl font-extrabold text-center">{props.title}</Text>
+            <Text className="text-2xl font-extrabold text-center mb-1">{props.title}</Text>
             <FormField
                 value={props.variableToEdit}
-                onChangeText={(text) => {props.onChangeFunction(text)}}
+                onChangeText={(text) => props.onChangeFunction(text)}
             />
             <View className="flex flex-row justify-around">
                 <TouchableOpacity

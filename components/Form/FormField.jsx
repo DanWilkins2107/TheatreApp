@@ -1,4 +1,4 @@
-import { TextInput } from "react-native";
+import { TextInput, Text } from "react-native";
 
 export default function FormField(props) {
     return (
@@ -11,6 +11,7 @@ export default function FormField(props) {
             autoCapitalize={props.autoCapitalize || "words"}
             secureTextEntry={props.secureTextEntry || false}
             onChangeText={props.onChangeText}
+            multiline={props.multiline || false}
         />
     );
 }

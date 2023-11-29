@@ -40,7 +40,7 @@ export default function App() {
                             name="UserProfile"
                             component={UserProfileScreen}
                             options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} />,
+                                headerTitle: () => <Header navigation={navigation} profileScreen/>,
                                 headerBackVisible: false
                               })}
                         />

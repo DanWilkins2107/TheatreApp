@@ -26,7 +26,7 @@ export default function UserDetailsModal(props) {
             setInitialLastName(userData.lastName);
             setLoading(false);
         });
-    });
+    }, []);
     return (
         <GeneralModal closeModal={props.closeModal}>
             {loading ? (
@@ -38,7 +38,7 @@ export default function UserDetailsModal(props) {
                         variableToEdit={firstName}
                         initialValue={initialFirstName}
                         onChangeFunction={(text) => {
-                            setFirstName(text);
+                            setFirstName(_old => text)
                         }}
                         onSubmitFunction={() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/firstName"), firstName);
@@ -50,9 +50,7 @@ export default function UserDetailsModal(props) {
                         title="Last Name"
                         variableToEdit={lastName}
                         initialValue={initialLastName}
-                        onChangeFunction={(text) => {
-                            setLastName(text);
-                        }}
+                        onChangeFunction={(text) => setLastName(_old => text)}
                         onSubmitFunction={() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/lastName"), lastName);
                             setInitialLastName(lastName);

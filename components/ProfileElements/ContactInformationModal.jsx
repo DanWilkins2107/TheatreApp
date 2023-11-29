@@ -25,7 +25,7 @@ export default function ContactInformationModal(props) {
             setInitialContactNo(userData.contactNo);
             setLoading(false);
         });
-    });
+    }, []);
     return (
         <GeneralModal closeModal={props.closeModal}>
             {loading ? (
@@ -39,7 +39,7 @@ export default function ContactInformationModal(props) {
                         onChangeFunction={(text) => {
                             setContactNo(text);
                         }}
-                        onSubmitFunction={() => {
+                        onSubmitFunction={async() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/contactNumber"), contactNo);
                             setInitialContactNo(contactNo);
                         }}
@@ -54,6 +54,7 @@ export default function ContactInformationModal(props) {
                         }}
                         onSubmitFunction={async () => {
                             await updateProfile(response.user, { email: `${email}`});
+                            setInitialEmail(email);
                         }}
                     />
                 </View>
