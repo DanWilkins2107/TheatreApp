@@ -6,22 +6,22 @@ import GeneralModal from "../GeneralModal/GeneralModal";
 import { firebase_auth, firebase_db } from "../../firebase.config";
 import { get, ref, set, child } from "firebase/database";
 
+const generatePlayCode = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+
+    for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return code;
+};
+
 export default function CreateProductionModal({ closeModal }) {
     const [name, setName] = useState("");
     const [errorText, setErrorText] = useState("");
     const db = firebase_db;
     const auth = firebase_auth;
-
-    const generatePlayCode = () => {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let code = "";
-
-        for (let i = 0; i < 6; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        return code;
-    };
 
     const CreateProduction = () => {
         setErrorText("");

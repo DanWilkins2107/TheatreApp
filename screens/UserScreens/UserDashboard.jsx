@@ -1,4 +1,4 @@
-import { Modal, View, Text, ScrollView } from "react-native";
+import { Modal, View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import { onValue, get, ref, child, set } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -17,12 +17,18 @@ export default function UserDashboardScreen({ navigation }) {
     const [createName, setCreateName] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const [productions, setProductions] = useState([]);
+    const [loading, setLoading] = useState(true);
     const auth = firebase_auth;
     const db = firebase_db;
 
     useEffect(() => {
+        setLoading(true);
         onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
-            if (!userSnapshot.exists()) return;
+            if (!userSnapshot.exists()) {
+                setLoading(false);
+                return;
+            }
+
             const userData = userSnapshot.val();
 
             const newProds = await Promise.all(
@@ -35,7 +41,6 @@ export default function UserDashboardScreen({ navigation }) {
                         })
                         .catch((error) => {
                             console.log("uh oh: ", error.message);
-                            return null;
                         });
                 })
             );
@@ -46,6 +51,8 @@ export default function UserDashboardScreen({ navigation }) {
                         b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]
                 )
             );
+
+            setLoading(false);
         });
     }, []);
 
@@ -104,7 +111,11 @@ export default function UserDashboardScreen({ navigation }) {
                     </Text>
                 </View>
                 <ScrollView className="flex-col space-y-12 grow">
-                    {productions.length === 0 ? (
+                    {loading ? (
+                        <View className="my-6">
+                            <ActivityIndicator size="large" color="#000000" />
+                        </View>
+                    ) : productions.length === 0 ? (
                         <Text className="text-center text-2xl my-6 font-bold">
                             No productions yet...
                         </Text>
