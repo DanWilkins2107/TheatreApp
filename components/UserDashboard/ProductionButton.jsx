@@ -1,9 +1,10 @@
 import { View, Text, TouchableOpacity } from "react-native";
 
-export default function ProductionButton({ production }) {
+export default function ProductionButton({ navigation, production }) {
     let participantString = `${Object.keys(production.participants).length} participant${Object.keys(production.participants).length === 1 ? "" : "s"}`;
+    
     return (
-        <TouchableOpacity className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 ">
+        <TouchableOpacity onPress={() => navigation.navigate("ProductionDashboard", {playCode: production.playCode})} className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 ">
             <Text className="text-2xl font-extrabold text-ellipsis" numberOfLines={1}>
                 {production.playName}
             </Text>

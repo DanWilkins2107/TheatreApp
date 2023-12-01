@@ -1,6 +1,6 @@
 import { Modal, View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
-import { onValue, get, ref, child, set } from "firebase/database";
+import { onValue, get, ref, child } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
@@ -121,7 +121,13 @@ export default function UserDashboardScreen({ navigation }) {
                         </Text>
                     ) : (
                         productions.map((production, index) => {
-                            return <ProductionButton production={production} key={index} />;
+                            return (
+                                <ProductionButton
+                                    navigation={navigation}
+                                    production={production}
+                                    key={index}
+                                />
+                            );
                         })
                     )}
                 </ScrollView>
