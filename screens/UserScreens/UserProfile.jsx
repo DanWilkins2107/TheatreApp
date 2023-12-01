@@ -117,6 +117,8 @@ export default function UserProfileScreen({ navigation }) {
         });
     };
 
+    //TODO: Add form validation for all of the modals
+
     return (
         <>
             {modals.map((item) => {
