@@ -3,9 +3,9 @@ import GeneralModal from "../GeneralModal/GeneralModal.jsx";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import { useState, useEffect } from "react";
 import EditInfo from "../Form/EditInfo.jsx";
-``;
 import { set, ref, get } from "firebase/database";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
+import { updateProfile } from "firebase/auth";
 
 
 export default function ContactInformationModal(props) {
@@ -21,8 +21,8 @@ export default function ContactInformationModal(props) {
         get(userRef).then((userSnapshot) => {
             if (!userSnapshot.exists()) return;
             const userData = userSnapshot.val();
-            setContactNo(userData.contactNo);
-            setInitialContactNo(userData.contactNo);
+            setContactNo(userData.contactNumber);
+            setInitialContactNo(userData.contactNumber);
             setLoading(false);
         });
     }, []);
@@ -36,10 +36,8 @@ export default function ContactInformationModal(props) {
                         title="Contact Number"
                         variableToEdit={contactNo}
                         initialValue={initialContactNo}
-                        onChangeFunction={(text) => {
-                            setContactNo(text);
-                        }}
-                        onSubmitFunction={async() => {
+                        onChange={setContactNo}
+                        onSubmit={() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/contactNumber"), contactNo);
                             setInitialContactNo(contactNo);
                         }}
@@ -49,13 +47,13 @@ export default function ContactInformationModal(props) {
                         title="Email"
                         variableToEdit={email}
                         initialValue={initialEmail}
-                        onChangeFunction={(text) => {
-                            setEmail(text);
-                        }}
-                        onSubmitFunction={async () => {
-                            await updateProfile(response.user, { email: `${email}`});
+                        onChange={setEmail}
+                        onSubmit={() => {
+                            updateProfile(auth.currentUser, { email: email });
+                            set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
                             setInitialEmail(email);
-                        }}
+                        }
+                    }
                     />
                 </View>
             )}

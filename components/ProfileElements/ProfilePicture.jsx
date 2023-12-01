@@ -1,5 +1,5 @@
 
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 
 export default function ProfilePicture({loading, profileURL, displayName}) {

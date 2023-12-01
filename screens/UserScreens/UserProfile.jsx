@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { get, child, ref as dbRef } from "firebase/database";
+import { get, child, ref as dbRef, onValue } from "firebase/database";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
@@ -24,9 +24,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
-    let [modal, setModal] = useState(null);
-    let auth = firebase_auth;
-    let db = firebase_db;
+    const [modal, setModal] = useState(null);
+    const auth = firebase_auth;
+    const db = firebase_db;
     const storageRef = ref(storage);
 
     useEffect(() => {

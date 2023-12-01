@@ -6,7 +6,7 @@ export default function GeneralModal({ closeModal, children }) {
     return (
         <View className="flex flex-1 justify-center items-center bg-[#FFFFFF90]">
             <View className={`w-10/12 h-2/5 border-2 rounded-xl  bg-white`}>
-                <ScrollView className="flex flex-col" scrollEnabled={false}>
+                <ScrollView className="flex flex-col" scrollEnabled={false} keyboardShouldPersistTaps="handled">
                     <View className="flex-row">
                         <TouchableOpacity
                             onPress={closeModal}

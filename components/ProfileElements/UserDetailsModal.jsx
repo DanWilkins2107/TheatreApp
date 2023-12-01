@@ -3,7 +3,6 @@ import GeneralModal from "../GeneralModal/GeneralModal.jsx";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import { useState, useEffect } from "react";
 import EditInfo from "../Form/EditInfo.jsx";
-``;
 import { set, ref, get } from "firebase/database";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 
@@ -37,10 +36,8 @@ export default function UserDetailsModal(props) {
                         title="First Name"
                         variableToEdit={firstName}
                         initialValue={initialFirstName}
-                        onChangeFunction={(text) => {
-                            setFirstName(_old => text)
-                        }}
-                        onSubmitFunction={() => {
+                        onChange={setFirstName}
+                        onSubmit={() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/firstName"), firstName);
                             setInitialFirstName(firstName);
                         }}
@@ -50,8 +47,8 @@ export default function UserDetailsModal(props) {
                         title="Last Name"
                         variableToEdit={lastName}
                         initialValue={initialLastName}
-                        onChangeFunction={(text) => setLastName(_old => text)}
-                        onSubmitFunction={() => {
+                        onChange={setLastName}
+                        onSubmit={() => {
                             set(ref(db, "users/" + auth.currentUser.uid + "/lastName"), lastName);
                             setInitialLastName(lastName);
                         }}
