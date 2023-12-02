@@ -9,7 +9,7 @@ import { firebase_auth } from "./firebase.config.js";
 import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
 import UserProfileScreen from "./screens/UserScreens/UserProfile.jsx";
-import ProductionDashboardScreen from "./screens/UserScreens/ProductionDashboard.jsx";
+import ProductionDashboardScreen from "./screens/ProductionScreens/ProductionDashboard.jsx";
 
 const Stack = createNativeStackNavigator();
 

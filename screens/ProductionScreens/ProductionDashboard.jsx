@@ -11,25 +11,20 @@ export default function ProductionDashboardScreen({ route }) {
     const playCode = route.params.playCode;
     const db = firebase_db;
 
-    useEffect(
-        () =>
-            onValue(
-                ref(db, `/productions/${playCode}`),
-                (snapshot) => {
-                    if (!snapshot.exists()) {
-                        setLoading(false);
-                        return;
-                    }
-                    const data = snapshot.val();
-                    setProduction(data);
-                    setLoading(false);
-                },
-                { onlyOnce: true }
-            ),
-        []
-    );
-
     useEffect(() => {
+        onValue(
+            ref(db, `/productions/${playCode}`),
+            (snapshot) => {
+                if (!snapshot.exists()) {
+                    setLoading(false);
+                    return;
+                }
+                const data = snapshot.val();
+                setProduction(data);
+            },
+            { onlyOnce: true }
+        );
+
         onValue(ref(db, `/productions/${playCode}/admins`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const adminData = snapshot.val();
@@ -68,8 +63,10 @@ export default function ProductionDashboardScreen({ route }) {
             );
 
             setParticipants(newParticipants);
+            setLoading(false);
         });
-    }, [production]);
+
+    }, []);
 
     return (
         <View className="flex-col">
