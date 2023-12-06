@@ -36,3 +36,7 @@ yarn-error.*
 
 # security
 /firebase.config.js
+
+# vscode folder
+.vscode/
+

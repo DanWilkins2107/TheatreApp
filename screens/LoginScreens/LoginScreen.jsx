@@ -1,9 +1,10 @@
-import { View, Button, KeyboardAvoidingView, Image, ActivityIndicator } from "react-native";
+import { View, Button, KeyboardAvoidingView, Image } from "react-native";
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
 import { firebase_auth } from "../../firebase.config.js";
+import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -45,9 +46,7 @@ export default function LoginScreen({ navigation }) {
                     onChangeText={(text) => setPassword(text.replace(/\s/g, ""))}
                 />
                 {loading ? (
-                    <View className="h-20">
-                        <ActivityIndicator size="large" color="#f1f5f9" />
-                    </View>
+                    <LoadingWheel />
                 ) : (
                     <>
                         <FormButton title="Login" onPress={handleLogin} />

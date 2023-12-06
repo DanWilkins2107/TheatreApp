@@ -1,9 +1,9 @@
-import { Text, View, Button, KeyboardAvoidingView, ActivityIndicator } from "react-native";
+import { Text, View, Button, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
-import { sendPasswordResetEmail } from "firebase/auth";
 import FormField from "../../components/Form/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/Form/FormButton.jsx";
+import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 
 export default function ForgottenPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -37,7 +37,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
                     onChangeText={(text) => setEmail(text.replace(/\s/g, ""))}
                 />
                 {loading ? (
-                    <ActivityIndicator size="large" color="#f1f5f9" />
+                    <LoadingWheel />
                 ) : (
                     <FormButton title="Send Reset Link" onPress={handlePasswordReset} />
                 )}

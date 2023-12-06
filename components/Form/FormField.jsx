@@ -11,6 +11,7 @@ export default function FormField(props) {
             autoCapitalize={props.autoCapitalize || "words"}
             secureTextEntry={props.secureTextEntry || false}
             onChangeText={props.onChangeText}
+            multiline={props.multiline || false}
         />
     );
 }
