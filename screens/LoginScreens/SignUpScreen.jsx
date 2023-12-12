@@ -7,6 +7,25 @@ import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 
+function ChooseProfileColor() {
+    const colorArray = [
+        "#ff0000",
+        "#ddaa00",
+        "#00ff00",
+        "#00aaff",
+        "#0000ff",
+        "#aa00ff",
+        "#ff00aa",
+        "#ffaaaa",
+        "#aaffaa",
+        "#aaaaff",
+        "#ffffaa",
+        "#ffaaff",
+    ];
+
+    return colorArray[Math.floor(Math.random() * colorArray.length)];
+}
+
 export default function SignUpScreen({ navigation }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -28,10 +47,12 @@ export default function SignUpScreen({ navigation }) {
             setLoading(true);
             const response = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(response.user, { displayName: `${firstName} ${lastName}` });
+            const color = ChooseProfileColor();
             set(ref(db, "users/" + response.user.uid), {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
+                profileBackground: color,
             });
         } catch (error) {
             alert(`Sign up failed: ${error.message}`);

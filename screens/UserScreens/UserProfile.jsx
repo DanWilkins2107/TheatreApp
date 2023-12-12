@@ -146,9 +146,9 @@ export default function UserProfileScreen({ navigation }) {
                     >
                         <ProfilePicture
                             className="z-10"
-                            loading={loading}
-                            profileURL={profileURL}
-                            displayName={`${userName[0]} ${userName[1]}`}
+                            dimensions={28}
+                            textSize="4xl"
+                            userId={auth.currentUser.uid}
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
                             <FontAwesomeIcon icon={(faPencil)} size={25}/>
