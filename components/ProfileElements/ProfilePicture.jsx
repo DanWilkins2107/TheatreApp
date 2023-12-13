@@ -1,10 +1,10 @@
 import { Image, Text, View } from "react-native";
-import LoadingWheel from "../Loading/LoadingWheel.jsx"
+import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { useState, useEffect } from "react";
 import { firebase_db } from "../../firebase.config.js";
-import { ref, get } from "firebase/database"
+import { ref, onValue } from "firebase/database";
 
-export default function ProfilePicture({dimensions, textSize, userId}) {
+export default function ProfilePicture({ dimensions, textSize, userId }) {
     const [loading, setLoading] = useState(true);
     const [profileURL, setProfileURL] = useState("");
     const [initials, setInitials] = useState("");
@@ -13,7 +13,8 @@ export default function ProfilePicture({dimensions, textSize, userId}) {
     useEffect(() => {
         const db = firebase_db;
         const userRef = ref(db, "users/" + userId);
-        get(userRef).then((userSnapshot) => {
+
+        onValue(userRef, (userSnapshot) => {
             if (!userSnapshot.exists()) return;
             const userData = userSnapshot.val();
             setProfileURL(userData.profileURL);
@@ -21,13 +22,14 @@ export default function ProfilePicture({dimensions, textSize, userId}) {
             setBackgroundColor(userData.profileBackground || "white");
             setLoading(false);
         });
-    }
-    , []);
+    }, []);
 
     return (
         <>
             {loading ? (
-                <View className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`}>
+                <View
+                    className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`}
+                >
                     <LoadingWheel />
                 </View>
             ) : profileURL ? (
@@ -40,10 +42,11 @@ export default function ProfilePicture({dimensions, textSize, userId}) {
                 />
             ) : (
                 // Style is due to errors occurring w string interpolation in background colour
-                <View className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`} style={{backgroundColor: backgroundColor}}>
-                    <Text className={`font-extrabold ${textSize} p-0 m-0`}>
-                        {initials}
-                    </Text>
+                <View
+                    className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`}
+                    style={{ backgroundColor: backgroundColor }}
+                >
+                    <Text className={`font-extrabold ${textSize} p-0 m-0`}>{initials}</Text>
                 </View>
             )}
         </>

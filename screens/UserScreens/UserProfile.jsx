@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { get, child, ref as dbRef, onValue } from "firebase/database";
+import { get, child, ref as dbRef, set } from "firebase/database";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
@@ -80,12 +80,9 @@ export default function UserProfileScreen({ navigation }) {
         },
     ];
 
-    const [profileURL, setProfileURL] = useState(firebase_auth.currentUser.photoURL || null);
-    const [loading, setLoading] = useState(false);
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
-                setLoading(true);
                 fetch(response.assets[0].uri).then((image) => {
                     image.blob().then((blob) => {
                         uploadBytes(
@@ -104,9 +101,7 @@ export default function UserProfileScreen({ navigation }) {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
-                                    set(ref(db, "users/" + auth.currentUser.uid + "/profilePicture"), url);
-                                    setProfileURL(url);
-                                    setLoading(false);
+                                    set(dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"), url);
                                 })
                                 .catch((error) => {
                                     console.log(error);
