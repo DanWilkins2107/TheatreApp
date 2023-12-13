@@ -18,7 +18,7 @@ export default function ProfilePicture({dimensions, textSize, userId}) {
             const userData = userSnapshot.val();
             setProfileURL(userData.profileURL);
             setInitials(userData.firstName[0] + userData.lastName[0]);
-            setBackgroundColor(userData.profileBackground);
+            setBackgroundColor(userData.profileBackground || "white");
             setLoading(false);
         });
     }
@@ -39,8 +39,9 @@ export default function ProfilePicture({dimensions, textSize, userId}) {
                     resizeMode="cover"
                 />
             ) : (
-                <View className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center bg-[${backgroundColor}]`}>
-                    <Text className={`font-extrabold text-${textSize} p-0 m-0`}>
+                // Style is due to errors occurring w string interpolation in background colour
+                <View className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`} style={{backgroundColor: backgroundColor}}>
+                    <Text className={`font-extrabold ${textSize} p-0 m-0`}>
                         {initials}
                     </Text>
                 </View>
