@@ -5,7 +5,6 @@ export default function ProductionButton({ navigation, production }) {
     const participantString = `${Object.keys(production.participants).length} participant${
         Object.keys(production.participants).length === 1 ? "" : "s"
     }`;
-
     return (
         <TouchableOpacity
             onPress={() =>
@@ -18,20 +17,31 @@ export default function ProductionButton({ navigation, production }) {
             </Text>
             <Text className="text-xl font-semibold">{participantString}</Text>
             <View className="w-max flex flex-row mt-2">
-                {Object.keys(production.participants).map((id) => {
-                    return (
-                        <>
-                            <ProfilePicture
-                                key={id}
-                                dimensions={10}
-                                textSize="2xl"
-                                userId={id}
-                                className="mx-10"
-                            />
-                            <View className="w-1" />
-                        </>
-                    );
-                })}
+                {Object.keys(production.participants)
+                    .slice(0, 5)
+                    .map((id) => {
+                        return (
+                            <>
+                                <ProfilePicture
+                                    key={id}
+                                    dimensions={10}
+                                    textSize="2xl"
+                                    userId={id}
+                                    className="mx-10"
+                                    loadingSize="small"
+                                />
+                                <View className="w-1" />
+                            </>
+                        );
+                    })}
+
+                {Object.keys(production.participants).length > 5 && (
+                    <View className="w-10 h-10 rounded-full bg-white justify-center items-center border-2 border-black">
+                        <Text className="font-semibold">
+                            {`+${Object.keys(production.participants).length - 5}`}
+                        </Text>
+                    </View>
+                )}
             </View>
         </TouchableOpacity>
     );

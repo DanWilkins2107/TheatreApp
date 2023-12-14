@@ -29,7 +29,7 @@ export default function UserDetailsModal(props) {
     return (
         <GeneralModal closeModal={props.closeModal}>
             {loading ? (
-                <LoadingWheel />
+                <LoadingWheel size="large"/>
             ) : (
                 <View className="flex flex-col items-center h-full">
                     <EditInfo

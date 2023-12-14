@@ -145,6 +145,7 @@ export default function UserProfileScreen({ navigation }) {
                             dimensions={32}
                             textSize="text-4xl"
                             userId={auth.currentUser.uid}
+                            loadingSize="large"
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
                             <FontAwesomeIcon icon={(faPencil)} size={25}/>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { firebase_db } from "../../firebase.config.js";
 import { ref, onValue } from "firebase/database";
 
-export default function ProfilePicture({ dimensions, textSize, userId }) {
+export default function ProfilePicture({ dimensions, textSize, userId, loadingSize }) {
     const [loading, setLoading] = useState(true);
     const [profileURL, setProfileURL] = useState("");
     const [initials, setInitials] = useState("");
@@ -18,6 +18,7 @@ export default function ProfilePicture({ dimensions, textSize, userId }) {
             if (!userSnapshot.exists()) return;
             const userData = userSnapshot.val();
             setProfileURL(userData.profileURL);
+            if (!userData.firstName || !userData.lastName) return;
             setInitials(userData.firstName[0] + userData.lastName[0]);
             setBackgroundColor(userData.profileBackground || "white");
             setLoading(false);
@@ -30,7 +31,7 @@ export default function ProfilePicture({ dimensions, textSize, userId }) {
                 <View
                     className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`}
                 >
-                    <LoadingWheel />
+                    <LoadingWheel size={loadingSize}/>
                 </View>
             ) : profileURL ? (
                 <Image
