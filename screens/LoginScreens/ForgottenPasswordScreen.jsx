@@ -4,23 +4,40 @@ import FormField from "../../components/Form/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
+import { sendPasswordResetEmail } from "@firebase/auth";
 
 export default function ForgottenPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const auth = firebase_auth;
 
+    // const handlePasswordReset = async () => {
+    //     setLoading(true);
+    //     try {
+    //         //await sendPasswordResetEmail(email);
+    //         alert("Reset Link Sent");
+    //     } catch (error) {
+    //         console.log(error);
+    //         alert(`Password reset failed: ${error.message}`);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
     const handlePasswordReset = async () => {
         setLoading(true);
-        try {
-            //await sendPasswordResetEmail(email);
-            alert("Reset Link Sent");
-        } catch (error) {
-            console.log(error);
-            alert(`Password reset failed: ${error.message}`);
-        } finally {
-            setLoading(false);
-        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                alert("Reset Link Sent");
+                
+            })
+            .catch((error) => {
+                console.log(error.code, error.message);
+            })
+            .finally(() => {
+                setLoading(false);
+                navigation.navigate("Login");
+            });
     };
 
     return (
