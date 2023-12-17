@@ -27,7 +27,6 @@ export default function UserProfileScreen({ navigation }) {
     const auth = firebase_auth;
     const db = firebase_db;
     const storageRef = ref(storage);
-    console.log("ID = ", auth.currentUser.uid);
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
@@ -53,48 +52,38 @@ export default function UserProfileScreen({ navigation }) {
             get(child(dbRef(db), `users/${auth.currentUser.uid}/productions`)).then((snapshot) => {
                 if (snapshot.exists()) {
                     const productions = snapshot.val();
-                    console.log("reached 1")
                     // Delete user from all productions
                     Object.keys(productions).forEach((playCode) => {
-                        console.log(playCode)
-                        try {
                         remove(
-                            ref(db, `productions/${playCode}/participants/${auth.currentUser.uid}`)
+                            dbRef(
+                                db,
+                                `productions/${playCode}/participants/${auth.currentUser.uid}`
+                            )
                         );
-                        } catch (error) {
-                            console.log("Could not remove participant (Catch 1)")
-                        }
-                        console.log("removed")
                         get(child(dbRef(db), `productions/${playCode}/admins`)).then((snapshot) => {
                             if (snapshot.exists()) {
-                                const admins = snapshot.val();
+                                const admins = Object.keys(snapshot.val());
                                 if (admins.includes(auth.currentUser.uid)) {
-                                    if ((Object.keys(admins).length = 1)) {
-                                        // If length equals 1, add new admin from participants
+                                    if (admins.length === 1) {
+                                        // If only one admin, add someone in from participants or delete production
                                         get(
                                             child(dbRef(db), `productions/${playCode}/participants`)
                                         ).then((snapshot) => {
                                             if (snapshot.exists()) {
-                                                if (snapshot.val().length > 1) {
-                                                    // If there is more than 1 participant, add another as admin
-                                                    const admins = Object.keys(snapshot.val());
-                                                    const newAdmin =
-                                                        admins[0] === auth.currentUser.uid
-                                                            ? admins[1]
-                                                            : admins[0];
-                                                    set(ref(db, `productions/${playCode}/admins`), {
-                                                        [newAdmin]: Date.now(),
-                                                    });
-                                                } else {
-                                                    // If there is only 1 participant, delete production
-                                                    remove(ref(db, `productions/${playCode}`));
-                                                }
+                                                const participants = Object.keys(snapshot.val());
+                                                // If there are other participants, make first one an admin
+                                                set(dbRef(db, `productions/${playCode}/admins`), {
+                                                    [participants[0]]: Date.now(),
+                                                });
+                                            } else {
+                                                // If there are no participants, delete production.
+                                                remove(dbRef(db, `productions/${playCode}`));
                                             }
                                         });
                                     } else {
                                         // If user is in list of admins, but is not the only admin, remove user
                                         remove(
-                                            ref(
+                                            dbRef(
                                                 db,
                                                 `productions/${playCode}/admins/${auth.currentUser.uid}`
                                             )
@@ -106,11 +95,10 @@ export default function UserProfileScreen({ navigation }) {
                     });
                 }
             });
-            // Delete user from database
-            remove(ref(db, `users/${auth.currentUser.uid}`));
-            // Delete user from authentication
-            deleteUser(auth.currentUser);
-
+            // // Delete user from database
+            // remove(ref(db, `users/${auth.currentUser.uid}`));
+            // // Delete user from authentication
+            // deleteUser(auth.currentUser);
         } catch (error) {
             alert("delete account failed:", error.message);
         }

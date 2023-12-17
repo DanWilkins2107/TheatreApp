@@ -24,7 +24,7 @@ export default function UserDashboardScreen({ navigation }) {
     useEffect(() => {
         setLoading(true);
         onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
-            if (!userSnapshot.exists()) {
+            if (!userSnapshot.exists()) {  
                 setLoading(false);
                 return;
             }
