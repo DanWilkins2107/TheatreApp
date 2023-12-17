@@ -2,8 +2,9 @@ import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
 
 export default function ProductionButton({ navigation, production }) {
-    const participantString = `${Object.keys(production.participants).length} participant${
-        Object.keys(production.participants).length === 1 ? "" : "s"
+    const noOfParticipants = Object.keys(production.participants).length;
+    const participantString = `${noOfParticipants} participant${
+        noOfParticipants === 1 ? "" : "s"
     }`;
     return (
         <TouchableOpacity
@@ -35,10 +36,10 @@ export default function ProductionButton({ navigation, production }) {
                         );
                     })}
 
-                {Object.keys(production.participants).length > 5 && (
+                {noOfParticipants > 5 && (
                     <View className="w-10 h-10 rounded-full bg-white justify-center items-center border-2 border-black">
                         <Text className="font-semibold">
-                            {`+${Object.keys(production.participants).length - 5}`}
+                            {`+${noOfParticipants - 5}`}
                         </Text>
                     </View>
                 )}
