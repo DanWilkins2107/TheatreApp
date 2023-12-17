@@ -1,9 +1,9 @@
 import { View, TouchableOpacity, Text, ScrollView, Modal } from "react-native";
 import { signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { updateProfile } from "firebase/auth";
+import { updateProfile, deleteUser } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { get, child, ref as dbRef, set } from "firebase/database";
+import { get, child, ref as dbRef, remove, set } from "firebase/database";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
@@ -21,30 +21,99 @@ import ContactInformationModal from "../../components/ProfileElements/ContactInf
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
-
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
     const [modal, setModal] = useState(null);
     const auth = firebase_auth;
     const db = firebase_db;
     const storageRef = ref(storage);
+    console.log("ID = ", auth.currentUser.uid);
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
-            setUserName(snapshot.exists() ? [snapshot.val().firstName, snapshot.val().lastName] : "Anonymous");
+            setUserName(
+                snapshot.exists()
+                    ? [snapshot.val().firstName, snapshot.val().lastName]
+                    : "Anonymous"
+            );
         });
     }, []);
 
     const handleSignOut = () => {
         try {
             signOut(auth);
-        } catch (error) { 
+        } catch (error) {
             alert("sign out failed:", error.message);
         }
     };
 
     const handleDeleteAccount = () => {
-        alert("Delete Account");
+        try {
+            // Find all of user's productions
+            get(child(dbRef(db), `users/${auth.currentUser.uid}/productions`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const productions = snapshot.val();
+                    console.log("reached 1")
+                    // Delete user from all productions
+                    Object.keys(productions).forEach((playCode) => {
+                        console.log(playCode)
+                        try {
+                        remove(
+                            ref(db, `productions/${playCode}/participants/${auth.currentUser.uid}`)
+                        );
+                        } catch (error) {
+                            console.log("Could not remove participant (Catch 1)")
+                        }
+                        console.log("removed")
+                        get(child(dbRef(db), `productions/${playCode}/admins`)).then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const admins = snapshot.val();
+                                if (admins.includes(auth.currentUser.uid)) {
+                                    if ((Object.keys(admins).length = 1)) {
+                                        // If length equals 1, add new admin from participants
+                                        get(
+                                            child(dbRef(db), `productions/${playCode}/participants`)
+                                        ).then((snapshot) => {
+                                            if (snapshot.exists()) {
+                                                if (snapshot.val().length > 1) {
+                                                    // If there is more than 1 participant, add another as admin
+                                                    const admins = Object.keys(snapshot.val());
+                                                    const newAdmin =
+                                                        admins[0] === auth.currentUser.uid
+                                                            ? admins[1]
+                                                            : admins[0];
+                                                    set(ref(db, `productions/${playCode}/admins`), {
+                                                        [newAdmin]: Date.now(),
+                                                    });
+                                                } else {
+                                                    // If there is only 1 participant, delete production
+                                                    remove(ref(db, `productions/${playCode}`));
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        // If user is in list of admins, but is not the only admin, remove user
+                                        remove(
+                                            ref(
+                                                db,
+                                                `productions/${playCode}/admins/${auth.currentUser.uid}`
+                                            )
+                                        );
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+            // Delete user from database
+            remove(ref(db, `users/${auth.currentUser.uid}`));
+            // Delete user from authentication
+            deleteUser(auth.currentUser);
+
+        } catch (error) {
+            alert("delete account failed:", error.message);
+        }
     };
 
     const modals = [
@@ -148,9 +217,8 @@ export default function UserProfileScreen({ navigation }) {
                             loadingSize="large"
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
-                            <FontAwesomeIcon icon={(faPencil)} size={25}/>
+                            <FontAwesomeIcon icon={faPencil} size={25} />
                         </View>
-
                     </TouchableOpacity>
                     <View className="flex-1 flex-col">
                         <Text
