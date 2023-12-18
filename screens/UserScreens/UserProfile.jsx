@@ -46,6 +46,7 @@ export default function UserProfileScreen({ navigation }) {
         }
     };
 
+    // TODO: Check this works w multiple admins!
     const handleDeleteAccount = () => {
         try {
             // Find all of user's productions
@@ -95,11 +96,16 @@ export default function UserProfileScreen({ navigation }) {
                     });
                 }
             });
-            // // Delete user from database
-            // remove(ref(db, `users/${auth.currentUser.uid}`));
-            // // Delete user from authentication
-            // deleteUser(auth.currentUser);
+            // Delete user from database
+            remove(dbRef(db, `users/${auth.currentUser.uid}`));
         } catch (error) {
+            alert("delete account failed:", error.message);
+        }
+        try {
+            // Delete user from authentication
+            deleteUser(auth.currentUser);
+        }
+        catch (error) {
             alert("delete account failed:", error.message);
         }
     };
