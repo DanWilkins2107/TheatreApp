@@ -1,9 +1,9 @@
 import { View, ActivityIndicator } from "react-native";
 
-export default function LoadingWheel() {
+export default function LoadingWheel({size}) {
     return (
-        <View className="flex flex-row h-5/6 justify-center">
-            <ActivityIndicator size="large" color="black" />
+        <View className="flex flex-row flex-1 justify-center">
+            <ActivityIndicator size={size} color="black" />
         </View>
     );
 }   

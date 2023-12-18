@@ -19,7 +19,7 @@ export default function ReportErrorModal(props) {
                     />
                 </View>
                 <SmallFormButton
-                    backgroundColor="green-400"
+                    backgroundColor="bg-green-400"
                     title="Submit"
                     onPress={() => {
                         alert("Report submitted!");

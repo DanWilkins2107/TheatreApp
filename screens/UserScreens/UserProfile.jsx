@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { get, child, ref as dbRef, onValue } from "firebase/database";
+import { get, child, ref as dbRef, set } from "firebase/database";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
@@ -80,12 +80,9 @@ export default function UserProfileScreen({ navigation }) {
         },
     ];
 
-    const [profileURL, setProfileURL] = useState(firebase_auth.currentUser.photoURL || null);
-    const [loading, setLoading] = useState(false);
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
-                setLoading(true);
                 fetch(response.assets[0].uri).then((image) => {
                     image.blob().then((blob) => {
                         uploadBytes(
@@ -104,8 +101,7 @@ export default function UserProfileScreen({ navigation }) {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
-                                    setProfileURL(url);
-                                    setLoading(false);
+                                    set(dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"), url);
                                 })
                                 .catch((error) => {
                                     console.log(error);
@@ -139,23 +135,24 @@ export default function UserProfileScreen({ navigation }) {
             <ScrollView className="flex flex-col h-full">
                 <View className="w-max bg-white flex-row rounded-3xl px-4 m-2 border-2 align-middle items-center">
                     <TouchableOpacity
-                        className="m-3 w-max"
+                        className="my-3 w-32"
                         onPress={() => {
                             handleProfileChange();
                         }}
                     >
                         <ProfilePicture
                             className="z-10"
-                            loading={loading}
-                            profileURL={profileURL}
-                            displayName={`${userName[0]} ${userName[1]}`}
+                            dimensions={32}
+                            textSize="text-4xl"
+                            userId={auth.currentUser.uid}
+                            loadingSize="large"
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
                             <FontAwesomeIcon icon={(faPencil)} size={25}/>
                         </View>
 
                     </TouchableOpacity>
-                    <View className="w-[212] flex-col">
+                    <View className="flex-1 flex-col">
                         <Text
                             className="ml-4 text-xl font-extrabold text-ellipsis"
                             numberOfLines={1}

@@ -9,12 +9,12 @@ export default function EditInfo(props) {
             <FormField value={props.variableToEdit} onChangeText={(text) => props.onChange(text)} />
             <View className="flex flex-row justify-around">
                 <SmallFormButton
-                    backgroundColor="green-400"
+                    backgroundColor="bg-green-400"
                     title="Submit"
                     onPress={props.onSubmit}
                 />
                 <SmallFormButton
-                    backgroundColor="white"
+                    backgroundColor="bg-white"
                     title="Reset"
                     onPress={() => props.onChange(props.initialValue)}
                 />
