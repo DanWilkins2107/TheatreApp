@@ -51,50 +51,49 @@ export default function UserProfileScreen({ navigation }) {
         try {
             // Find all of user's productions
             get(child(dbRef(db), `users/${auth.currentUser.uid}/productions`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const productions = snapshot.val();
-                    // Delete user from all productions
-                    Object.keys(productions).forEach((playCode) => {
-                        remove(
-                            dbRef(
-                                db,
-                                `productions/${playCode}/participants/${auth.currentUser.uid}`
-                            )
-                        );
-                        get(child(dbRef(db), `productions/${playCode}/admins`)).then((snapshot) => {
-                            if (snapshot.exists()) {
-                                const admins = Object.keys(snapshot.val());
-                                if (admins.includes(auth.currentUser.uid)) {
-                                    if (admins.length === 1) {
-                                        // If only one admin, add someone in from participants or delete production
-                                        get(
-                                            child(dbRef(db), `productions/${playCode}/participants`)
-                                        ).then((snapshot) => {
-                                            if (snapshot.exists()) {
-                                                const participants = Object.keys(snapshot.val());
-                                                // If there are other participants, make first one an admin
-                                                set(dbRef(db, `productions/${playCode}/admins`), {
-                                                    [participants[0]]: Date.now(),
-                                                });
-                                            } else {
-                                                // If there are no participants, delete production.
-                                                remove(dbRef(db, `productions/${playCode}`));
-                                            }
-                                        });
-                                    } else {
-                                        // If user is in list of admins, but is not the only admin, remove user
-                                        remove(
-                                            dbRef(
-                                                db,
-                                                `productions/${playCode}/admins/${auth.currentUser.uid}`
-                                            )
-                                        );
-                                    }
-                                }
-                            }
-                        });
-                    });
+                if (!snapshot.exists()) {
+                    return;
                 }
+                const productions = snapshot.val();
+                // Delete user from all productions
+                Object.keys(productions).forEach((playCode) => {
+                    remove(
+                        dbRef(db, `productions/${playCode}/participants/${auth.currentUser.uid}`)
+                    );
+                    get(child(dbRef(db), `productions/${playCode}/admins`)).then((snapshot) => {
+                        if (!snapshot.exists()) {
+                            return;
+                        }
+                        const admins = Object.keys(snapshot.val());
+                        if (admins.includes(auth.currentUser.uid)) {
+                            if (admins.length === 1) {
+                                // If only one admin, add someone in from participants or delete production
+                                get(child(dbRef(db), `productions/${playCode}/participants`)).then(
+                                    (snapshot) => {
+                                        if (snapshot.exists()) {
+                                            const participants = Object.keys(snapshot.val());
+                                            // If there are other participants, make first one an admin
+                                            set(dbRef(db, `productions/${playCode}/admins`), {
+                                                [participants[0]]: Date.now(),
+                                            });
+                                        } else {
+                                            // If there are no participants, delete production.
+                                            remove(dbRef(db, `productions/${playCode}`));
+                                        }
+                                    }
+                                );
+                            } else {
+                                // If user is in list of admins, but is not the only admin, remove user
+                                remove(
+                                    dbRef(
+                                        db,
+                                        `productions/${playCode}/admins/${auth.currentUser.uid}`
+                                    )
+                                );
+                            }
+                        }
+                    });
+                });
             });
             // Delete user from database
             remove(dbRef(db, `users/${auth.currentUser.uid}`));
@@ -104,8 +103,7 @@ export default function UserProfileScreen({ navigation }) {
         try {
             // Delete user from authentication
             deleteUser(auth.currentUser);
-        }
-        catch (error) {
+        } catch (error) {
             alert("delete account failed:", error.message);
         }
     };
@@ -164,7 +162,10 @@ export default function UserProfileScreen({ navigation }) {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
-                                    set(dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"), url);
+                                    set(
+                                        dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"),
+                                        url
+                                    );
                                 })
                                 .catch((error) => {
                                     console.log(error);
