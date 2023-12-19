@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { useState, useEffect, useContext } from "react";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { get, ref, onValue } from "firebase/database";
 import { firebase_db } from "../../firebase.config.js";
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 
 export default function ProductionDashboardScreen({ route }) {
     const [production, setProduction] = useState({});
@@ -10,6 +11,7 @@ export default function ProductionDashboardScreen({ route }) {
     const [loading, setLoading] = useState(true);
     const playCode = route.params.playCode;
     const db = firebase_db;
+    const { setAlert } = useContext(AlertContext);
 
     useEffect(() => {
         onValue(
@@ -65,7 +67,6 @@ export default function ProductionDashboardScreen({ route }) {
             setParticipants(newParticipants);
             setLoading(false);
         });
-
     }, []);
 
     return (
@@ -103,6 +104,13 @@ export default function ProductionDashboardScreen({ route }) {
                     </View>
                 </>
             )}
+            <TouchableOpacity
+                onPress={() => {
+                    setAlert("Test Alert", "red", "error");
+                }}
+            >
+                <Text>Test Alert</Text>
+            </TouchableOpacity>
         </View>
     );
 }
