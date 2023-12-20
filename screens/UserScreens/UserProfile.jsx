@@ -18,7 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx";
 import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
-import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
+import HelpModal from "../../components/ProfileElements/HelpModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
