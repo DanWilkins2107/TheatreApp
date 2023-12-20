@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Text, ScrollView, Modal } from "react-native";
 import { signOut } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { updateProfile, deleteUser } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { get, child, ref as dbRef, remove, set } from "firebase/database";
@@ -20,6 +20,7 @@ import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx"
 import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
@@ -27,6 +28,7 @@ export default function UserProfileScreen({ navigation }) {
     const auth = firebase_auth;
     const db = firebase_db;
     const storageRef = ref(storage);
+    const { setAlert } = useContext(AlertContext);
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
@@ -168,7 +170,7 @@ export default function UserProfileScreen({ navigation }) {
                                     );
                                 })
                                 .catch((error) => {
-                                    console.log(error);
+                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circleExclamation"}));
                                 });
                         });
                     });
