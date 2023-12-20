@@ -21,7 +21,7 @@ import ContactInformationModal from "../../components/ProfileElements/ContactInf
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
-
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
@@ -33,14 +33,18 @@ export default function UserProfileScreen({ navigation }) {
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
-            setUserName(snapshot.exists() ? [snapshot.val().firstName, snapshot.val().lastName] : "Anonymous");
+            setUserName(
+                snapshot.exists()
+                    ? [snapshot.val().firstName, snapshot.val().lastName]
+                    : "Anonymous"
+            );
         });
     }, []);
 
     const handleSignOut = () => {
         try {
             signOut(auth);
-        } catch (error) { 
+        } catch (error) {
             alert("sign out failed:", error.message);
         }
     };
@@ -85,37 +89,42 @@ export default function UserProfileScreen({ navigation }) {
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
-                fetch(response.assets[0].uri).then((image) => {
-                    image.blob().then((blob) => {
-                        uploadBytes(
-                            ref(
-                                storageRef,
-                                "images/" +
-                                    auth.currentUser.uid +
-                                    response.assets[0].fileName.substring(
-                                        response.assets[0].fileName.lastIndexOf(".")
-                                    )
-                            ),
-                            blob
-                        ).then((snapshot) => {
-                            getDownloadURL(snapshot.ref)
-                                .then((url) => {
+                try {
+                    fetch(response.assets[0].uri).then((image) => {
+                        image.blob().then((blob) => {
+                            uploadBytes(
+                                ref(
+                                    storageRef,
+                                    "images/" +
+                                        auth.currentUser.uid +
+                                        response.assets[0].fileName.substring(
+                                            response.assets[0].fileName.lastIndexOf(".")
+                                        )
+                                ),
+                                blob
+                            ).then((snapshot) => {
+                                getDownloadURL(snapshot.ref).then((url) => {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
-                                    set(dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"), url);
-                                })
-                                .catch((error) => {
-                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circleExclamation"}));
+                                    set(
+                                        dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"),
+                                        url
+                                    );
                                 });
+                            });
                         });
                     });
-                });
+                } catch (error) {
+                    setAlert(
+                        "Error uploading profile picture",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
             }
         });
     };
-
-    //TODO: Add form validation for all of the modals
 
     return (
         <>
@@ -150,9 +159,8 @@ export default function UserProfileScreen({ navigation }) {
                             loadingSize="large"
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
-                            <FontAwesomeIcon icon={(faPencil)} size={25}/>
+                            <FontAwesomeIcon icon={faPencil} size={25} />
                         </View>
-
                     </TouchableOpacity>
                     <View className="flex-1 flex-col">
                         <Text
