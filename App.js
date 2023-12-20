@@ -27,62 +27,64 @@ export default function App() {
     }, []);
 
     return (
-        <>
-        <View className="h-2/3 w-2/3 bg-green-400 z-20 absolute">
-            <Text>
-                
-            </Text>
-        </View>
-        <NavigationContainer className="z-10 absolute">
-            <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}>
-                {user ? (
-                    <>
-                        <Stack.Screen
-                            name="UserDashboard"
-                            component={UserDashboardScreen}
-                            options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} firstScreen />,
-                                headerBackVisible: false,
-                            })}
-                        />
-                        <Stack.Screen
-                            name="ProductionDashboard"
-                            component={ProductionDashboardScreen}
-                            options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} />,
-                                headerBackVisible: false,
-                            })}
-                        />
-                        <Stack.Screen
-                            name="UserProfile"
-                            component={UserProfileScreen}
-                            options={({ navigation }) => ({
-                                headerTitle: () => <Header navigation={navigation} profileScreen />,
-                                headerBackVisible: false,
-                            })}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <Stack.Screen
-                            name="Login"
-                            component={LoginScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="SignUp"
-                            component={SignUpScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="ForgottenPassword"
-                            component={ForgottenPasswordScreen}
-                            options={{ headerShown: false }}
-                        />
-                    </>
-                )}
-            </Stack.Navigator>
-        </NavigationContainer>
-        </>
+        <AlertProvider>
+            <View className="h-fit w-full z-20 absolute">
+                <Alert />
+            </View>
+            <NavigationContainer className="z-10 absolute">
+                <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}>
+                    {user ? (
+                        <>
+                            <Stack.Screen
+                                name="UserDashboard"
+                                component={UserDashboardScreen}
+                                options={({ navigation }) => ({
+                                    headerTitle: () => (
+                                        <Header navigation={navigation} firstScreen />
+                                    ),
+                                    headerBackVisible: false,
+                                })}
+                            />
+                            <Stack.Screen
+                                name="ProductionDashboard"
+                                component={ProductionDashboardScreen}
+                                options={({ navigation }) => ({
+                                    headerTitle: () => <Header navigation={navigation} />,
+                                    headerBackVisible: false,
+                                })}
+                            />
+                            <Stack.Screen
+                                name="UserProfile"
+                                component={UserProfileScreen}
+                                options={({ navigation }) => ({
+                                    headerTitle: () => (
+                                        <Header navigation={navigation} profileScreen />
+                                    ),
+                                    headerBackVisible: false,
+                                })}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <Stack.Screen
+                                name="Login"
+                                component={LoginScreen}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="SignUp"
+                                component={SignUpScreen}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="ForgottenPassword"
+                                component={ForgottenPasswordScreen}
+                                options={{ headerShown: false }}
+                            />
+                        </>
+                    )}
+                </Stack.Navigator>
+            </NavigationContainer>
+        </AlertProvider>
     );
 }
