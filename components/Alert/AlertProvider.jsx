@@ -1,9 +1,11 @@
 import { createContext, useState } from "react";
+import { Text } from "react-native";
 
 const initialState = {
     text: "",
     color: "",
     icon: "",
+    totalAlerts: 0,
 };
 
 export const AlertContext = createContext({ ...initialState, setAlert: () => {} });
