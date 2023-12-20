@@ -21,6 +21,7 @@ import ContactInformationModal from "../../components/ProfileElements/ContactInf
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
@@ -146,21 +147,21 @@ export default function UserProfileScreen({ navigation }) {
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
-                fetch(response.assets[0].uri).then((image) => {
-                    image.blob().then((blob) => {
-                        uploadBytes(
-                            ref(
-                                storageRef,
-                                "images/" +
-                                    auth.currentUser.uid +
-                                    response.assets[0].fileName.substring(
-                                        response.assets[0].fileName.lastIndexOf(".")
-                                    )
-                            ),
-                            blob
-                        ).then((snapshot) => {
-                            getDownloadURL(snapshot.ref)
-                                .then((url) => {
+                try {
+                    fetch(response.assets[0].uri).then((image) => {
+                        image.blob().then((blob) => {
+                            uploadBytes(
+                                ref(
+                                    storageRef,
+                                    "images/" +
+                                        auth.currentUser.uid +
+                                        response.assets[0].fileName.substring(
+                                            response.assets[0].fileName.lastIndexOf(".")
+                                        )
+                                ),
+                                blob
+                            ).then((snapshot) => {
+                                getDownloadURL(snapshot.ref).then((url) => {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
@@ -172,14 +173,19 @@ export default function UserProfileScreen({ navigation }) {
                                 .catch((error) => {
                                     setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circleExclamation"}));
                                 });
+                            });
                         });
                     });
-                });
+                } catch (error) {
+                    setAlert(
+                        "Error uploading profile picture",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
             }
         });
     };
-
-    //TODO: Add form validation for all of the modals
 
     return (
         <>
