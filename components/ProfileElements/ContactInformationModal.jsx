@@ -1,12 +1,13 @@
 import { View } from "react-native";
 import GeneralModal from "../GeneralModal/GeneralModal.jsx";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import EditInfo from "../Form/EditInfo.jsx";
 import { set, ref, get } from "firebase/database";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { updateProfile } from "firebase/auth";
-
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function ContactInformationModal(props) {
     const db = firebase_db;
@@ -16,6 +17,8 @@ export default function ContactInformationModal(props) {
     const [contactNo, setContactNo] = useState("");
     const [initialEmail, setInitialEmail] = useState(auth.currentUser.email);
     const [email, setEmail] = useState(auth.currentUser.email);
+    const { setAlert } = useContext(AlertContext);
+
     useEffect(() => {
         const userRef = ref(db, "users/" + auth.currentUser.uid);
         get(userRef).then((userSnapshot) => {
@@ -26,10 +29,11 @@ export default function ContactInformationModal(props) {
             setLoading(false);
         });
     }, []);
+
     return (
         <GeneralModal closeModal={props.closeModal}>
             {loading ? (
-                <LoadingWheel size="large"/>
+                <LoadingWheel size="large" />
             ) : (
                 <View className="flex flex-col items-center h-full">
                     <EditInfo
@@ -38,8 +42,24 @@ export default function ContactInformationModal(props) {
                         initialValue={initialContactNo}
                         onChange={setContactNo}
                         onSubmit={() => {
-                            set(ref(db, "users/" + auth.currentUser.uid + "/contactNumber"), contactNo);
-                            setInitialContactNo(contactNo);
+                            try {
+                                set(
+                                    ref(db, "users/" + auth.currentUser.uid + "/contactNumber"),
+                                    contactNo
+                                );
+                                setInitialContactNo(contactNo);
+                                setAlert(
+                                    "Contact number updated successfully",
+                                    "bg-green-500",
+                                    icon({ name: "circle-check" })
+                                );
+                            } catch (error) {
+                                setAlert(
+                                    "Error updating Contact Number. Please Try Again.",
+                                    "bg-red-500",
+                                    icon({ name: "circle-exclamation" })
+                                );
+                            }
                         }}
                     />
                     <View className="h-8"></View>
@@ -49,11 +69,23 @@ export default function ContactInformationModal(props) {
                         initialValue={initialEmail}
                         onChange={setEmail}
                         onSubmit={() => {
-                            updateProfile(auth.currentUser, { email: email });
-                            set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
-                            setInitialEmail(email);
-                        }
-                    }
+                            try {
+                                updateProfile(auth.currentUser, { email: email });
+                                set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
+                                setInitialEmail(email);
+                                setAlert(
+                                    "Email updated successfully",
+                                    "bg-green-500",
+                                    icon({ name: "circle-check" })
+                                );
+                            } catch (error) {
+                                setAlert(
+                                    "Could not update email. Please Try Again.",
+                                    "bg-red-500",
+                                    icon({ name: "circle-exclamation" })
+                                );
+                            }
+                        }}
                     />
                 </View>
             )}
