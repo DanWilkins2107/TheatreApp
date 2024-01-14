@@ -67,6 +67,10 @@ export default function ProductionDashboardScreen({ route }) {
         });
     }, []);
 
+    function createBudget() {
+        console.log("create budget")
+    }
+
     return (
         <View className="flex-col">
             <Text className="self-center text-3xl font-extrabold">Production Dashboard</Text>
@@ -100,6 +104,9 @@ export default function ProductionDashboardScreen({ route }) {
                             );
                         })}
                     </View>
+                    <TouchableOpacity>
+                        <Text>Create Budget</Text>
+                    </TouchableOpacity>
                 </>
             )}
         </View>
