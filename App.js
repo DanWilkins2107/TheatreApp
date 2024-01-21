@@ -10,9 +10,11 @@ import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
 import UserProfileScreen from "./screens/UserScreens/UserProfile.jsx";
 import ProductionDashboardScreen from "./screens/ProductionScreens/ProductionDashboard.jsx";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { AlertProvider } from "./components/Alert/AlertProvider.jsx";
 import Alert from "./components/Alert/Alert.jsx";
+import { ModalProvider } from "./components/Modal/ModalProvider.jsx";
+import Modal from "./components/Modal/Modal.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,63 +30,68 @@ export default function App() {
 
     return (
         <AlertProvider>
-            <View className="h-fit w-full z-20 absolute">
-                <Alert />
-            </View>
-            <NavigationContainer className="z-10 absolute">
-                <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}>
-                    {user ? (
-                        <>
-                            <Stack.Screen
-                                name="UserDashboard"
-                                component={UserDashboardScreen}
-                                options={({ navigation }) => ({
-                                    headerTitle: () => (
-                                        <Header navigation={navigation} firstScreen />
-                                    ),
-                                    headerBackVisible: false,
-                                })}
-                            />
-                            <Stack.Screen
-                                name="ProductionDashboard"
-                                component={ProductionDashboardScreen}
-                                options={({ navigation }) => ({
-                                    headerTitle: () => <Header navigation={navigation} />,
-                                    headerBackVisible: false,
-                                })}
-                            />
-                            <Stack.Screen
-                                name="UserProfile"
-                                component={UserProfileScreen}
-                                options={({ navigation }) => ({
-                                    headerTitle: () => (
-                                        <Header navigation={navigation} profileScreen />
-                                    ),
-                                    headerBackVisible: false,
-                                })}
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <Stack.Screen
-                                name="Login"
-                                component={LoginScreen}
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen
-                                name="SignUp"
-                                component={SignUpScreen}
-                                options={{ headerShown: false }}
-                            />
-                            <Stack.Screen
-                                name="ForgottenPassword"
-                                component={ForgottenPasswordScreen}
-                                options={{ headerShown: false }}
-                            />
-                        </>
-                    )}
-                </Stack.Navigator>
-            </NavigationContainer>
+            <ModalProvider>
+                <View className="h-fit w-full z-30 absolute">
+                    <Alert />
+                </View>
+                <View className="h-fit w-full z-20 absolute">
+                    <Modal />
+                </View>
+                <NavigationContainer className="z-10 absolute">
+                    <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}>
+                        {user ? (
+                            <>
+                                <Stack.Screen
+                                    name="UserDashboard"
+                                    component={UserDashboardScreen}
+                                    options={({ navigation }) => ({
+                                        headerTitle: () => (
+                                            <Header navigation={navigation} firstScreen />
+                                        ),
+                                        headerBackVisible: false,
+                                    })}
+                                />
+                                <Stack.Screen
+                                    name="ProductionDashboard"
+                                    component={ProductionDashboardScreen}
+                                    options={({ navigation }) => ({
+                                        headerTitle: () => <Header navigation={navigation} />,
+                                        headerBackVisible: false,
+                                    })}
+                                />
+                                <Stack.Screen
+                                    name="UserProfile"
+                                    component={UserProfileScreen}
+                                    options={({ navigation }) => ({
+                                        headerTitle: () => (
+                                            <Header navigation={navigation} profileScreen />
+                                        ),
+                                        headerBackVisible: false,
+                                    })}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Stack.Screen
+                                    name="Login"
+                                    component={LoginScreen}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="SignUp"
+                                    component={SignUpScreen}
+                                    options={{ headerShown: false }}
+                                />
+                                <Stack.Screen
+                                    name="ForgottenPassword"
+                                    component={ForgottenPasswordScreen}
+                                    options={{ headerShown: false }}
+                                />
+                            </>
+                        )}
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </ModalProvider>
         </AlertProvider>
     );
 }

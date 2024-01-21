@@ -22,14 +22,15 @@ import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
-    const [modal, setModal] = useState(null);
     const auth = firebase_auth;
     const db = firebase_db;
     const storageRef = ref(storage);
     const { setAlert } = useContext(AlertContext);
+    const { setModal } = useContext(ModalContext);
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
@@ -111,39 +112,6 @@ export default function UserProfileScreen({ navigation }) {
         }
     };
 
-    const modals = [
-        {
-            name: "UserDetails",
-            component: (
-                <UserDetailsModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-        {
-            name: "ContactInformation",
-            component: (
-                <ContactInformationModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-        {
-            name: "ReportError",
-            component: (
-                <ReportErrorModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-    ];
-
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
@@ -189,21 +157,6 @@ export default function UserProfileScreen({ navigation }) {
 
     return (
         <>
-            {modals.map((item) => {
-                return (
-                    <Modal
-                        key={item.name}
-                        animationType="fade"
-                        transparent={true}
-                        visible={modal === item.name}
-                        onRequestClose={() => {
-                            setModal(null);
-                        }}
-                    >
-                        {item.component}
-                    </Modal>
-                );
-            })}
             <ScrollView className="flex flex-col h-full">
                 <View className="w-max bg-white flex-row rounded-3xl px-4 m-2 border-2 align-middle items-center">
                     <TouchableOpacity
@@ -236,21 +189,21 @@ export default function UserProfileScreen({ navigation }) {
                     icon={faCircleInfo}
                     text="User Details"
                     onClick={() => {
-                        setModal("UserDetails");
+                        setModal(<UserDetailsModal />);
                     }}
                 />
                 <ProfilePanel
                     icon={faPhone}
                     text="Contact Information"
                     onClick={() => {
-                        setModal("ContactInformation");
+                        setModal(<ContactInformationModal />);
                     }}
                 />
                 <ProfilePanel
                     icon={faCircleExclamation}
                     text="Report Error"
                     onClick={() => {
-                        setModal("ReportError");
+                        setModal(<ReportErrorModal />);
                     }}
                 />
                 <ProfilePanel

@@ -27,7 +27,6 @@ export const AlertProvider = ({ children }) => {
         setAlertNo((alertNo) => alertNo + 1);
 
         setTimeout(() => {
-            console.log(alertRef.current, alertNo);
             if (alertRef.current - 1 === alertNo) {
                 setText(initialState.text);
                 setColor(initialState.color);

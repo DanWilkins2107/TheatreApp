@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import GeneralModal from "../GeneralModal/GeneralModal.jsx";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import { useState, useEffect, useContext } from "react";
 import EditInfo from "../Form/EditInfo.jsx";
@@ -32,7 +31,7 @@ export default function UserDetailsModal(props) {
     }, []);
 
     return (
-        <GeneralModal closeModal={props.closeModal}>
+        <>
             {loading ? (
                 <LoadingWheel size="large" />
             ) : (
@@ -92,6 +91,6 @@ export default function UserDetailsModal(props) {
                     />
                 </View>
             )}
-        </GeneralModal>
+        </>
     );
 }

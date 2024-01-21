@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import GeneralModal from "../GeneralModal/GeneralModal.jsx";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import { useState, useEffect, useContext } from "react";
 import EditInfo from "../Form/EditInfo.jsx";
@@ -29,66 +28,65 @@ export default function ContactInformationModal(props) {
             setLoading(false);
         });
     }, []);
-
     return (
-        <GeneralModal closeModal={props.closeModal}>
-            {loading ? (
-                <LoadingWheel size="large" />
-            ) : (
-                <View className="flex flex-col items-center h-full">
-                    <EditInfo
-                        title="Contact Number"
-                        variableToEdit={contactNo}
-                        initialValue={initialContactNo}
-                        onChange={setContactNo}
-                        onSubmit={() => {
-                            try {
-                                set(
-                                    ref(db, "users/" + auth.currentUser.uid + "/contactNumber"),
-                                    contactNo
-                                );
-                                setInitialContactNo(contactNo);
-                                setAlert(
-                                    "Contact number updated successfully",
-                                    "bg-green-500",
-                                    icon({ name: "circle-check" })
-                                );
-                            } catch (error) {
-                                setAlert(
-                                    "Error updating Contact Number. Please Try Again.",
-                                    "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
-                                );
-                            }
-                        }}
-                    />
-                    <View className="h-8"></View>
-                    <EditInfo
-                        title="Email"
-                        variableToEdit={email}
-                        initialValue={initialEmail}
-                        onChange={setEmail}
-                        onSubmit={() => {
-                            try {
-                                updateProfile(auth.currentUser, { email: email });
-                                set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
-                                setInitialEmail(email);
-                                setAlert(
-                                    "Email updated successfully",
-                                    "bg-green-500",
-                                    icon({ name: "circle-check" })
-                                );
-                            } catch (error) {
-                                setAlert(
-                                    "Could not update email. Please Try Again.",
-                                    "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
-                                );
-                            }
-                        }}
-                    />
-                </View>
-            )}
-        </GeneralModal>
+            <>
+                {loading ? (
+                    <LoadingWheel size="large" />
+                ) : (
+                    <View className="flex flex-col items-center h-full">
+                        <EditInfo
+                            title="Contact Number"
+                            variableToEdit={contactNo}
+                            initialValue={initialContactNo}
+                            onChange={setContactNo}
+                            onSubmit={() => {
+                                try {
+                                    set(
+                                        ref(db, "users/" + auth.currentUser.uid + "/contactNumber"),
+                                        contactNo
+                                    );
+                                    setInitialContactNo(contactNo);
+                                    setAlert(
+                                        "Contact number updated successfully",
+                                        "bg-green-500",
+                                        icon({ name: "circle-check" })
+                                    );
+                                } catch (error) {
+                                    setAlert(
+                                        "Error updating Contact Number. Please Try Again.",
+                                        "bg-red-500",
+                                        icon({ name: "circle-exclamation" })
+                                    );
+                                }
+                            }}
+                        />
+                        <View className="h-8"></View>
+                        <EditInfo
+                            title="Email"
+                            variableToEdit={email}
+                            initialValue={initialEmail}
+                            onChange={setEmail}
+                            onSubmit={() => {
+                                try {
+                                    updateProfile(auth.currentUser, { email: email });
+                                    set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
+                                    setInitialEmail(email);
+                                    setAlert(
+                                        "Email updated successfully",
+                                        "bg-green-500",
+                                        icon({ name: "circle-check" })
+                                    );
+                                } catch (error) {
+                                    setAlert(
+                                        "Could not update email. Please Try Again.",
+                                        "bg-red-500",
+                                        icon({ name: "circle-exclamation" })
+                                    );
+                                }
+                            }}
+                        />
+                    </View>
+                )}
+            </>
     );
 }
