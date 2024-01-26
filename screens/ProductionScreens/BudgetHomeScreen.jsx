@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export default function BudgetScreen({ route }) {
+export default function BudgetHomeScreen({ route }) {
     // const CreateProduction = () => {
     //     setErrorText("");
     //     const dbRef = ref(db);
@@ -39,10 +39,7 @@ export default function BudgetScreen({ route }) {
     };
     return (
         <View className="flex-col">
-            <View className="bg-red-200 h-2/5">
-                <Text>Pie Chart Here</Text>
-            </View>
-            <Text>Budget Screen</Text>
+            <Text>Budget Selection Screen</Text>
         </View>
     );
 }
