@@ -4,6 +4,7 @@ import FormButton from "../Form/FormButton";
 import { useState, useContext } from "react";
 import { firebase_auth, firebase_db } from "../../firebase.config";
 import { get, ref, set, child } from "firebase/database";
+import { ModalContext } from "../Modal/ModalProvider";
 
 export default function JoinProductionModal({ closeModal }) {
     const [code, setCode] = useState("");

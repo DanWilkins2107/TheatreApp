@@ -1,9 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { get, ref, onValue } from "firebase/database";
 import { firebase_db } from "../../firebase.config.js";
-import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function ProductionDashboardScreen({ route }) {
     const [production, setProduction] = useState({});
@@ -12,7 +10,6 @@ export default function ProductionDashboardScreen({ route }) {
     const [loading, setLoading] = useState(true);
     const playCode = route.params.playCode;
     const db = firebase_db;
-    const { setAlert } = useContext(AlertContext);
 
     useEffect(() => {
         onValue(
@@ -105,20 +102,6 @@ export default function ProductionDashboardScreen({ route }) {
                     </View>
                 </>
             )}
-            <TouchableOpacity
-                onPress={() => {
-                    setAlert("Test Alert", "bg-red-500", icon({ name: "user" }));
-                }}
-            >
-                <Text>Test Alert</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => {
-                    setAlert("Test Alert", "bg-green-500", icon({ name: "user" }));
-                }}
-            >
-                <Text>Test Alert 2</Text>
-            </TouchableOpacity>
         </View>
     );
 }

@@ -4,7 +4,7 @@ const initialState = {
     modal: null
 };
 
-export const ModalContext = createContext({ ...initialState, setModal: () => {} });
+export const ModalContext = createContext();
 
 export const ModalProvider = ({ children }) => {
     const [modal, setModal] = useState(initialState.modal);

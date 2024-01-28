@@ -30,6 +30,24 @@ export default function UserDetailsModal(props) {
         });
     }, []);
 
+    const submitName = (string, nameVariable, editInitialValue) => {
+        try {
+            set(ref(db, "users/" + auth.currentUser.uid + "/" + string), nameVariable);
+            editInitialValue(nameVariable);
+            setAlert(
+                string + " updated successfully",
+                "bg-green-500",
+                icon({ name: "circle-check" })
+            );
+        } catch (error) {
+            setAlert(
+                "Error updating " + string + ". Please Try Again.",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
+        }
+    };
+
     return (
         <>
             {loading ? (
@@ -41,26 +59,7 @@ export default function UserDetailsModal(props) {
                         variableToEdit={firstName}
                         initialValue={initialFirstName}
                         onChange={setFirstName}
-                        onSubmit={() => {
-                            try {
-                                set(
-                                    ref(db, "users/" + auth.currentUser.uid + "/firstName"),
-                                    firstName
-                                );
-                                setInitialFirstName(firstName);
-                                setAlert(
-                                    "First name updated successfully",
-                                    "bg-green-500",
-                                    icon({ name: "circle-check" })
-                                );
-                            } catch (error) {
-                                setAlert(
-                                    "Error updating First Name. Please Try Again.",
-                                    "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
-                                );
-                            }
-                        }}
+                        onSubmit={() => submitName("firstName", firstName, setInitialFirstName)}
                     />
                     <View className="h-8"></View>
                     <EditInfo
@@ -68,26 +67,7 @@ export default function UserDetailsModal(props) {
                         variableToEdit={lastName}
                         initialValue={initialLastName}
                         onChange={setLastName}
-                        onSubmit={() => {
-                            try {
-                                set(
-                                    ref(db, "users/" + auth.currentUser.uid + "/lastName"),
-                                    lastName
-                                );
-                                setInitialLastName(lastName);
-                                setAlert(
-                                    "Last name updated successfully",
-                                    "bg-green-500",
-                                    icon({ name: "circle-check" })
-                                );
-                            } catch (error) {
-                                setAlert(
-                                    "Error updating Last Name. Please Try Again.",
-                                    "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
-                                );
-                            }
-                        }}
+                        onSubmit={() => submitName("lastName", lastName, setInitialLastName)}
                     />
                 </View>
             )}

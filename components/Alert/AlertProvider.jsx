@@ -7,7 +7,7 @@ const initialState = {
     totalAlerts: 0,
 };
 
-export const AlertContext = createContext({ ...initialState, setAlert: () => {} });
+export const AlertContext = createContext();
 
 export const AlertProvider = ({ children }) => {
     const [text, setText] = useState(initialState.text);
