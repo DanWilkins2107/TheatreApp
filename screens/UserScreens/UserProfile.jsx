@@ -148,7 +148,7 @@ export default function UserProfileScreen({ navigation }) {
                     setAlert(
                         "Error uploading profile picture",
                         "bg-red-500",
-                        icon({ name: "circle-exclamation" })
+                        icon({ name: "circleExclamation" })
                     );
                 }
             }
