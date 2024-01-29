@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Text, ScrollView, Modal } from "react-native";
 import { signOut } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { updateProfile, deleteUser } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { get, child, ref as dbRef, remove, set } from "firebase/database";
@@ -20,13 +20,17 @@ import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx"
 import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
 import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
-    const [modal, setModal] = useState(null);
     const auth = firebase_auth;
     const db = firebase_db;
     const storageRef = ref(storage);
+    const { setAlert } = useContext(AlertContext);
+    const { setModal } = useContext(ModalContext);
 
     useEffect(() => {
         get(child(dbRef(db), `users/${auth.currentUser.uid}`)).then((snapshot) => {
@@ -108,57 +112,24 @@ export default function UserProfileScreen({ navigation }) {
         }
     };
 
-    const modals = [
-        {
-            name: "UserDetails",
-            component: (
-                <UserDetailsModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-        {
-            name: "ContactInformation",
-            component: (
-                <ContactInformationModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-        {
-            name: "ReportError",
-            component: (
-                <ReportErrorModal
-                    closeModal={() => {
-                        setModal(null);
-                    }}
-                />
-            ),
-        },
-    ];
-
     const handleProfileChange = async () => {
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
-                fetch(response.assets[0].uri).then((image) => {
-                    image.blob().then((blob) => {
-                        uploadBytes(
-                            ref(
-                                storageRef,
-                                "images/" +
-                                    auth.currentUser.uid +
-                                    response.assets[0].fileName.substring(
-                                        response.assets[0].fileName.lastIndexOf(".")
-                                    )
-                            ),
-                            blob
-                        ).then((snapshot) => {
-                            getDownloadURL(snapshot.ref)
-                                .then((url) => {
+                try {
+                    fetch(response.assets[0].uri).then((image) => {
+                        image.blob().then((blob) => {
+                            uploadBytes(
+                                ref(
+                                    storageRef,
+                                    "images/" +
+                                        auth.currentUser.uid +
+                                        response.assets[0].fileName.substring(
+                                            response.assets[0].fileName.lastIndexOf(".")
+                                        )
+                                ),
+                                blob
+                            ).then((snapshot) => {
+                                getDownloadURL(snapshot.ref).then((url) => {
                                     updateProfile(auth.currentUser, {
                                         photoURL: url,
                                     });
@@ -168,34 +139,24 @@ export default function UserProfileScreen({ navigation }) {
                                     );
                                 })
                                 .catch((error) => {
-                                    console.log(error);
+                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circle-exclamation"}));
                                 });
+                            });
                         });
                     });
-                });
+                } catch (error) {
+                    setAlert(
+                        "Error uploading profile picture",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
             }
         });
     };
 
-    //TODO: Add form validation for all of the modals
-
     return (
         <>
-            {modals.map((item) => {
-                return (
-                    <Modal
-                        key={item.name}
-                        animationType="fade"
-                        transparent={true}
-                        visible={modal === item.name}
-                        onRequestClose={() => {
-                            setModal(null);
-                        }}
-                    >
-                        {item.component}
-                    </Modal>
-                );
-            })}
             <ScrollView className="flex flex-col h-full">
                 <View className="w-max bg-white flex-row rounded-3xl px-4 m-2 border-2 align-middle items-center">
                     <TouchableOpacity
@@ -228,21 +189,21 @@ export default function UserProfileScreen({ navigation }) {
                     icon={faCircleInfo}
                     text="User Details"
                     onClick={() => {
-                        setModal("UserDetails");
+                        setModal(<UserDetailsModal />);
                     }}
                 />
                 <ProfilePanel
                     icon={faPhone}
                     text="Contact Information"
                     onClick={() => {
-                        setModal("ContactInformation");
+                        setModal(<ContactInformationModal />);
                     }}
                 />
                 <ProfilePanel
                     icon={faCircleExclamation}
                     text="Report Error"
                     onClick={() => {
-                        setModal("ReportError");
+                        setModal(<ReportErrorModal />);
                     }}
                 />
                 <ProfilePanel

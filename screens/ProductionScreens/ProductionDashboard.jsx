@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { get, ref, onValue } from "firebase/database";
 import { firebase_db } from "../../firebase.config.js";
 
@@ -65,7 +65,6 @@ export default function ProductionDashboardScreen({ route }) {
             setParticipants(newParticipants);
             setLoading(false);
         });
-
     }, []);
 
     return (
