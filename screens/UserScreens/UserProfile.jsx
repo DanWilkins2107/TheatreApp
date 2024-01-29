@@ -139,7 +139,7 @@ export default function UserProfileScreen({ navigation }) {
                                     );
                                 })
                                 .catch((error) => {
-                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circleExclamation"}));
+                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circle-exclamation"}));
                                 });
                             });
                         });
@@ -148,7 +148,7 @@ export default function UserProfileScreen({ navigation }) {
                     setAlert(
                         "Error uploading profile picture",
                         "bg-red-500",
-                        icon({ name: "circleExclamation" })
+                        icon({ name: "circle-exclamation" })
                     );
                 }
             }
