@@ -9,7 +9,7 @@ import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
 import UserDetailsModal from "../../components/ProfileElements/UserDetailsModal.jsx";
 import {
-    faCircleExclamation,
+    faCircleQuestion,
     faCircleInfo,
     faPencil,
     faPhone,
@@ -200,8 +200,8 @@ export default function UserProfileScreen({ navigation }) {
                     }}
                 />
                 <ProfilePanel
-                    icon={faCircleExclamation}
-                    text="Report Error"
+                    icon={faCircleQuestion}
+                    text="Help"
                     onClick={() => {
                         setModal(<ReportErrorModal />);
                     }}
