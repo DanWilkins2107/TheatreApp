@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 
-export default function BudgetHomeScreen({ route }) {
+export default function BudgetMain({ route }) {
     return (
         <View className="flex-col">
             <View className="bg-red-200 h-2/5">

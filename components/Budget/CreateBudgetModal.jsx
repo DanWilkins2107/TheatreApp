@@ -27,17 +27,17 @@ export default function CreateBudgetModal({ closeModal, productionCode }) {
             <Text className="text-lg font-semibold text-center">
                 Enter the name for your budget.
             </Text>
-            <FormField value={name} placeholder="Name" onChangeText={(name) => setName(name)} />
+            <FormField value={name} placeholder="Name" onChangeText={setName} />
             <Text className="text-lg font-semibold text-center">
                 Enter the budget for your budget.
             </Text>
             <FormField
                 value={budget}
                 placeholder="Budget"
-                onChangeText={(budget) => setBudget(budget)}
+                onChangeText={setBudget}
             />
             <View className="flex-1" />
-            <FormButton title="Create" onPress={() => createBudget()} />
+            <FormButton title="Create" onPress={createBudget} />
         </View>
     );
 }
