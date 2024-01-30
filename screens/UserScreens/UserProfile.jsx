@@ -203,7 +203,7 @@ export default function UserProfileScreen({ navigation }) {
                     icon={faCircleQuestion}
                     text="Help"
                     onClick={() => {
-                        setModal(<ReportErrorModal />);
+                        setModal(<HelpModal />);
                     }}
                 />
                 <ProfilePanel
