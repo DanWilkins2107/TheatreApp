@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Text, ScrollView, Modal } from "react-native";
+import { View, TouchableOpacity, Text, ScrollView } from "react-native";
 import { signOut } from "firebase/auth";
 import { useState, useEffect, useContext } from "react";
 import { updateProfile, deleteUser } from "firebase/auth";

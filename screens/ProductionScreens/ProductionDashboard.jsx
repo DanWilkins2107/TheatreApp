@@ -1,15 +1,21 @@
-import { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
+import { useState, useEffect, useContext } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
 import { get, ref, onValue } from "firebase/database";
 import { firebase_db } from "../../firebase.config.js";
+import JoinViewBudgetButton from "../../components/Budget/JoinViewBudgetButton.jsx";
+import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faPiggyBank, faSearchDollar } from "@fortawesome/free-solid-svg-icons";
+import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 
-export default function ProductionDashboardScreen({ route }) {
+export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
     const playCode = route.params.playCode;
     const db = firebase_db;
+    const { setModal } = useContext(ModalContext);
 
     useEffect(() => {
         onValue(
@@ -99,6 +105,21 @@ export default function ProductionDashboardScreen({ route }) {
                                 </Text>
                             );
                         })}
+
+                        <View className="flex flex-col m-2">
+                            <JoinViewBudgetButton
+                                text="Create Budget"
+                                onPress={() => setModal(<CreateBudgetModal />)}
+                            >
+                                <FontAwesomeIcon icon={faPiggyBank} size={50} />
+                            </JoinViewBudgetButton>
+                            <JoinViewBudgetButton
+                                text="View Budget"
+                                onPress={() => navigation.navigate("BudgetHome")}
+                            >
+                                <FontAwesomeIcon icon={faSearchDollar} size={50} />
+                            </JoinViewBudgetButton>
+                        </View>
                     </View>
                 </>
             )}
