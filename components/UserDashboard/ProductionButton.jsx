@@ -24,14 +24,14 @@ export default function ProductionButton({ navigation, production }) {
                         return (
                             <>
                                 <ProfilePicture
-                                    key={index}
+                                    key={2 * index}
                                     dimensions={10}
                                     textSize="2xl"
                                     userId={id}
                                     className="mx-10"
                                     loadingSize="small"
                                 />
-                                <View className="w-1" />
+                                <View key={2 * index + 1} className="w-1" />
                             </>
                         );
                     })}

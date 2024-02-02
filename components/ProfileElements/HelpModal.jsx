@@ -16,7 +16,7 @@ const furtherInfo = {
     SuggestImprovement: "Further details about your suggestion.",
 };
 
-export default function HelpModal(props) {
+export default function HelpModal() {
     const [type, setType] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -52,11 +52,12 @@ export default function HelpModal(props) {
     };
 
     return (
-        <View className="flex flex-col h-full items-center">
-            <Text className="text-2xl font-extrabold text-center mb-1">Help</Text>
-            <View className="flex-1 flex-col m-4">
+        <View className="flex items-center mx-4">
+            <Text className="text-2xl font-extrabold text-center mb-2">Help</Text>
+            <View>
                 <DropDownPicker
                     className="px-5 my-1 rounded-xl border-2"
+                    dropDownContainerStyle={{ borderWidth: 2, borderTopWidth: 1, borderRadius: 12 }}
                     open={open}
                     value={type}
                     items={items}
@@ -79,7 +80,7 @@ export default function HelpModal(props) {
                     autoCapitalize={"sentences"}
                     multiline
                 />
-                <View className="items-center pt-4">
+                <View className="items-center mt-4">
                     <SmallFormButton
                         backgroundColor="bg-green-400"
                         title="Submit"

@@ -6,7 +6,7 @@ import { firebase_auth, firebase_db } from "../../firebase.config";
 import { get, ref, set, child } from "firebase/database";
 import { ModalContext } from "../Modal/ModalProvider";
 
-export default function JoinProductionModal({ closeModal }) {
+export default function JoinProductionModal() {
     const [code, setCode] = useState("");
     const [errorText, setErrorText] = useState("");
     const db = firebase_db;
@@ -46,20 +46,19 @@ export default function JoinProductionModal({ closeModal }) {
     };
 
     return (
-        <View className="flex flex-col p-3 h-full">
-            <Text className="text-3xl font-extrabold text-center mb-3">Join Production</Text>
-            <View className="flex-1" />
-            <Text className="text-lg font-semibold text-center">
+        <View className="flex px-4">
+            <Text className="text-3xl font-extrabold text-center mb-2">Join Production</Text>
+            <Text className="text-lg font-semibold text-center mb-2">
                 Enter the code for the production you wish to join.
             </Text>
             <FormField
+                extraClassName="mb-4"
                 value={code}
                 placeholder="Code"
                 autoCapitalize="none"
-                onChangeText={(text) => setCode(text)}
+                onChangeText={setCode}
             />
-            <View className="flex-1" />
-            <FormButton title="Join" onPress={() => JoinProduction()} />
+            <FormButton title="Join" onPress={JoinProduction} />
             <Text className="text-red-500 text-center">{errorText}</Text>
         </View>
     );

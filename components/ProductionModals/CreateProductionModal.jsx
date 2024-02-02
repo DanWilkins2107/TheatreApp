@@ -17,7 +17,7 @@ const generatePlayCode = () => {
     return code;
 };
 
-export default function CreateProductionModal({ closeModal }) {
+export default function CreateProductionModal() {
     const [name, setName] = useState("");
     const [errorText, setErrorText] = useState("");
     const db = firebase_db;
@@ -58,15 +58,18 @@ export default function CreateProductionModal({ closeModal }) {
     };
 
     return (
-        <View className="flex flex-col p-3 h-full">
-            <Text className="text-3xl font-extrabold text-center mb-3">Create Production</Text>
-            <View className="flex-1" />
-            <Text className="text-lg font-semibold text-center">
+        <View className="flex px-4">
+            <Text className="text-3xl font-extrabold text-center mb-2">Create Production</Text>
+            <Text className="text-lg font-semibold text-center mb-2">
                 Enter the name for your production.
             </Text>
-            <FormField value={name} placeholder="Name" onChangeText={(name) => setName(name)} />
-            <View className="flex-1" />
-            <FormButton title="Create" onPress={() => CreateProduction()} />
+            <FormField
+                extraClassName="mb-4"
+                value={name}
+                placeholder="Name"
+                onChangeText={setName}
+            />
+            <FormButton title="Create" onPress={CreateProduction} />
             <Text className="text-red-500 text-center">{errorText}</Text>
         </View>
     );
