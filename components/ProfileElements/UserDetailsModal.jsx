@@ -7,7 +7,7 @@ import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
-export default function UserDetailsModal(props) {
+export default function UserDetailsModal() {
     const db = firebase_db;
     const auth = firebase_auth;
     const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ export default function UserDetailsModal(props) {
             {loading ? (
                 <LoadingWheel size="large" />
             ) : (
-                <View className="flex flex-col items-center h-full">
+                <View className="flex items-center">
                     <EditInfo
                         title="First Name"
                         variableToEdit={firstName}

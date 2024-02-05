@@ -8,7 +8,7 @@ import { updateProfile } from "firebase/auth";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
-export default function ContactInformationModal(props) {
+export default function ContactInformationModal() {
     const db = firebase_db;
     const auth = firebase_auth;
     const [loading, setLoading] = useState(true);
@@ -29,64 +29,64 @@ export default function ContactInformationModal(props) {
         });
     }, []);
     return (
-            <>
-                {loading ? (
-                    <LoadingWheel size="large" />
-                ) : (
-                    <View className="flex flex-col items-center h-full">
-                        <EditInfo
-                            title="Contact Number"
-                            variableToEdit={contactNo}
-                            initialValue={initialContactNo}
-                            onChange={setContactNo}
-                            onSubmit={() => {
-                                try {
-                                    set(
-                                        ref(db, "users/" + auth.currentUser.uid + "/contactNumber"),
-                                        contactNo
-                                    );
-                                    setInitialContactNo(contactNo);
-                                    setAlert(
-                                        "Contact number updated successfully",
-                                        "bg-green-500",
-                                        icon({ name: "circle-check" })
-                                    );
-                                } catch (error) {
-                                    setAlert(
-                                        "Error updating Contact Number. Please Try Again.",
-                                        "bg-red-500",
-                                        icon({ name: "circle-exclamation" })
-                                    );
-                                }
-                            }}
-                        />
-                        <View className="h-8"></View>
-                        <EditInfo
-                            title="Email"
-                            variableToEdit={email}
-                            initialValue={initialEmail}
-                            onChange={setEmail}
-                            onSubmit={() => {
-                                try {
-                                    updateProfile(auth.currentUser, { email: email });
-                                    set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
-                                    setInitialEmail(email);
-                                    setAlert(
-                                        "Email updated successfully",
-                                        "bg-green-500",
-                                        icon({ name: "circle-check" })
-                                    );
-                                } catch (error) {
-                                    setAlert(
-                                        "Could not update email. Please Try Again.",
-                                        "bg-red-500",
-                                        icon({ name: "circle-exclamation" })
-                                    );
-                                }
-                            }}
-                        />
-                    </View>
-                )}
-            </>
+        <>
+            {loading ? (
+                <LoadingWheel size="large" />
+            ) : (
+                <View className="flex items-center">
+                    <EditInfo
+                        title="Contact Number"
+                        variableToEdit={contactNo}
+                        initialValue={initialContactNo}
+                        onChange={setContactNo}
+                        onSubmit={() => {
+                            try {
+                                set(
+                                    ref(db, "users/" + auth.currentUser.uid + "/contactNumber"),
+                                    contactNo
+                                );
+                                setInitialContactNo(contactNo);
+                                setAlert(
+                                    "Contact number updated successfully",
+                                    "bg-green-500",
+                                    icon({ name: "circle-check" })
+                                );
+                            } catch (error) {
+                                setAlert(
+                                    "Error updating Contact Number. Please Try Again.",
+                                    "bg-red-500",
+                                    icon({ name: "circle-exclamation" })
+                                );
+                            }
+                        }}
+                    />
+                    <View className="h-8"></View>
+                    <EditInfo
+                        title="Email"
+                        variableToEdit={email}
+                        initialValue={initialEmail}
+                        onChange={setEmail}
+                        onSubmit={() => {
+                            try {
+                                updateProfile(auth.currentUser, { email: email });
+                                set(ref(db, "users/" + auth.currentUser.uid + "/email"), email);
+                                setInitialEmail(email);
+                                setAlert(
+                                    "Email updated successfully",
+                                    "bg-green-500",
+                                    icon({ name: "circle-check" })
+                                );
+                            } catch (error) {
+                                setAlert(
+                                    "Could not update email. Please Try Again.",
+                                    "bg-red-500",
+                                    icon({ name: "circle-exclamation" })
+                                );
+                            }
+                        }}
+                    />
+                </View>
+            )}
+        </>
     );
 }

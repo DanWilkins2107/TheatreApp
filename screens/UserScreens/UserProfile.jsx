@@ -9,7 +9,7 @@ import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
 import UserDetailsModal from "../../components/ProfileElements/UserDetailsModal.jsx";
 import {
-    faCircleExclamation,
+    faCircleQuestion,
     faCircleInfo,
     faPencil,
     faPhone,
@@ -18,7 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx";
 import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
-import ReportErrorModal from "../../components/ProfileElements/ReportErrorModal.jsx";
+import HelpModal from "../../components/ProfileElements/HelpModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
@@ -200,10 +200,10 @@ export default function UserProfileScreen({ navigation }) {
                     }}
                 />
                 <ProfilePanel
-                    icon={faCircleExclamation}
-                    text="Report Error"
+                    icon={faCircleQuestion}
+                    text="Help"
                     onClick={() => {
-                        setModal(<ReportErrorModal />);
+                        setModal(<HelpModal />);
                     }}
                 />
                 <ProfilePanel

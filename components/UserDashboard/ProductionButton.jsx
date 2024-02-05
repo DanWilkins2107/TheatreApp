@@ -20,18 +20,18 @@ export default function ProductionButton({ navigation, production }) {
             <View className="w-max flex flex-row mt-2">
                 {Object.keys(production.participants)
                     .slice(0, 5)
-                    .map((id) => {
+                    .map((id, index) => {
                         return (
                             <>
                                 <ProfilePicture
-                                    key={id}
+                                    key={2 * index}
                                     dimensions={10}
                                     textSize="2xl"
                                     userId={id}
                                     className="mx-10"
                                     loadingSize="small"
                                 />
-                                <View className="w-1" />
+                                <View key={2 * index + 1} className="w-1" />
                             </>
                         );
                     })}
