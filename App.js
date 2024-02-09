@@ -70,6 +70,16 @@ export default function App() {
                                         headerBackVisible: false,
                                     })}
                                 />
+                                <Stack.Screen
+                                    name="BudgetHome"
+                                    component={BudgetHomeScreen}
+                                    options={({ navigation }) => ({
+                                        headerTitle: () => (
+                                            <Header navigation={navigation} />
+                                        ),
+                                        headerBackVisible: false,
+                                    })}
+                                />
                             </>
                         ) : (
                             <>
