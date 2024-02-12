@@ -32,7 +32,7 @@ export default function ProductionButton({ navigation, production }) {
                                     loadingSize="small"
                                 />
                                 <View key={2 * index + 1} className="w-1" />
-                            </>
+                            </View>
                         );
                     })}
 
