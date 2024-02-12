@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { View, Text } from "react-native";
-import { get, set, ref, onValue } from "firebase/database";
+import { set, ref, onValue } from "firebase/database";
 import FormField from "../Form/FormField";
 import FormButton from "../Form/FormButton";
 import ParticipantSelector from "../Participants/ParticipantSelector";
@@ -13,43 +13,51 @@ export default function CreateBudgetModal({ productionCode }) {
     const [name, setName] = useState("");
     const [budget, setBudget] = useState("");
     const [participants, setParticipants] = useState({});
-    const [loading, setLoading] = useState(true);
     const db = firebase_db;
     const { setAlert } = useContext(AlertContext);
     const { setModal } = useContext(ModalContext);
 
     useEffect(() => {
-        setLoading(true);
         try {
-            onValue(
-                ref(db, `productions/${productionCode}/participants`),
-                async (productionSnapshot) => {
-                    if (!productionSnapshot.exists()) {
-                        setAlert(
-                            "Could not find production.",
-                            "bg-red-500",
-                            icon({ name: "circle-exclamation" })
-                        );
-                        return;
-                    }
-                    const participantArray = Object.keys(productionSnapshot.val());
-                    let participantObject = {};
-                    participantArray.forEach((participant) => {
-                        participantObject[participant] = false;
-                    });
-                    setParticipants(participantObject);
-                    setLoading(False);
+            onValue(ref(db, `productions/${productionCode}/participants`), (productionSnapshot) => {
+                if (!productionSnapshot.exists()) {
+                    setAlert(
+                        "Could not find production.",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                    return;
                 }
-            );
+                const participantArray = Object.keys(productionSnapshot.val());
+                let participantObject = {};
+                participantArray.forEach((participant) => {
+                    participantObject[participant] = false;
+                });
+                setParticipants(participantObject);
+            });
         } catch (error) {
-            console.log("uh oh: ", error.message);
+            setAlert(
+                "Error occurred when fetching participants.",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
+            return;
         }
     }, []);
 
     const createBudget = () => {
         if (name === "" || budget === "") {
             setAlert(
-                "Please fill in all fields.",
+                "Please fill out all fields.",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
+            return;
+        }
+
+        if (isNaN(budget)) {
+            setAlert(
+                "Please enter a valid budget amount",
                 "bg-red-500",
                 icon({ name: "circle-exclamation" })
             );
@@ -85,17 +93,25 @@ export default function CreateBudgetModal({ productionCode }) {
     };
 
     return (
-        <View className="flex flex-col p-3 h-full">
+        <View className="flex p-3 h-full">
             <Text className="text-3xl font-extrabold text-center mb-3">Create Budget</Text>
             <Text className="text-lg font-semibold text-center">Name</Text>
-            <FormField value={name} placeholder="Name" onChangeText={setName} />
-            <View className="h-2" />
+            <FormField
+                value={name}
+                placeholder="Name"
+                onChangeText={setName}
+                extraClassName="mb-2"
+            />
             <Text className="text-lg font-semibold text-center">Budget (£)</Text>
-            <FormField value={budget} placeholder="Budget" onChangeText={setBudget} />
-            <View className="h-8" />
+            <FormField
+                value={budget}
+                placeholder="Budget"
+                onChangeText={setBudget}
+                extraClassName="mb-8"
+                autocapitalize="sentences"
+            />
             <ParticipantSelector participants={participants} setParticipants={setParticipants} />
-            <View className="h-2" />
-            <FormButton title="Create" onPress={createBudget} />
+            <FormButton title="Create" onPress={createBudget} extraClassName="mt-2" />
         </View>
     );
 }

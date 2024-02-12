@@ -31,8 +31,6 @@ export default function ParticipantSelector({ participants, setParticipants }) {
             await Promise.all(promises);
             setParticipantDisplayNames(participantNames);
         };
-
-        // Call the async function
         fetchParticipantNames();
     }, [participants]);
 
@@ -69,12 +67,12 @@ export default function ParticipantSelector({ participants, setParticipants }) {
                             <Text className="w-3/6">{participantDisplayNames[participant]}</Text>
                             <Checkbox
                                 checked={participants[participant]}
-                                setChecked={() =>
+                                setChecked={() => {
                                     setParticipants({
                                         ...participants,
                                         [participant]: !participants[participant],
-                                    })
-                                }
+                                    });
+                                }}
                             />
                         </View>
                     );
