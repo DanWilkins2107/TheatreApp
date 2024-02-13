@@ -93,7 +93,7 @@ export default function CreateBudgetModal({ productionCode }) {
     };
 
     return (
-        <View className="flex p-3 h-full">
+        <View className="flex p-3">
             <Text className="text-3xl font-extrabold text-center mb-3">Create Budget</Text>
             <Text className="text-lg font-semibold text-center">Name</Text>
             <FormField
@@ -111,7 +111,7 @@ export default function CreateBudgetModal({ productionCode }) {
                 autocapitalize="sentences"
             />
             <ParticipantSelector participants={participants} setParticipants={setParticipants} />
-            <FormButton title="Create" onPress={createBudget} extraClassName="mt-2" />
+            <FormButton title="Create" onPress={createBudget} blockClassName="mt-6" />
         </View>
     );
 }
