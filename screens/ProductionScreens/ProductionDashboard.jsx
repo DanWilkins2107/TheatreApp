@@ -109,7 +109,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         <View className="flex flex-col m-2">
                             <JoinViewBudgetButton
                                 text="Create Budget"
-                                onPress={() => setModal(<CreateBudgetModal />)}
+                                onPress={() => setModal(<CreateBudgetModal productionCode={playCode}/>)}
                             >
                                 <FontAwesomeIcon icon={faPiggyBank} size={50} />
                             </JoinViewBudgetButton>

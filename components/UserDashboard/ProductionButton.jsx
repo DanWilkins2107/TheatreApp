@@ -17,12 +17,12 @@ export default function ProductionButton({ navigation, production }) {
                 {production.playName}
             </Text>
             <Text className="text-xl font-semibold">{participantString}</Text>
-            <View className="w-max flex flex-row mt-2">
+            <View className="w-max flex flex-row">
                 {Object.keys(production.participants)
                     .slice(0, 5)
                     .map((id, index) => {
                         return (
-                            <>
+                            <View key={id}>
                                 <ProfilePicture
                                     key={2 * index}
                                     dimensions={10}
@@ -32,7 +32,7 @@ export default function ProductionButton({ navigation, production }) {
                                     loadingSize="small"
                                 />
                                 <View key={2 * index + 1} className="w-1" />
-                            </>
+                            </View>
                         );
                     })}
 
