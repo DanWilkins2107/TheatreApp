@@ -15,6 +15,7 @@ export default function BudgetAddExpense({ navigation, route }) {
 
     const submitForm = () => {
         setAlert("Created Budget", "bg-green-500", icon({ name: "circle-check" }));
+        // TODO: Complete Submit Form Functionality
     };
 
     const setRecieptLibrary = () => {
