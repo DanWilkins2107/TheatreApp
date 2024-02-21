@@ -4,25 +4,73 @@ import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FormField from "../../components/Form/FormField.jsx";
+import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
+import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCamera, faImages } from "@fortawesome/free-solid-svg-icons";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { launchImageLibraryAsync } from "expo-image-picker";
+import { storage } from "../../firebase.config.js";
 
 export default function BudgetAddExpense({ navigation, route }) {
+    const expenseID = Math.floor(Math.random() * 10 ** 20);
+    const [receiptLoading, setReceiptLoading] = useState(false);
     const [budget, setBudget] = useState("");
     const [reference, setReference] = useState("");
     const [description, setDescription] = useState("");
-    const [recieptURL, setRecieptURL] = useState("");
+    const [receiptURL, setReceiptURL] = useState("");
     const [cost, setCost] = useState("");
     const { setAlert } = useContext(AlertContext);
+    const storageRef = ref(storage);
 
     const submitForm = () => {
         setAlert("Created Budget", "bg-green-500", icon({ name: "circle-check" }));
         // TODO: Complete Submit Form Functionality
     };
 
-    const setRecieptLibrary = () => {
-        // TODO: Add Library Reciept Functionality
+    const setReceiptLibrary = () => {
+        launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
+            if (!response.canceled) {
+                try {
+                    fetch(response.assets[0].uri).then((image) => {
+                        image.blob().then((blob) => {
+                            uploadBytes(
+                                ref(
+                                    storageRef,
+                                    "receipts/" +
+                                        expenseID +
+                                        response.assets[0].fileName.substring(
+                                            response.assets[0].fileName.lastIndexOf(".")
+                                        )
+                                ),
+                                blob
+                            ).then((snapshot) => {
+                                getDownloadURL(snapshot.ref)
+                                    .then((url) => {
+                                        setReceiptURL(url);
+                                    })
+                                    .catch((error) => {
+                                        setAlert(
+                                            "Error uploading profile picture",
+                                            "bg-red-500",
+                                            icon({ name: "circle-exclamation" })
+                                        );
+                                    });
+                            });
+                        });
+                    });
+                } catch (error) {
+                    setAlert(
+                        "Error uploading profile picture",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
+            }
+        });
     };
 
-    const setRecieptCamera = () => {
+    const setReceiptCamera = () => {
         // TODO: Add Camera Reciept Functionality
     };
 
@@ -56,12 +104,17 @@ export default function BudgetAddExpense({ navigation, route }) {
                     <Text className="text-lg font-semibold text-center">Cost</Text>
                     <FormField value={cost} placeholder="Cost (£)" onChangeText={setCost} />
                 </View>
-                {/* TODO: Add Reciept Camera/Photo Library Buttons */}
-                {/* TODO: Edit Reciept Implementation */}
-                <View>
-                    {recieptURL ? 
-                    <Text>Reciept Exists</Text> :
-                    <Text>Reciept Doesn't Exist</Text>}
+                <View className="h-80">
+                    <Text className="text-lg font-semibold text-center">Reciept</Text>
+                    <ReceiptViewer recieptURL={receiptURL} loading={receiptLoading}/>
+                    <View className="flex-row justify-around mt-[-50]">
+                        <AddRecieptButton onPress={setReceiptCamera}>
+                            <FontAwesomeIcon icon={faCamera} size={50} />
+                        </AddRecieptButton>
+                        <AddRecieptButton onPress={setReceiptLibrary}>
+                            <FontAwesomeIcon icon={faImages} size={50} />
+                        </AddRecieptButton>
+                    </View>
                 </View>
             </ScrollView>
             <View className="flex flex-row w-max justify-around">
