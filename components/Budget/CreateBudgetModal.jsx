@@ -73,9 +73,7 @@ export default function CreateBudgetModal({ productionCode }) {
 
         const budgetID = Math.floor(Math.random() * 10 ** 20);
         try {
-            set(ref(db, `productions/${productionCode}/budgets`), {
-                [budgetID]: Date.now(),
-            });
+            set(ref(db, `productions/${productionCode}/budgets/${budgetID}`), Date.now());
             set(ref(db, "budgets/" + budgetID), {
                 name: name,
                 budget: budget,
@@ -101,6 +99,7 @@ export default function CreateBudgetModal({ productionCode }) {
                 placeholder="Name"
                 onChangeText={setName}
                 extraClassName="mb-2"
+                autocapitalize="sentences"
             />
             <Text className="text-lg font-semibold text-center">Budget (£)</Text>
             <FormField
@@ -108,7 +107,6 @@ export default function CreateBudgetModal({ productionCode }) {
                 placeholder="Budget"
                 onChangeText={setBudget}
                 extraClassName="mb-8"
-                autocapitalize="sentences"
             />
             <ParticipantSelector participants={participants} setParticipants={setParticipants} />
             <FormButton title="Create" onPress={createBudget} blockClassName="mt-6" />
