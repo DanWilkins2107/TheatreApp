@@ -4,6 +4,7 @@ import { get, ref, onValue } from "firebase/database";
 import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
+import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
     faPiggyBank,
@@ -130,7 +131,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             )}
                             <ProductionDashboardButton
                                 text="View Budget"
-                                onPress={() => navigation.navigate("BudgetHome")}
+                                onPress={() => setModal(<ViewBudgetModal productionCode={playCode}/>)}
                             >
                                 <FontAwesomeIcon icon={faSearchDollar} size={50} />
                             </ProductionDashboardButton>
