@@ -103,6 +103,7 @@ export default function CreateBudgetModal({ productionCode }) {
                 placeholder="Name"
                 onChangeText={setName}
                 extraClassName="mb-2"
+                autocapitalize="sentences"
             />
             <Text className="text-lg font-semibold text-center">Budget (£)</Text>
             <FormField
@@ -110,7 +111,6 @@ export default function CreateBudgetModal({ productionCode }) {
                 placeholder="Budget"
                 onChangeText={setBudget}
                 extraClassName="mb-8"
-                autocapitalize="sentences"
             />
             <ParticipantSelector participants={participants} setParticipants={setParticipants} />
             <FormButton title="Create" onPress={createBudget} blockClassName="mt-6" />

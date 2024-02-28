@@ -25,9 +25,8 @@ export default function ViewBudgetModal({ productionCode }) {
                     );
                     return;
                 }
-                console.log(Object.keys(productionSnapshot.val()));
+                
                 setBudgets(Object.keys(productionSnapshot.val()));
-                console.log(budgets);
             });
         } catch (error) {
             setAlert(
@@ -41,12 +40,20 @@ export default function ViewBudgetModal({ productionCode }) {
 
     return (
         <View className="flex p-3">
-            <Text className="text-3xl font-extrabold text-center mb-3">Budget</Text>
-            <View className="flex flex-col">
+            <Text className="text-3xl font-extrabold text-center mb-3">Select Budget</Text>
+            <ScrollView className="flex flex-col h-72">
                 {budgets.map((budget, i) => {
-                    return <BudgetInfo key={i} budgetCode={budget} onClick={() => {}} />;
+                    return (
+                        <BudgetInfo
+                            key={i}
+                            budgetCode={budget}
+                            onClick={() => {
+                                alert("working");
+                            }}
+                        />
+                    );
                 })}
-            </View>
+            </ScrollView>
         </View>
     );
 }
