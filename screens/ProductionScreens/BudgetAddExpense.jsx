@@ -49,6 +49,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                         placeholder="Description"
                         onChangeText={setDescription}
                         multiline
+                        extraClassName="h-20"
                     />
                 </View>
                 <View>

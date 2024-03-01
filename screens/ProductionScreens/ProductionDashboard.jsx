@@ -5,7 +5,7 @@ import { firebase_db } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPiggyBank, faSearchDollar, faFileInvoiceDollar, faFileAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPiggyBank, faSearchDollar, faFileInvoiceDollar } from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 
 export default function ProductionDashboardScreen({ navigation, route }) {
