@@ -9,7 +9,7 @@ import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCamera, faImages } from "@fortawesome/free-solid-svg-icons";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { launchImageLibraryAsync } from "expo-image-picker";
+import { launchImageLibraryAsync, launchCameraAsync, ImagePicker, useCameraPermissions } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
 
 export default function BudgetAddExpense({ navigation, route }) {
@@ -71,7 +71,45 @@ export default function BudgetAddExpense({ navigation, route }) {
     };
 
     const setReceiptCamera = () => {
-        // TODO: Add Camera Reciept Functionality
+        launchCameraAsync({ quality: 0.1 }).then((response) => {
+            if (!response.canceled) {
+                try {
+                    fetch(response.assets[0].uri).then((image) => {
+                        image.blob().then((blob) => {
+                            uploadBytes(
+                                ref(
+                                    storageRef,
+                                    "receipts/" +
+                                        expenseID +
+                                        response.assets[0].fileName.substring(
+                                            response.assets[0].fileName.lastIndexOf(".")
+                                        )
+                                ),
+                                blob
+                            ).then((snapshot) => {
+                                getDownloadURL(snapshot.ref)
+                                    .then((url) => {
+                                        setReceiptURL(url);
+                                    })
+                                    .catch((error) => {
+                                        setAlert(
+                                            "Error uploading profile picture",
+                                            "bg-red-500",
+                                            icon({ name: "circle-exclamation" })
+                                        );
+                                    });
+                            });
+                        });
+                    });
+                } catch (error) {
+                    setAlert(
+                        "Error uploading profile picture",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
+            }
+        });
     };
 
     return (
@@ -105,8 +143,8 @@ export default function BudgetAddExpense({ navigation, route }) {
                     <FormField value={cost} placeholder="Cost (£)" onChangeText={setCost} />
                 </View>
                 <View className="h-80">
-                    <Text className="text-lg font-semibold text-center">Reciept</Text>
-                    <ReceiptViewer recieptURL={receiptURL} loading={receiptLoading}/>
+                    <Text className="text-lg font-semibold text-center">Receipt</Text>
+                    <ReceiptViewer recieptURL={receiptURL} loading={receiptLoading} />
                     <View className="flex-row justify-around mt-[-50]">
                         <AddRecieptButton onPress={setReceiptCamera}>
                             <FontAwesomeIcon icon={faCamera} size={50} />
