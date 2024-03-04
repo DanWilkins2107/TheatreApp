@@ -167,7 +167,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                         setBudget("");
                         setReference("");
                         setCost("");
-                        // TODO: Add reset for reciept
+                        setReceiptURL("");
                     }}
                 />
             </View>
