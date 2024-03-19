@@ -7,12 +7,13 @@ import FormField from "../../components/Form/FormField.jsx";
 import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
 import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCamera, faImages } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faImages, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
     launchImageLibraryAsync,
     launchCameraAsync,
     requestCameraPermissionsAsync,
+    requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
 
@@ -21,53 +22,54 @@ export default function BudgetAddExpense({ navigation, route }) {
     const [budget, setBudget] = useState("");
     const [reference, setReference] = useState("");
     const [description, setDescription] = useState("");
-    const [receiptURL, setReceiptURL] = useState("");
+    const [receiptURI, setReceiptURI] = useState("");
     const [cost, setCost] = useState("");
     const { setAlert } = useContext(AlertContext);
     const storageRef = ref(storage);
 
-    const submitForm = () => {
-        setAlert("Created Budget", "bg-green-500", icon({ name: "circle-check" }));
+    const submitForm = async () => {
         // TODO: Complete Submit Form Functionality
+        setAlert("Created Budget", "bg-green-500", icon({ name: "circle-check" }));
+        const url = "";
+        if (receiptURI) {
+            try {
+                const blob = receiptURI.blob();
+                const extension = receiptURI.substring(receiptURI.lastIndexOf("."));
+                const snapshot = await uploadBytes(
+                    ref(storageRef, "receipts/" + expenseID + extension),
+                    blob
+                );
+                url = await getDownloadURL(snapshot.ref);
+            } catch (error) {
+                setAlert(
+                    "Error uploading receipt",
+                    "bg-red-500",
+                    icon({ name: "circle-exclamation" })
+                );
+            }
+        }
     };
 
-    // NOTE TO BE REMOVED!!! Basically what do you reckon is cleaner out of 
-    // setReceiptLibrary and setReceiptCamera? Will change them to be consistent! 
-    // Also do u reckon a upload function is needed?
-    const setReceiptLibrary = () => {
+    const setReceiptLibrary = async () => {
+        const libraryStatus = await requestMediaLibraryPermissionsAsync();
+        if (libraryStatus.status != "granted") {
+            console.log(libraryStatus);
+            setAlert(
+                "Please grant permission to access your photo library to upload a receipt",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
+            return;
+        }
         launchImageLibraryAsync({ quality: 0.1 }).then((response) => {
             if (!response.canceled) {
                 try {
-                    fetch(response.assets[0].uri).then((image) => {
-                        image.blob().then((blob) => {
-                            uploadBytes(
-                                ref(
-                                    storageRef,
-                                    "receipts/" +
-                                        expenseID +
-                                        response.assets[0].fileName.substring(
-                                            response.assets[0].fileName.lastIndexOf(".")
-                                        )
-                                ),
-                                blob
-                            ).then((snapshot) => {
-                                getDownloadURL(snapshot.ref)
-                                    .then((url) => {
-                                        setReceiptURL(url);
-                                    })
-                                    .catch((error) => {
-                                        setAlert(
-                                            "Error uploading profile picture",
-                                            "bg-red-500",
-                                            icon({ name: "circle-exclamation" })
-                                        );
-                                    });
-                            });
-                        });
+                    fetch(response.assets[0].uri).then(() => {
+                        setReceiptURI(response.assets[0].uri);
                     });
                 } catch (error) {
                     setAlert(
-                        "Error uploading profile picture",
+                        "An error occurred while uploading the receipt. Please try again.",
                         "bg-red-500",
                         icon({ name: "circle-exclamation" })
                     );
@@ -79,44 +81,35 @@ export default function BudgetAddExpense({ navigation, route }) {
     const setReceiptCamera = async () => {
         const cameraStatus = await requestCameraPermissionsAsync();
         if (cameraStatus.status != "granted") {
-            console.log("Camera Permission Denied");
+            setAlert(
+                "Please grant permission to access your camera to upload a receipt",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
             return;
         }
-        const result = await launchCameraAsync({ quality: 0.1 });
-
-        if (!result.canceled) {
-            try {
-                const response = await fetch(result.assets[0].uri);
-                const blob = await response.blob();
-                const extension = result.assets[0].uri.substring(
-                    result.assets[0].uri.lastIndexOf(".")
-                );
-                const snapshot = await uploadBytes(
-                    ref(
-                        storageRef,
-                        "receipts/" +
-                            expenseID +
-                            extension
-                    ),
-                    blob
-                );
-                const url = await getDownloadURL(snapshot.ref);
-                setReceiptURL(url);
-            } catch (error) {
-                setAlert(
-                    "Error uploading receipt",
-                    "bg-red-500",
-                    icon({ name: "circle-exclamation" })
-                );
+        launchCameraAsync({ quality: 0.1 }).then((response) => {
+            if (!response.canceled) {
+                try {
+                    fetch(response.assets[0].uri).then(() => {
+                        setReceiptURI(response.assets[0].uri);
+                    });
+                } catch (error) {
+                    setAlert(
+                        "An error occurred while uploading the receipt. Please try again.",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
             }
-        }
+        });
     };
 
     return (
         <View className="py-2 flex justify-center items-center">
             <Text className="self-center text-3xl font-extrabold">Add Expense</Text>
             <ScrollView className="h-5/6 w-10/12">
-                <View>
+                <View className="h-40">
                     {/* TODO: Select Budget */}
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
                 </View>
@@ -136,23 +129,36 @@ export default function BudgetAddExpense({ navigation, route }) {
                         onChangeText={setDescription}
                         multiline
                         extraClassName="h-20"
+                        autoCapitalize="sentences"
                     />
                 </View>
                 <View>
                     <Text className="text-lg font-semibold text-center">Cost</Text>
                     <FormField value={cost} placeholder="Cost (£)" onChangeText={setCost} />
                 </View>
-                <View className="h-80">
+                <View className="h-80 mb-24">
                     <Text className="text-lg font-semibold text-center">Receipt</Text>
-                    <ReceiptViewer recieptURL={receiptURL} />
-                    <View className="flex-row justify-around mt-[-50]">
-                        <AddRecieptButton onPress={setReceiptCamera}>
-                            <FontAwesomeIcon icon={faCamera} size={50} />
-                        </AddRecieptButton>
-                        <AddRecieptButton onPress={setReceiptLibrary}>
-                            <FontAwesomeIcon icon={faImages} size={50} />
-                        </AddRecieptButton>
-                    </View>
+                    <ReceiptViewer recieptURL={receiptURI} />
+                    {receiptURI ? (
+                        <View className="flex-row justify-around mt-[-50]">
+                            <AddRecieptButton
+                                onPress={() => {
+                                    setReceiptURI("");
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faTrash} size={50} />
+                            </AddRecieptButton>
+                        </View>
+                    ) : (
+                        <View className="flex-row justify-around mt-[-50]">
+                            <AddRecieptButton onPress={setReceiptCamera}>
+                                <FontAwesomeIcon icon={faCamera} size={50} />
+                            </AddRecieptButton>
+                            <AddRecieptButton onPress={setReceiptLibrary}>
+                                <FontAwesomeIcon icon={faImages} size={50} />
+                            </AddRecieptButton>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
             <View className="flex flex-row w-max justify-around">
@@ -167,7 +173,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                         setBudget("");
                         setReference("");
                         setCost("");
-                        setReceiptURL("");
+                        setReceiptURI("");
                     }}
                 />
             </View>
