@@ -53,7 +53,6 @@ export default function BudgetAddExpense({ navigation, route }) {
     const setReceiptLibrary = async () => {
         const libraryStatus = await requestMediaLibraryPermissionsAsync();
         if (libraryStatus.status != "granted") {
-            console.log(libraryStatus);
             setAlert(
                 "Please grant permission to access your photo library to upload a receipt",
                 "bg-red-500",
