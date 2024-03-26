@@ -7,6 +7,7 @@ import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPiggyBank, faSearchDollar, faFileInvoiceDollar } from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import Title from "../../components/TextStyles/Title.jsx";
 
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
@@ -75,7 +76,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     return (
         <View className="flex-col">
-            <Text className="self-center text-3xl font-extrabold">Production Dashboard</Text>
+            <Title extraClassName="text-center mt-4">Production Dashboard</Title>
             {loading ? (
                 <ActivityIndicator color="#000000" size="large" />
             ) : (
