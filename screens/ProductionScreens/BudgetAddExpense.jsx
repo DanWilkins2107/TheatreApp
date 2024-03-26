@@ -4,6 +4,7 @@ import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FormField from "../../components/Form/FormField.jsx";
+import Title from "../../components/TextStyles/Title.jsx";
 
 export default function BudgetAddExpense({ navigation, route }) {
     const [budget, setBudget] = useState("");
@@ -28,7 +29,7 @@ export default function BudgetAddExpense({ navigation, route }) {
 
     return (
         <View className="py-2 flex justify-center items-center">
-            <Text className="self-center text-3xl font-extrabold">Add Expense</Text>
+            <Title extraClassName="mb-2">Add Expense</Title>
             <ScrollView className="h-5/6 w-10/12">
                 <View>
                     {/* TODO: Select Budget */}

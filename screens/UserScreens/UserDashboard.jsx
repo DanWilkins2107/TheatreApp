@@ -9,6 +9,7 @@ import ProductionButton from "../../components/UserDashboard/ProductionButton";
 import JoinProductionModal from "../../components/ProductionModals/JoinProductionModal";
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import Title from "../../components/TextStyles/Title.jsx";
 
 //TODO:
 // - order participants by last action/ time joined
@@ -78,7 +79,7 @@ export default function UserDashboardScreen({ navigation }) {
                 </CreateAndJoinButtons>
             </View>
             <View className="border-b-2">
-                <Text className="text-3xl font-extrabold text-center mb-5">Your Productions</Text>
+                <Title extraClassName="mb-4 text-center">Your Productions</Title>
             </View>
             <ScrollView className="flex-col space-y-12 grow">
                 {loading ? (

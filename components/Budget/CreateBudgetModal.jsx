@@ -8,6 +8,7 @@ import { AlertContext } from "../Alert/AlertProvider";
 import { firebase_db } from "../../firebase.config";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { ModalContext } from "../Modal/ModalProvider";
+import Title from "../TextStyles/Title";
 
 export default function CreateBudgetModal({ productionCode }) {
     const [name, setName] = useState("");
@@ -92,7 +93,9 @@ export default function CreateBudgetModal({ productionCode }) {
 
     return (
         <View className="flex p-3">
-            <Text className="text-3xl font-extrabold text-center mb-3">Create Budget</Text>
+            <Title extraClassName="mb-4 text-center">
+                Create Budget
+            </Title>
             <Text className="text-lg font-semibold text-center">Name</Text>
             <FormField
                 value={name}
