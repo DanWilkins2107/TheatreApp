@@ -193,6 +193,12 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             >
                                 <IconFA5 name="file-invoice-dollar" size={50} />
                             </ProductionDashboardButton>
+                            <ProductionDashboardButton
+                                text="Set Availability"
+                                onPress={() => navigation.navigate("Availability")}
+                            >
+                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                            </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
                                     text="Admin Stuff"
