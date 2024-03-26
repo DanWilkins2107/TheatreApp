@@ -125,6 +125,12 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             >
                                 <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
                             </ProductionDashboardButton>
+                            <ProductionDashboardButton
+                                text="Set Availability"
+                                onPress={() => navigation.navigate("Availability")}
+                            >
+                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                            </ProductionDashboardButton>
                         </View>
                     </View>
                 </>
