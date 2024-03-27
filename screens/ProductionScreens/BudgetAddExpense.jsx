@@ -29,7 +29,6 @@ export default function BudgetAddExpense({ navigation, route }) {
 
     const submitForm = async () => {
         // TODO: Complete Submit Form Functionality
-        setAlert("Created Budget", "bg-green-500", icon({ name: "circle-check" }));
         const url = "";
         if (receiptURI) {
             try {
@@ -40,6 +39,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                     blob
                 );
                 url = await getDownloadURL(snapshot.ref);
+                throw Error();
             } catch (error) {
                 setAlert(
                     "Error uploading receipt",
@@ -107,7 +107,7 @@ export default function BudgetAddExpense({ navigation, route }) {
     return (
         <View className="py-2 flex justify-center items-center">
             <Text className="self-center text-3xl font-extrabold">Add Expense</Text>
-            <ScrollView className="h-5/6 w-10/12">
+            <ScrollView className="h-5/6 w-full px-8 ">
                 <View className="h-40">
                     {/* TODO: Select Budget */}
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
