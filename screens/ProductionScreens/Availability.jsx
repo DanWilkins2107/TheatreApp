@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import AvailabilityCalendar from "../../components/Availability/AvailabilityCalendar";
+import SmallFormButton from "../../components/Form/SmallFormButton";
 
 export default function Availability() {
     const [date, setDate] = useState(new Date());
@@ -55,7 +56,13 @@ export default function Availability() {
                     onChange={(event, selectedDate) => {setDate(selectedDate); setIsEditingDate(false);}}
                 />
             )}
-            <AvailabilityCalendar date={date} availabilityInfo={availabilityInfo} setAvailabilityInfo={setAvailabilityInfo}/>
+            <View className="w-full h-5/6 border-b">
+                <AvailabilityCalendar date={date} availabilityInfo={availabilityInfo} setAvailabilityInfo={setAvailabilityInfo}/>
+            </View>
+            <View className="flex flex-row justify-around w-full">
+                <SmallFormButton title="Submit" backgroundColor="bg-green-400" />
+                <SmallFormButton title="Reset" backgroundColor="bg-white" />
+            </View>
         </View>
     );
 }
