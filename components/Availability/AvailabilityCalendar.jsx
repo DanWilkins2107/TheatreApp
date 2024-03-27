@@ -64,21 +64,24 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         return "none";
     };
     return (
-        <>
+        <View className="h-full">
             <View className="w-full flex flex-row justify-around">
                 <Text>Time</Text>
                 <Text>PrevDay</Text>
                 <Text>Date</Text>
                 <Text>NextDay</Text>
             </View>
-            <ScrollView className="w-full mb-32">
-                <View className="w-full flex flex-row border-b">
+            <ScrollView className="w-full pb-8">
+                <View className="w-full flex flex-row">
                     <View className="flex-[0.75]">
                         <View className="flex flex-col">
                             {[...Array(24).keys()].map((hour) => {
                                 return (
-                                    <View className="h-20 border-t w-full border-l p-1">
-                                        <Text key={hour}>{`${hour}:00`}</Text>
+                                    <View
+                                        className="h-20 border-t w-full border-l p-1"
+                                        key={String(hour) + "time"}
+                                    >
+                                        <Text key={String(hour) + "text"}>{`${hour}:00`}</Text>
                                     </View>
                                 );
                             })}
@@ -88,7 +91,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <TouchableOpacity
+                                    <View
+                                        key={String(hour) + "-1"}
                                         className={`h-10 border-t border-l ${findColour(
                                             checkAvailability(hour / 2, editDate(date, -1))
                                         )}`}
@@ -104,7 +108,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <TouchableOpacity
+                                    <View
+                                        key={String(hour) + "-0"}
                                         className={`h-10 border-t border-l ${findColour(
                                             checkAvailability(hour / 2, editDate(date, 0))
                                         )}`}
@@ -120,7 +125,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <TouchableOpacity
+                                    <View
+                                        key={String(hour) + "+1"}
                                         className={`h-10 border-t ${findColour(
                                             checkAvailability(hour / 2, editDate(date, 1))
                                         )}`}
@@ -134,6 +140,6 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     </View>
                 </View>
             </ScrollView>
-        </>
+        </View>
     );
 }
