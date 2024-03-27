@@ -1,4 +1,7 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import DateCircles from "./DateCircles";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -19,7 +22,8 @@ const findColour = (colour) => {
     } else return "bg-white";
 };
 
-export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo, date }) {
+export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
+    const [date, setDate] = useState(new Date());
     const handleOnPress = (hour, daysToChange) => {
         const correctDate = editDate(date, daysToChange);
         const dayData = splitDate(correctDate);
@@ -65,11 +69,27 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
     };
     return (
         <View className="h-full">
+            <View className="h-20 flex-row justify-center items-center">
+                <Text className="font-semibold text-lg">Choose Date:</Text>
+                <DateTimePicker
+                    value={date}
+                    mode="date"
+                    onChange={(event, selectedDate) => {
+                        setDate(selectedDate);
+                    }}
+                />
+            </View>
             <View className="w-full flex flex-row justify-around">
-                <Text>Time</Text>
-                <Text>PrevDay</Text>
-                <Text>Date</Text>
-                <Text>NextDay</Text>
+                <View className="flex-[0.75]" />
+                <View className="flex-[0.75] items-center justify-center">
+                    <DateCircles number={splitDate(editDate(date, -1))[2]} onPress={() => {setDate(editDate(date, -1))}}/>
+                </View>
+                <View className="flex-1 items-center">
+                    <DateCircles number={splitDate(editDate(date, 0))[2]} />
+                </View>
+                <View className="flex-[0.75] items-center">
+                    <DateCircles number={splitDate(editDate(date, 1))[2]} onPress={() => {setDate(editDate(date, 1))}}/>
+                </View>
             </View>
             <ScrollView className="w-full pb-8">
                 <View className="w-full flex flex-row">
@@ -77,10 +97,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(24).keys()].map((hour) => {
                                 return (
-                                    <View
-                                        className="h-20 border-t w-full border-l p-1"
-                                        key={String(hour) + "time"}
-                                    >
+                                    <View className="h-20 border-t w-full border-l p-1" key={hour}>
                                         <Text key={String(hour) + "text"}>{`${hour}:00`}</Text>
                                     </View>
                                 );
@@ -91,8 +108,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <View
-                                        key={String(hour) + "-1"}
+                                    <Pressable
+                                        key={hour}
                                         className={`h-10 border-t border-l ${findColour(
                                             checkAvailability(hour / 2, editDate(date, -1))
                                         )}`}
@@ -108,8 +125,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <View
-                                        key={String(hour) + "-0"}
+                                    <Pressable
+                                        key={hour}
                                         className={`h-10 border-t border-l ${findColour(
                                             checkAvailability(hour / 2, editDate(date, 0))
                                         )}`}
@@ -125,8 +142,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(48).keys()].map((hour) => {
                                 return (
-                                    <View
-                                        key={String(hour) + "+1"}
+                                    <Pressable
+                                        key={hour}
                                         className={`h-10 border-t ${findColour(
                                             checkAvailability(hour / 2, editDate(date, 1))
                                         )}`}

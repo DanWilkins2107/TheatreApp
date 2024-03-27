@@ -5,11 +5,7 @@ import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-    faPiggyBank,
-    faSearchDollar,
-    faFileInvoiceDollar,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPiggyBank, faSearchDollar, faFileInvoiceDollar, faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
@@ -148,7 +144,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 text="Set Availability"
                                 onPress={() => navigation.navigate("Availability")}
                             >
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                <FontAwesomeIcon icon={faCalendarCheck} size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
