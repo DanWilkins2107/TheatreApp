@@ -17,6 +17,7 @@ import Alert from "./components/Alert/Alert.jsx";
 import { ModalProvider } from "./components/Modal/ModalProvider.jsx";
 import Modal from "./components/Modal/Modal.jsx";
 import BudgetAddExpense from "./screens/ProductionScreens/BudgetAddExpense.jsx";
+import Availability from "./screens/ProductionScreens/Availability.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +85,16 @@ export default function App() {
                                 <Stack.Screen
                                     name="BudgetAddExpense"
                                     component={BudgetAddExpense}
+                                    options={({ navigation }) => ({
+                                        headerTitle: () => (
+                                            <Header navigation={navigation} />
+                                        ),
+                                        headerBackVisible: false,
+                                    })}
+                                />
+                                <Stack.Screen
+                                    name="Availability"
+                                    component={Availability}
                                     options={({ navigation }) => ({
                                         headerTitle: () => (
                                             <Header navigation={navigation} />
