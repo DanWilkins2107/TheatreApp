@@ -29,7 +29,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
     return (
         <View className="flex-1 mx-10 justify-center">
             <KeyboardAvoidingView behavior="position">
-                <Text className="text-xl text-center font-extrabold"> Forgotten Password</Text>
+                <Text className="text-xl text-center font-extrabold">Forgotten Password</Text>
                 <Text className="text-center my-5">
                     Enter your email below and you will be sent a link to reset your password.
                 </Text>

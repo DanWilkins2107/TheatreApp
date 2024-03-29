@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
+import Subtitle from "../TextStyles/Subtitle";
 
 export default function ProductionButton({ navigation, production }) {
     const noOfParticipants = Object.keys(production.participants).length;
@@ -16,7 +17,7 @@ export default function ProductionButton({ navigation, production }) {
             <Text className="text-2xl font-extrabold text-ellipsis" numberOfLines={1}>
                 {production.playName}
             </Text>
-            <Text className="text-xl font-semibold">{participantString}</Text>
+            <Subtitle>{participantString}</Subtitle>
             <View className="w-max flex flex-row">
                 {Object.keys(production.participants)
                     .slice(0, 5)
