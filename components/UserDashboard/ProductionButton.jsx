@@ -1,17 +1,48 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
+import { firebase_auth, firebase_db } from "../../firebase.config";
+import { useContext } from "react";
+import { AlertContext } from "../Alert/AlertProvider";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { set, ref, onValue } from "firebase/database";
 import Subtitle from "../TextStyles/Subtitle";
 
 export default function ProductionButton({ navigation, production }) {
     const noOfParticipants = Object.keys(production.participants).length;
-    const participantString = `${noOfParticipants} participant${
-        noOfParticipants === 1 ? "" : "s"
-    }`;
+    const participantString = `${noOfParticipants} participant${noOfParticipants === 1 ? "" : "s"}`;
+    const db = firebase_db;
+    const auth = firebase_auth;
+    const { setAlert } = useContext(AlertContext);
     return (
         <TouchableOpacity
-            onPress={() =>
-                navigation.navigate("ProductionDashboard", { playCode: production.playCode })
-            }
+            onPress={() => {
+                navigation.navigate("ProductionDashboard", { playCode: production.playCode });
+                try {
+                    set(
+                        ref(
+                            db,
+                            "/productions/" +
+                                production.playCode +
+                                "/participants/" +
+                                auth.currentUser.uid
+                        ),
+                        Date.now()
+                    );
+                    set(
+                        ref(
+                            db,
+                            "/users/" + auth.currentUser.uid + "/productions/" + production.playCode
+                        ),
+                        Date.now()
+                    );
+                } catch (error) {
+                    setAlert(
+                        "Could not change order of productions.",
+                        "bg-red-500",
+                        icon({ name: "circle-exclamation" })
+                    );
+                }
+            }}
             className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 "
         >
             <Text className="text-2xl font-extrabold text-ellipsis" numberOfLines={1}>
@@ -39,9 +70,7 @@ export default function ProductionButton({ navigation, production }) {
 
                 {noOfParticipants > 5 && (
                     <View className="w-10 h-10 rounded-full bg-white justify-center items-center border-2 border-black">
-                        <Text className="font-semibold">
-                            {`+${noOfParticipants - 5}`}
-                        </Text>
+                        <Text className="font-semibold">{`+${noOfParticipants - 5}`}</Text>
                     </View>
                 )}
             </View>
