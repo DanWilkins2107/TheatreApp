@@ -195,7 +195,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Set Availability"
-                                onPress={() => navigation.navigate("Availability")}
+                                onPress={() => navigation.navigate("Availability", { productionCode: playCode })}
                             >
                                 <FontAwesomeIcon icon={faCalendarCheck} size={50} />
                             </ProductionDashboardButton>

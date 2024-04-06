@@ -1,46 +1,81 @@
 import { Text, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import AvailabilityCalendar from "../../components/Availability/AvailabilityCalendar";
 import SmallFormButton from "../../components/Form/SmallFormButton";
+import { ref, set, get, child } from "firebase/database";
+import { firebase_auth, firebase_db } from "../../firebase.config";
+import { randomUUID } from "expo-crypto";
+import { AlertContext } from "../../components/Alert/AlertProvider";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
-export default function Availability() {
-    const [availabilityInfo, setAvailabilityInfo] = useState({})
+export default function Availability({navigation, route}) {
+    const [availabilityInfo, setAvailabilityInfo] = useState({});
+    const [initialAvailabilityInfo, setInitialAvailabilityInfo] = useState({});
+    const db = firebase_db;
+    const auth = firebase_auth;
+    const playCode = route.params.productionCode;
+    const { setAlert } = useContext(AlertContext);
+
+    const onSubmit = () => {
+        const dbRef = ref(db);
+        let availabilityUID;
+        try {
+            get(child(dbRef, `/productions/${playCode}/availability/`)).then(
+                (snapshot) => {
+                    const data = snapshot.val();
+                    if (!data) {
+                        console.log("No availability found, creating new availability entry.")
+                        availabilityUID = randomUUID();
+                        set(
+                            ref(
+                                db,
+                                `/productions/${playCode}/availability/${auth.currentUser.uid}`
+                            ),
+                            availabilityUID
+                        );
+                    } else {
+                        availabilityUID = data[auth.currentUser.uid];
+                    }
+                    set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
+                    setInitialAvailabilityInfo(availabilityInfo);
+                    setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
+                }
+            );
+        } catch (error) {
+            setAlert("Could not update availability", "bg-red-500", icon({ name: "circle-exclamation" }));
+        }
+    };
+
+    const onReset = () => {
+        setAvailabilityInfo(initialAvailabilityInfo);
+    };
 
     useEffect(() => {
-        const exampleAvailabilityInfo = {
-            2024: {
-                3: {
-                    26: {
-                        0: "green",
-                        0.5: "green",
-                        1: "green",
-                        1.5: "green",
-                        2: "red",
-                        4: "red",
-                        5: "red",
-                        7: "red",
-                    }
-                },
-                4: {
-                    21: {
-                        0: "green",
-                        0.5: "green",
-                    }
-                }
+        const dbRef = ref(db);
+        get(child(dbRef, `/productions/${playCode}/availability/`)).then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const availabilityUID = data[auth.currentUser.uid];
+                get(ref(db, `/availabilities/${availabilityUID}/`)).then((snapshot) => {
+                    setInitialAvailabilityInfo(snapshot.val());
+                    setAvailabilityInfo(snapshot.val());
+                });
             }
-        }
-        setAvailabilityInfo(exampleAvailabilityInfo)
+        });
     }, []);
 
     return (
         <View className="flex items-center p-2">
             <Text className="text-3xl font-extrabold">Set Availability</Text>
             <View className="w-full h-5/6 border-b mb-8">
-                <AvailabilityCalendar availabilityInfo={availabilityInfo} setAvailabilityInfo={setAvailabilityInfo}/>
+                <AvailabilityCalendar
+                    availabilityInfo={availabilityInfo}
+                    setAvailabilityInfo={setAvailabilityInfo}
+                />
             </View>
             <View className="flex flex-row justify-around w-full">
-                <SmallFormButton title="Submit" backgroundColor="bg-green-400" />
-                <SmallFormButton title="Reset" backgroundColor="bg-white" />
+                <SmallFormButton title="Submit" backgroundColor="bg-green-400" onPress={onSubmit} />
+                <SmallFormButton title="Reset" backgroundColor="bg-white" onPress={onReset} />
             </View>
         </View>
     );
