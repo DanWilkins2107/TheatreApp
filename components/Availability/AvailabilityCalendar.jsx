@@ -31,15 +31,19 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
 
         newInfo = { ...availabilityInfo };
 
+        // Fix this, is not working for some reason
         if (value === "none") {
             if (newInfo[dayData[0]] === undefined) {
-                newInfo[dayData[0]] = {};
+                newInfo = { ...newInfo, [dayData[0]]: {} };
             }
             if (newInfo[dayData[0]][dayData[1]] === undefined) {
-                newInfo[dayData[0][dayData[1]]] = {};
+                newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
             }
             if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
-                newInfo[dayData[0]][dayData[1]][dayData[2]] = {};
+                newInfo[dayData[0]][dayData[1]] = {
+                    ...newInfo[dayData[0]][dayData[1]],
+                    [dayData[2]]: {},
+                };
             }
             newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
         }
@@ -49,7 +53,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         if (value === "red") {
             newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
         }
-        setAvailabilityInfo(() => newInfo);
+        setAvailabilityInfo(newInfo);
     };
 
     const checkAvailability = (hour, date) => {
@@ -74,7 +78,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                 <DateTimePicker
                     value={date}
                     mode="date"
-                    onChange={(event, selectedDate) => {
+                    onChange={(_event, selectedDate) => {
                         setDate(selectedDate);
                     }}
                 />
@@ -97,7 +101,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         <View className="flex flex-col">
                             {[...Array(24).keys()].map((hour) => {
                                 return (
-                                    <View className="h-20 border-t w-full border-l p-1" key={hour}>
+                                    <View className="h-20 border-t bg-blue-100 w-full border-l p-1" key={hour}>
                                         <Text key={String(hour) + "text"}>{`${hour}:00`}</Text>
                                     </View>
                                 );
@@ -111,10 +115,10 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                                     <Pressable
                                         key={hour}
                                         className={`h-10 border-t border-l ${findColour(
-                                            checkAvailability(hour / 2, editDate(date, -1))
+                                            checkAvailability(hour, editDate(date, -1))
                                         )}`}
                                         onPress={() => {
-                                            handleOnPress(hour / 2, -1);
+                                            handleOnPress(hour, -1);
                                         }}
                                     />
                                 );
@@ -128,10 +132,10 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                                     <Pressable
                                         key={hour}
                                         className={`h-10 border-t border-l ${findColour(
-                                            checkAvailability(hour / 2, editDate(date, 0))
+                                            checkAvailability(hour, editDate(date, 0))
                                         )}`}
                                         onPress={() => {
-                                            handleOnPress(hour / 2, 0);
+                                            handleOnPress(hour, 0);
                                         }}
                                     />
                                 );
@@ -145,10 +149,10 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                                     <Pressable
                                         key={hour}
                                         className={`h-10 border-t ${findColour(
-                                            checkAvailability(hour / 2, editDate(date, 1))
+                                            checkAvailability(hour, editDate(date, 1))
                                         )}`}
                                         onPress={() => {
-                                            handleOnPress(hour / 2, 1);
+                                            handleOnPress(hour, 1);
                                         }}
                                     />
                                 );
