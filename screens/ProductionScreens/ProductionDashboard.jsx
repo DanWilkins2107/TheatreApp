@@ -7,6 +7,8 @@ import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPiggyBank, faSearchDollar, faFileInvoiceDollar } from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import Title from "../../components/TextStyles/Title.jsx";
+import Subtitle from "../../components/TextStyles/Subtitle.jsx";
 
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
@@ -75,19 +77,19 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     return (
         <View className="flex-col">
-            <Text className="self-center text-3xl font-extrabold">Production Dashboard</Text>
+            <Title extraClassName="text-center mt-4">Production Dashboard</Title>
             {loading ? (
                 <ActivityIndicator color="#000000" size="large" />
             ) : (
                 <>
                     <View className="flex-row justify-around my-2">
-                        <Text className="text-xl font-semibold">
+                        <Subtitle>
                             Production: {production.playName}
-                        </Text>
-                        <Text className="text-xl font-semibold">{playCode}</Text>
+                        </Subtitle>
+                        <Subtitle>{playCode}</Subtitle>
                     </View>
                     <View className="flex-col m-2">
-                        <Text className="text-xl font-semibold">Admins:</Text>
+                        <Subtitle>Admins:</Subtitle>
                         {admins.map((admin, index) => {
                             return (
                                 <Text key={index}>
@@ -97,7 +99,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         })}
                     </View>
                     <View className="flex-col m-2">
-                        <Text className="text-xl font-semibold">Participants:</Text>
+                        <Subtitle>Participants:</Subtitle>
                         {participants.map((participant, index) => {
                             return (
                                 <Text key={index}>

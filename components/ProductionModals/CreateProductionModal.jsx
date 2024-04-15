@@ -5,6 +5,7 @@ import { useState, useContext } from "react";
 import { firebase_auth, firebase_db } from "../../firebase.config";
 import { get, ref, set, child } from "firebase/database";
 import { ModalContext } from "../Modal/ModalProvider";
+import Title from "../TextStyles/Title";
 
 const generatePlayCode = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -59,7 +60,7 @@ export default function CreateProductionModal() {
 
     return (
         <View className="flex px-4">
-            <Text className="text-3xl font-extrabold text-center mb-2">Create Production</Text>
+            <Title extraClassName="text-center mb-2">Create Production</Title>
             <Text className="text-lg font-semibold text-center mb-2">
                 Enter the name for your production.
             </Text>
