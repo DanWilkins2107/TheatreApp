@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DateCircles from "./DateCircles";
 
@@ -24,6 +24,7 @@ const findColour = (colour) => {
 
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
     const [date, setDate] = useState(new Date());
+    const scrollViewRef = useRef();
     const handleOnPress = (hour, daysToChange) => {
         const correctDate = editDate(date, daysToChange);
         const dayData = splitDate(correctDate);
@@ -31,7 +32,6 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
 
         newInfo = { ...availabilityInfo };
 
-        // Fix this, is not working for some reason
         if (value === "none") {
             if (newInfo[dayData[0]] === undefined) {
                 newInfo = { ...newInfo, [dayData[0]]: {} };
@@ -71,6 +71,10 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         }
         return "none";
     };
+
+    useEffect(() => {
+        scrollViewRef.current.scrollTo({ y:635, animated: true });
+    });
     return (
         <View className="h-full">
             <View className="h-20 flex-row justify-center items-center">
@@ -95,14 +99,14 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     <DateCircles number={splitDate(editDate(date, 1))[2]} onPress={() => {setDate(editDate(date, 1))}}/>
                 </View>
             </View>
-            <ScrollView className="w-full pb-8">
+            <ScrollView className="w-full pb-8" bounces={false} ref={scrollViewRef}>
                 <View className="w-full flex flex-row">
                     <View className="flex-[0.75]">
                         <View className="flex flex-col">
                             {[...Array(24).keys()].map((hour) => {
                                 return (
                                     <View className="h-20 border-t bg-blue-100 w-full border-l p-1" key={hour}>
-                                        <Text key={String(hour) + "text"}>{`${hour}:00`}</Text>
+                                        <Text className="font-semibold" key={String(hour) + "text"}>{`${hour}:00`}</Text>
                                     </View>
                                 );
                             })}
