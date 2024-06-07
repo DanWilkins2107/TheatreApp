@@ -18,14 +18,9 @@ export default function ViewBudgetModal({ productionCode }) {
         try {
             onValue(ref(db, `productions/${productionCode}/budgets`), (productionSnapshot) => {
                 if (!productionSnapshot.exists()) {
-                    setAlert(
-                        "Could not find production.",
-                        "bg-red-500",
-                        icon({ name: "circle-exclamation" })
-                    );
                     return;
                 }
-                
+
                 setBudgets(Object.keys(productionSnapshot.val()));
             });
         } catch (error) {
@@ -41,18 +36,22 @@ export default function ViewBudgetModal({ productionCode }) {
     return (
         <View className="flex p-3">
             <Text className="text-3xl font-extrabold text-center mb-3">Select Budget</Text>
-            <ScrollView className="flex flex-col h-72">
-                {budgets.map((budget, i) => {
-                    return (
-                        <BudgetInfo
-                            key={i}
-                            budgetCode={budget}
-                            onClick={() => {
-                                alert("working");
-                            }}
-                        />
-                    );
-                })}
+            <ScrollView className="flex flex-col h-96">
+                {budgets.length > 0 ? (
+                    budgets.map((budget, i) => {
+                        return (
+                            <BudgetInfo
+                                key={i}
+                                budgetCode={budget}
+                                onClick={() => {
+                                    alert("working");
+                                }}
+                            />
+                        );
+                    })
+                ) : (
+                    <Text className="text-center">No budgets found.</Text>
+                )}
             </ScrollView>
         </View>
     );
