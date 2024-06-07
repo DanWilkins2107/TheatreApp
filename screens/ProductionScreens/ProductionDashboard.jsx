@@ -1,22 +1,29 @@
 import { useState, useEffect, useContext } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { get, ref, onValue } from "firebase/database";
-import { firebase_db } from "../../firebase.config.js";
+import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPiggyBank, faSearchDollar, faFileInvoiceDollar } from "@fortawesome/free-solid-svg-icons";
+import {
+    faPiggyBank,
+    faSearchDollar,
+    faFileInvoiceDollar,
+} from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
 
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
+    const [isAdmin, setIsAdmin] = useState(false);
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
     const playCode = route.params.playCode;
     const db = firebase_db;
+    const auth = firebase_auth;
+
     const { setModal } = useContext(ModalContext);
 
     useEffect(() => {
@@ -49,7 +56,9 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         });
                 })
             );
-
+            if (adminData[auth.currentUser.uid]) {
+                setIsAdmin(true);
+            }
             setAdmins(newAdmins);
         });
 
@@ -109,12 +118,16 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         })}
 
                         <View className="flex flex-col m-2">
-                            <ProductionDashboardButton
-                                text="Create Budget"
-                                onPress={() => setModal(<CreateBudgetModal productionCode={playCode}/>)}
-                            >
-                                <FontAwesomeIcon icon={faPiggyBank} size={50} />
-                            </ProductionDashboardButton>
+                            {isAdmin && (
+                                <ProductionDashboardButton
+                                    text="Create Budget"
+                                    onPress={() =>
+                                        setModal(<CreateBudgetModal productionCode={playCode} />)
+                                    }
+                                >
+                                    <FontAwesomeIcon icon={faPiggyBank} size={50} />
+                                </ProductionDashboardButton>
+                            )}
                             <ProductionDashboardButton
                                 text="View Budget"
                                 onPress={() => navigation.navigate("BudgetHome")}
@@ -123,10 +136,38 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Add Expense"
-                                onPress={() => navigation.navigate("BudgetAddExpense", { productionCode: playCode })}
+                                onPress={() =>
+                                    navigation.navigate("BudgetAddExpense", {
+                                        productionCode: playCode,
+                                    })
+                                }
                             >
                                 <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
                             </ProductionDashboardButton>
+                            {isAdmin && (
+                                <ProductionDashboardButton
+                                    text="Admin Stuff"
+                                    onPress={() =>
+                                        navigation.navigate("Admin", { productionCode: playCode })
+                                    }
+                                >
+                                    <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                </ProductionDashboardButton>
+                            )}
+                            <ProductionDashboardButton
+                                text="View Schedule"
+                                onPress={() => alert("Need to Implement")}
+                            >
+                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                            </ProductionDashboardButton>
+                            {isAdmin && (
+                                <ProductionDashboardButton
+                                    text="Create Schedule"
+                                    onPress={() => alert("Need to Implement")}
+                                >
+                                    <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                </ProductionDashboardButton>
+                            )}
                         </View>
                     </View>
                 </>

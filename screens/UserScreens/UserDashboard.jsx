@@ -15,14 +15,13 @@ import Title from "../../components/TextStyles/Title.jsx";
 // - order participants by last action/ time joined
 
 export default function UserDashboardScreen({ navigation }) {
-    const [createName, setCreateName] = useState("");
-    const [joinCode, setJoinCode] = useState("");
     const [productions, setProductions] = useState([]);
     const [loading, setLoading] = useState(true);
     const auth = firebase_auth;
     const db = firebase_db;
     const { setModal } = useContext(ModalContext);
 
+    // TODO: Order Productions
     useEffect(() => {
         setLoading(true);
         onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
