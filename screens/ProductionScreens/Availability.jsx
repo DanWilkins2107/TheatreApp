@@ -37,8 +37,12 @@ export default function Availability({navigation, route}) {
                         availabilityUID = data[auth.currentUser.uid];
                     }
                     set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
-                    setInitialAvailabilityInfo(availabilityInfo);
+                    
                     setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
+                }
+            ).then(
+                () => {
+                    setInitialAvailabilityInfo(availabilityInfo);
                 }
             );
         } catch (error) {
@@ -65,15 +69,15 @@ export default function Availability({navigation, route}) {
     }, []);
 
     return (
-        <View className="flex items-center p-2">
-            <Text className="text-3xl font-extrabold">Set Availability</Text>
-            <View className="w-full h-5/6 border-b mb-8">
+        <View className="flex-1 items-center p-2">
+            <Text className="text-3xl font-extrabold mb-4">Set Availability</Text>
+            <View className="w-full flex-1 border-b mb-8 ">
                 <AvailabilityCalendar
                     availabilityInfo={availabilityInfo}
                     setAvailabilityInfo={setAvailabilityInfo}
                 />
             </View>
-            <View className="flex flex-row justify-around w-full">
+            <View className="flex flex-row justify-around w-full mb-8">
                 <SmallFormButton title="Submit" backgroundColor="bg-green-400" onPress={onSubmit} />
                 <SmallFormButton title="Reset" backgroundColor="bg-white" onPress={onReset} />
             </View>

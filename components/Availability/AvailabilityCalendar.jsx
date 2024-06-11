@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { useState, useRef, useEffect } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { View, Text, ScrollView, Pressable, Button, TouchableOpacity } from "react-native";
+import { useState, useRef, useCallback } from "react";
 import DateCircles from "./DateCircles";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCircleChevronLeft, faCircleChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -24,8 +25,32 @@ const findColour = (colour) => {
 
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
     const [date, setDate] = useState(new Date());
-    const scrollViewRef = useRef();
-    const handleOnPress = (hour, daysToChange) => {
+    const dateBarRef = useRef(null);
+    const timeBarRef = useRef(null);
+    const mainAreaRefHorizontal = useRef(null);
+    const mainAreaRefVertical = useRef(null);
+
+    const handleDateScroll = (event) => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        mainAreaRefHorizontal.current.scrollTo({ x: offsetX, animated: false });
+    };
+
+    const handleTimeScroll = (event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        mainAreaRefVertical.current.scrollTo({ y: offsetY, animated: false });
+    };
+
+    const handleHorizontalMainScroll = (event) => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        dateBarRef.current.scrollTo({ x: offsetX, animated: false });
+    };
+
+    const handleVerticalMainScroll = (event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        timeBarRef.current.scrollTo({ y: offsetY, animated: false });
+    };
+
+    const handleOnPress = useCallback((hour, daysToChange) => {
         const correctDate = editDate(date, daysToChange);
         const dayData = splitDate(correctDate);
         const value = checkAvailability(hour, correctDate);
@@ -54,7 +79,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
             newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
         }
         setAvailabilityInfo(newInfo);
-    };
+    }, [date, availabilityInfo]);
 
     const checkAvailability = (hour, date) => {
         const dayInfo = splitDate(date);
@@ -72,99 +97,123 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         return "none";
     };
 
-    useEffect(() => {
-        scrollViewRef.current.scrollTo({ y:635, animated: true });
-    });
+    const getWeekStartDate = (date) => {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day == 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+    };
+
+    const dateString = (date) => {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     return (
-        <View className="h-full">
-            <View className="h-20 flex-row justify-center items-center">
-                <Text className="font-semibold text-lg">Choose Date:</Text>
-                <DateTimePicker
-                    value={date}
-                    mode="date"
-                    onChange={(_event, selectedDate) => {
-                        setDate(selectedDate);
+        <View className="flex-1">
+            <View className="flex-row items-center justify-around">
+                <TouchableOpacity
+                    className="w-10 h-10 justify-center items-center"
+                    onPress={() => {
+                        setDate(editDate(date, -7));
                     }}
-                />
+                >
+                    <FontAwesomeIcon icon={faCircleChevronLeft} size={25}/>
+                </TouchableOpacity>
+                <Text className="flex-1 text-center font-semibold text-xl">
+                    {dateString(getWeekStartDate(date))} -{" "}
+                    {dateString(editDate(getWeekStartDate(date), 6))}
+                </Text>
+                <TouchableOpacity
+                    className="w-10 h-10 justify-center items-center"
+                    onPress={() => {
+                        setDate(editDate(date, 7));
+                    }}
+                >
+                    <FontAwesomeIcon icon={faCircleChevronRight} size={25}/>
+                </TouchableOpacity>
             </View>
-            <View className="w-full flex flex-row justify-around">
-                <View className="flex-[0.75]" />
-                <View className="flex-[0.75] items-center justify-center">
-                    <DateCircles number={splitDate(editDate(date, -1))[2]} onPress={() => {setDate(editDate(date, -1))}}/>
-                </View>
-                <View className="flex-1 items-center">
-                    <DateCircles number={splitDate(editDate(date, 0))[2]} />
-                </View>
-                <View className="flex-[0.75] items-center">
-                    <DateCircles number={splitDate(editDate(date, 1))[2]} onPress={() => {setDate(editDate(date, 1))}}/>
-                </View>
-            </View>
-            <ScrollView className="w-full pb-8" bounces={false} ref={scrollViewRef}>
-                <View className="w-full flex flex-row">
-                    <View className="flex-[0.75]">
-                        <View className="flex flex-col">
-                            {[...Array(24).keys()].map((hour) => {
+            <View className="flex-1 border-r">
+                <ScrollView
+                    ref={dateBarRef}
+                    horizontal
+                    onScroll={handleDateScroll}
+                    scrollEventThrottle={16}
+                    bounces={false}
+                    className="absolute top-0 h-16 z-10 left-16 right-0 border-l bg-slate-100 border-t"
+                >
+                    <View className="flex-row h-16">
+                        {[...Array(7).keys()].map((day) => {
+                            const newDate = editDate(getWeekStartDate(date), day);
+                            return (
+                                <View className="h-16 w-16 justify-end items-center" key={day}>
+                                    <DateCircles number={splitDate(newDate)[2]} />
+                                </View>
+                            );
+                        })}
+                    </View>
+                </ScrollView>
+                <ScrollView
+                    ref={timeBarRef}
+                    vertical
+                    onScroll={handleTimeScroll}
+                    scrollEventThrottle={16}
+                    bounces={false}
+                    className="absolute top-16 left-0 bottom-0 w-16 bg-slate-100 z-10 border-x"
+                >
+                    <View className="flex-col">
+                        {[...Array(24).keys()].map((hour) => {
+                            return (
+                                <View className="h-20 border-t" key={hour}>
+                                    <Text className="font-semibold">{`${hour}:00`}</Text>
+                                </View>
+                            );
+                        })}
+                    </View>
+                </ScrollView>
+                <ScrollView
+                    ref={mainAreaRefHorizontal}
+                    horizontal
+                    onScroll={handleHorizontalMainScroll}
+                    scrollEventThrottle={16}
+                    className="flex-1 bg-blue-500 z-0 absolute top-16 left-16 right-0 bottom-0 "
+                    bounces={false}
+                    contentContainerStyle="flex-row"
+                >
+                    <ScrollView
+                        ref={mainAreaRefVertical}
+                        onScroll={handleVerticalMainScroll}
+                        scrollEventThrottle={16}
+                        bounces={false}
+                    >
+                        <View className="flex-row flex">
+                            {[...Array(7).keys()].map((day) => {
+                                const newDate = editDate(getWeekStartDate(date), day);
                                 return (
-                                    <View className="h-20 border-t bg-blue-100 w-full border-l p-1" key={hour}>
-                                        <Text className="font-semibold" key={String(hour) + "text"}>{`${hour}:00`}</Text>
+                                    <View className="flex-col" key={day}>
+                                        {[...Array(48).keys()].map((hour) => {
+                                            return (
+                                                <Pressable
+                                                    key={hour}
+                                                    className={`h-10 border-t ${
+                                                        day != 0 && "border-l"
+                                                    } w-16 ${findColour(
+                                                        checkAvailability(hour, newDate)
+                                                    )}`}
+                                                    onPress={() => {
+                                                        handleOnPress(hour, day);
+                                                    }}
+                                                />
+                                            );
+                                        })}
                                     </View>
                                 );
                             })}
                         </View>
-                    </View>
-                    <View className="flex-[0.75]">
-                        <View className="flex flex-col">
-                            {[...Array(48).keys()].map((hour) => {
-                                return (
-                                    <Pressable
-                                        key={hour}
-                                        className={`h-10 border-t border-l ${findColour(
-                                            checkAvailability(hour, editDate(date, -1))
-                                        )}`}
-                                        onPress={() => {
-                                            handleOnPress(hour, -1);
-                                        }}
-                                    />
-                                );
-                            })}
-                        </View>
-                    </View>
-                    <View className="flex-1">
-                        <View className="flex flex-col">
-                            {[...Array(48).keys()].map((hour) => {
-                                return (
-                                    <Pressable
-                                        key={hour}
-                                        className={`h-10 border-t border-l ${findColour(
-                                            checkAvailability(hour, editDate(date, 0))
-                                        )}`}
-                                        onPress={() => {
-                                            handleOnPress(hour, 0);
-                                        }}
-                                    />
-                                );
-                            })}
-                        </View>
-                    </View>
-                    <View className="border-x flex-[0.75]">
-                        <View className="flex flex-col">
-                            {[...Array(48).keys()].map((hour) => {
-                                return (
-                                    <Pressable
-                                        key={hour}
-                                        className={`h-10 border-t ${findColour(
-                                            checkAvailability(hour, editDate(date, 1))
-                                        )}`}
-                                        onPress={() => {
-                                            handleOnPress(hour, 1);
-                                        }}
-                                    />
-                                );
-                            })}
-                        </View>
-                    </View>
-                </View>
-            </ScrollView>
+                    </ScrollView>
+                </ScrollView>
+            </View>
         </View>
     );
 }
