@@ -1,48 +1,55 @@
 import { useState, useEffect, useContext } from "react";
 import { View, Text, ScrollView } from "react-native";
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, get } from "firebase/database";
 import { AlertContext } from "../Alert/AlertProvider";
-import { ModalContext } from "../Modal/ModalProvider";
-import { firebase_auth, firebase_db } from "../../firebase.config";
+import { firebase_db } from "../../firebase.config";
 import BudgetInfo from "./BudgetInfo.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import LoadingWheel from "../Loading/LoadingWheel.jsx";
 
 export default function ViewBudgetModal({ productionCode }) {
     const { setAlert } = useContext(AlertContext);
-    //const { setModal } = useContext(ModalContext);
     const [budgets, setBudgets] = useState([]);
-    //const auth = firebase_auth;
+    const [loading, setLoading] = useState(true);
     const db = firebase_db;
 
     useEffect(() => {
-        try {
-            onValue(ref(db, `productions/${productionCode}/budgets`), (productionSnapshot) => {
-                if (!productionSnapshot.exists()) {
-                    return;
-                }
-
-                setBudgets(Object.keys(productionSnapshot.val()));
-            });
-        } catch (error) {
-            setAlert(
-                "Error occurred when fetching budgets.",
-                "bg-red-500",
-                icon({ name: "circle-exclamation" })
+        onValue(ref(db, `productions/${productionCode}/budgets`), async (productionSnapshot) => {
+            if (!productionSnapshot.exists()) {
+                setLoading(false);
+                return;
+            }
+            const newBudgets = await Promise.all(
+                Object.keys(productionSnapshot.val()).map(async (budget) => {
+                    console.log(budget);
+                    return get(ref(db, `budgets/${budget}`))
+                        .then(async (budgetSnapshot) => {
+                            if (!budgetSnapshot.exists()) return;
+                            return budgetSnapshot.val();
+                        })
+                        .catch((error) => {
+                            console.log("error: ", error.message);
+                        });
+                })
             );
-            return;
-        }
+
+            console.log(newBudgets);
+            setBudgets(newBudgets.filter(Boolean));
+            setLoading(false);
+        });
     }, []);
 
     return (
         <View className="flex p-3">
             <Text className="text-3xl font-extrabold text-center mb-3">Select Budget</Text>
-            <ScrollView className="flex flex-col h-96">
-                {budgets.length > 0 ? (
+            <ScrollView className="flex flex-col h-96" showsVerticalScrollIndicator={false}>
+                {loading ? (
+                    <LoadingWheel size="large" />
+                ) : budgets.length > 0 ? (
                     budgets.map((budget, i) => {
                         return (
                             <BudgetInfo
                                 key={i}
-                                budgetCode={budget}
+                                budget={budget}
                                 onClick={() => {
                                     alert("working");
                                 }}
