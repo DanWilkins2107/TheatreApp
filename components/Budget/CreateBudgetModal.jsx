@@ -9,6 +9,7 @@ import { firebase_db } from "../../firebase.config";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { ModalContext } from "../Modal/ModalProvider";
 import Title from "../TextStyles/Title";
+import { randomUUID } from "expo-crypto";
 
 export default function CreateBudgetModal({ productionCode }) {
     const [name, setName] = useState("");
@@ -72,7 +73,7 @@ export default function CreateBudgetModal({ productionCode }) {
             }
         }
 
-        const budgetID = Math.floor(Math.random() * 10 ** 20);
+        const budgetID = randomUUID();
         try {
             set(ref(db, `productions/${productionCode}/budgets/${budgetID}`), Date.now());
             set(ref(db, "budgets/" + budgetID), {

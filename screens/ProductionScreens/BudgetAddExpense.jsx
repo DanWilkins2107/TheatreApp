@@ -17,9 +17,11 @@ import {
     requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
+import { randomUUID } from "expo-crypto";
+
 
 export default function BudgetAddExpense({ navigation, route }) {
-    const expenseID = Math.floor(Math.random() * 10 ** 20);
+    const expenseID = randomUUID();
     const [budget, setBudget] = useState("");
     const [reference, setReference] = useState("");
     const [description, setDescription] = useState("");
