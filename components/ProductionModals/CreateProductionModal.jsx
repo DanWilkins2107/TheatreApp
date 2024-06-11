@@ -8,11 +8,6 @@ import { ModalContext } from "../Modal/ModalProvider";
 import Title from "../TextStyles/Title";
 
 const generatePlayCode = () => {
-    // Quick Question Here, do we need to set the database key to be a UUID and then refactor 
-    // it so that we access the playcode from inside the production?
-    // This would mean users can change the playcode if they would like to.
-    // Also means we can get rid of any worries about duplicate playcodes.
-    // Lmk what you think.
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
 
@@ -22,6 +17,7 @@ const generatePlayCode = () => {
 
     return code;
 };
+// TODO: Edit so that database uses UUIDs for production IDs
 
 export default function CreateProductionModal() {
     const [name, setName] = useState("");
