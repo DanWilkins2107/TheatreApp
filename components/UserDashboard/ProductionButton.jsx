@@ -1,47 +1,14 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
-import { firebase_auth, firebase_db } from "../../firebase.config";
-import { useContext } from "react";
-import { AlertContext } from "../Alert/AlertProvider";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { set, ref, onValue } from "firebase/database";
 import Subtitle from "../TextStyles/Subtitle";
 
-export default function ProductionButton({ navigation, production }) {
+export default function ProductionButton({ navigation, production, onPress }) {
     const noOfParticipants = Object.keys(production.participants).length;
     const participantString = `${noOfParticipants} participant${noOfParticipants === 1 ? "" : "s"}`;
-    const db = firebase_db;
-    const auth = firebase_auth;
-    const { setAlert } = useContext(AlertContext);
     return (
         <TouchableOpacity
             onPress={() => {
-                navigation.navigate("ProductionDashboard", { playCode: production.playCode });
-                try {
-                    set(
-                        ref(
-                            db,
-                            "/productions/" +
-                                production.playCode +
-                                "/participants/" +
-                                auth.currentUser.uid
-                        ),
-                        Date.now()
-                    );
-                    set(
-                        ref(
-                            db,
-                            "/users/" + auth.currentUser.uid + "/productions/" + production.playCode
-                        ),
-                        Date.now()
-                    );
-                } catch (error) {
-                    setAlert(
-                        "Could not change order of productions.",
-                        "bg-red-500",
-                        icon({ name: "circle-exclamation" })
-                    );
-                }
+                onPress(production);
             }}
             className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 "
         >

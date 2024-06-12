@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useState, useEffect, useContext } from "react";
-import { onValue, get, ref, child } from "firebase/database";
+import { onValue, get, ref, child, set } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
@@ -9,6 +9,8 @@ import ProductionButton from "../../components/UserDashboard/ProductionButton";
 import JoinProductionModal from "../../components/ProductionModals/JoinProductionModal";
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import { AlertContext } from "../../components/Alert/AlertProvider";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import Title from "../../components/TextStyles/Title.jsx";
 
 //TODO:
@@ -20,6 +22,7 @@ export default function UserDashboardScreen({ navigation }) {
     const auth = firebase_auth;
     const db = firebase_db;
     const { setModal } = useContext(ModalContext);
+    const { setAlert } = useContext(AlertContext);
 
     // TODO: Order Productions
     useEffect(() => {
@@ -56,6 +59,35 @@ export default function UserDashboardScreen({ navigation }) {
             setLoading(false);
         });
     }, []);
+
+    const productionButtonOnClick = async (production) => {
+        try {
+            set(
+                ref(
+                    db,
+                    "/productions/" + production.playCode + "/participants/" + auth.currentUser.uid
+                ),
+                Date.now()
+            ).then(() => {
+                set(
+                    ref(
+                        db,
+                        "/users/" + auth.currentUser.uid + "/productions/" + production.playCode
+                    ),
+                    Date.now()
+                );
+            }).then(() => {
+                navigation.navigate("ProductionDashboard", { playCode: production.playCode });
+            });
+        } catch (error) {
+            setAlert(
+                "Could not change order of productions.",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
+            console.log(error.message);
+        }
+    };
 
     return (
         <View className="flex-col p-4 gap h-[95%] z-10">
@@ -96,6 +128,7 @@ export default function UserDashboardScreen({ navigation }) {
                                 navigation={navigation}
                                 production={production}
                                 key={index}
+                                onPress={productionButtonOnClick}
                             />
                         );
                     })
