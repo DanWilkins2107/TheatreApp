@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { View, Text, ScrollView } from "react-native";
-import { ref, onValue, get } from "firebase/database";
+import { ref, onValue, get, set } from "firebase/database";
 import { AlertContext } from "../Alert/AlertProvider";
-import { firebase_db } from "../../firebase.config";
+import { firebase_db, firebase_auth } from "../../firebase.config";
 import BudgetInfo from "./BudgetInfo.jsx";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 
@@ -11,6 +11,7 @@ export default function ViewBudgetModal({ productionCode }) {
     const [budgets, setBudgets] = useState([]);
     const [loading, setLoading] = useState(true);
     const db = firebase_db;
+    const auth = firebase_auth;
 
     useEffect(() => {
         onValue(ref(db, `productions/${productionCode}/budgets`), async (productionSnapshot) => {
@@ -20,20 +21,26 @@ export default function ViewBudgetModal({ productionCode }) {
             }
             const newBudgets = await Promise.all(
                 Object.keys(productionSnapshot.val()).map(async (budget) => {
-                    console.log(budget);
                     return get(ref(db, `budgets/${budget}`))
                         .then(async (budgetSnapshot) => {
                             if (!budgetSnapshot.exists()) return;
                             return budgetSnapshot.val();
                         })
-                        .catch((error) => {
-                            console.log("error: ", error.message);
+                        .catch(() => {
+                            setAlert("Error occurred when fetching budgets.", "bg-red-500");
                         });
                 })
             );
 
-            console.log(newBudgets);
-            setBudgets(newBudgets.filter(Boolean));
+            setBudgets(
+                newBudgets.filter(Boolean).filter((budget) => {
+                    if (budget.participants) {
+                        return Object.keys(budget.participants).includes(auth.currentUser.uid);
+                    } else {
+                        return false;
+                    }
+                })
+            );
             setLoading(false);
         });
     }, []);

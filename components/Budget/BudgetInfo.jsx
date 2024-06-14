@@ -5,7 +5,7 @@ import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function BudgetInfo(props) {
     const budget = props.budget;
-    const participants = budget.participants;
+    const participants = budget.participants || {};
 
     return (
         <TouchableOpacity
