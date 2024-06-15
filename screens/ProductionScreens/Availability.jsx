@@ -37,21 +37,18 @@ export default function Availability({navigation, route}) {
                         availabilityUID = data[auth.currentUser.uid];
                     }
                     set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
-                    
                     setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
+                    setInitialAvailabilityInfo({...availabilityInfo});
                 }
-            ).then(
-                () => {
-                    setInitialAvailabilityInfo(availabilityInfo);
-                }
-            );
+            )
         } catch (error) {
             setAlert("Could not update availability", "bg-red-500", icon({ name: "circle-exclamation" }));
         }
     };
 
     const onReset = () => {
-        setAvailabilityInfo(initialAvailabilityInfo);
+        console.log("Resetting availability info", initialAvailabilityInfo, "to", availabilityInfo);
+        setAvailabilityInfo({...initialAvailabilityInfo});
     };
 
     useEffect(() => {

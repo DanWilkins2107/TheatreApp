@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, Button, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Pressable, TouchableOpacity } from "react-native";
 import { useState, useRef, useCallback } from "react";
 import DateCircles from "./DateCircles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -17,10 +17,23 @@ const editDate = (oldDate, daysToChange) => {
     return newDate;
 };
 
+const getWeekStartDate = (date) => {
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day == 0 ? -6 : 1);
+    return new Date(date.setDate(diff));
+};
+
 const findColour = (colour) => {
     if (colour != "none") {
         return "bg-" + colour + "-400";
     } else return "bg-white";
+};
+
+const dateString = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 };
 
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
@@ -81,7 +94,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         setAvailabilityInfo(newInfo);
     }, [date, availabilityInfo]);
 
-    const checkAvailability = (hour, date) => {
+    const checkAvailability = useCallback((hour, date) => {
         const dayInfo = splitDate(date);
         const year = dayInfo[0];
         const month = dayInfo[1];
@@ -95,20 +108,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
             return availabilityInfo[year][month][day][hour];
         }
         return "none";
-    };
-
-    const getWeekStartDate = (date) => {
-        const day = date.getDay();
-        const diff = date.getDate() - day + (day == 0 ? -6 : 1);
-        return new Date(date.setDate(diff));
-    };
-
-    const dateString = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    };
+    }, [availabilityInfo]);
 
     return (
         <View className="flex-1">
@@ -141,13 +141,13 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     onScroll={handleDateScroll}
                     scrollEventThrottle={16}
                     bounces={false}
-                    className="absolute top-0 h-16 z-10 left-16 right-0 border-l bg-slate-100 border-t"
+                    className="absolute top-0 h-14 z-10 left-[63] right-0 border-l bg-slate-100 border-y"
                 >
-                    <View className="flex-row h-16">
+                    <View className="flex-row h-14">
                         {[...Array(7).keys()].map((day) => {
                             const newDate = editDate(getWeekStartDate(date), day);
                             return (
-                                <View className="h-16 w-16 justify-end items-center" key={day}>
+                                <View className="h-14 w-16 justify-center items-center" key={day}>
                                     <DateCircles number={splitDate(newDate)[2]} />
                                 </View>
                             );
@@ -160,12 +160,12 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     onScroll={handleTimeScroll}
                     scrollEventThrottle={16}
                     bounces={false}
-                    className="absolute top-16 left-0 bottom-0 w-16 bg-slate-100 z-10 border-x"
+                    className="absolute top-[55] left-0 bottom-0 w-16 bg-slate-100 z-10 border-x border-t"
                 >
                     <View className="flex-col">
                         {[...Array(24).keys()].map((hour) => {
                             return (
-                                <View className="h-20 border-t" key={hour}>
+                                <View className={`h-20 ${hour != 0 && "border-t"}`} key={hour}>
                                     <Text className="font-semibold">{`${hour}:00`}</Text>
                                 </View>
                             );
@@ -177,7 +177,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     horizontal
                     onScroll={handleHorizontalMainScroll}
                     scrollEventThrottle={16}
-                    className="flex-1 bg-blue-500 z-0 absolute top-16 left-16 right-0 bottom-0 "
+                    className="flex-1 bg-blue-500 z-0 absolute top-14 left-16 right-0 bottom-0 "
                     bounces={false}
                     contentContainerStyle="flex-row"
                 >
@@ -196,7 +196,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                                             return (
                                                 <Pressable
                                                     key={hour}
-                                                    className={`h-10 border-t ${
+                                                    className={`h-10 ${hour != 0 && "border-t"} ${
                                                         day != 0 && "border-l"
                                                     } w-16 ${findColour(
                                                         checkAvailability(hour, newDate)
