@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
-import { useState, useEffect, useContext } from "react";
+import { View, Text, ScrollView, ActivityIndicator, Button } from "react-native";
+import { useState, useCallback, useContext } from "react";
 import { onValue, get, ref, child, set } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
@@ -10,11 +10,10 @@ import JoinProductionModal from "../../components/ProductionModals/JoinProductio
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
+import { useFocusEffect } from "@react-navigation/native";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import Title from "../../components/TextStyles/Title.jsx";
-
-//TODO:
-// - order participants by last action/ time joined
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function UserDashboardScreen({ navigation }) {
     const [productions, setProductions] = useState([]);
@@ -24,9 +23,9 @@ export default function UserDashboardScreen({ navigation }) {
     const { setModal } = useContext(ModalContext);
     const { setAlert } = useContext(AlertContext);
 
-    // TODO: Order Productions
-    useEffect(() => {
+    const fetchProductions = async () => {
         setLoading(true);
+
         onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
             if (!userSnapshot.exists()) {
                 setLoading(false);
@@ -34,59 +33,55 @@ export default function UserDashboardScreen({ navigation }) {
             }
 
             const userData = userSnapshot.val();
+            const localProductions = JSON.parse(await AsyncStorage.getItem("productions")) || {};
+            const combinedProductions = { ...userData, ...localProductions };
 
-            const newProds = await Promise.all(
+            let areAnyInvalid = false;
+            const dbProductions = await Promise.all(
                 Object.keys(userData).map(async (productionCode) => {
                     return get(child(ref(db), `productions/${productionCode}`))
                         .then((playSnapshot) => {
-                            if (!playSnapshot.exists()) return;
+                            if (!playSnapshot.exists()) return null;
                             const playData = playSnapshot.val();
                             return { ...playData, playCode: playSnapshot.key };
                         })
                         .catch((error) => {
-                            console.log("uh oh: ", error.message);
+                            areAnyInvalid = true;
                         });
                 })
             );
 
-            setProductions(
-                newProds.sort(
-                    (a, b) =>
-                        b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]
-                )
-            );
-
+            if (areAnyInvalid) {
+                setAlert(
+                    "Error occurred when fetching productions.",
+                    "bg-red-500",
+                    icon({ name: "circle-exclamation" })
+                );
+            }
+            
+            const validProductions = dbProductions.filter((prod) => prod !== null);
+            const sortedProductions = validProductions.sort((a, b) => {
+                return combinedProductions[b.playCode] - combinedProductions[a.playCode];
+            });
+            setProductions(sortedProductions);
             setLoading(false);
         });
-    }, []);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchProductions();
+        }, [])
+    );
 
     const productionButtonOnClick = async (production) => {
-        try {
-            set(
-                ref(
-                    db,
-                    "/productions/" + production.playCode + "/participants/" + auth.currentUser.uid
-                ),
-                Date.now()
-            ).then(() => {
-                set(
-                    ref(
-                        db,
-                        "/users/" + auth.currentUser.uid + "/productions/" + production.playCode
-                    ),
-                    Date.now()
-                );
-            }).then(() => {
-                navigation.navigate("ProductionDashboard", { playCode: production.playCode });
-            });
-        } catch (error) {
-            setAlert(
-                "Could not change order of productions.",
-                "bg-red-500",
-                icon({ name: "circle-exclamation" })
-            );
-            console.log(error.message);
-        }
+        navigation.navigate("ProductionDashboard", { playCode: production.playCode });
+        const existingData = await AsyncStorage.getItem("productions");
+        const newData = {
+            ...JSON.parse(existingData),
+            [production.playCode]: Date.now(),
+        };
+        await AsyncStorage.setItem("productions", JSON.stringify(newData));
     };
 
     return (
