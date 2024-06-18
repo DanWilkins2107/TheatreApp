@@ -6,9 +6,8 @@ import FormField from "../../components/Form/FormField.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
 import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCamera, faImages, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 import {
     launchImageLibraryAsync,
     launchCameraAsync,
@@ -142,16 +141,16 @@ export default function BudgetAddExpense({ navigation, route }) {
                                     setReceiptURI("");
                                 }}
                             >
-                                <FontAwesomeIcon icon={faTrash} size={50} />
+                                <Icon name="trash" size={50} />
                             </AddRecieptButton>
                         </View>
                     ) : (
                         <View className="flex-row justify-around mt-[-50]">
                             <AddRecieptButton onPress={setReceiptCamera}>
-                                <FontAwesomeIcon icon={faCamera} size={50} />
+                                <Icon name="camera" size={50} />
                             </AddRecieptButton>
                             <AddRecieptButton onPress={setReceiptLibrary}>
-                                <FontAwesomeIcon icon={faImages} size={50} />
+                                <Icon name="image" size={50} />
                             </AddRecieptButton>
                         </View>
                     )}

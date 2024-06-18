@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { onValue, get, ref, child } from "firebase/database";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import CreateAndJoinButtons from "../../components/UserDashboard/CreateAndJoin";
@@ -66,7 +66,7 @@ export default function UserDashboardScreen({ navigation }) {
                         setModal(<CreateProductionModal />);
                     }}
                 >
-                    <FontAwesomeIcon icon={faClapperboard} size={50} />
+                    <Icon name="film" size={50} />
                 </CreateAndJoinButtons>
                 <CreateAndJoinButtons
                     title="Join"
@@ -74,7 +74,8 @@ export default function UserDashboardScreen({ navigation }) {
                         setModal(<JoinProductionModal />);
                     }}
                 >
-                    <FontAwesomeIcon icon={faMasksTheater} size={50} />
+                    {/* TODO: Find replacement icons */}
+                    <Icon name="theater-masks" size={50} />
                 </CreateAndJoinButtons>
             </View>
             <View className="border-b-2">

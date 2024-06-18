@@ -5,12 +5,7 @@ import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-    faPiggyBank,
-    faSearchDollar,
-    faFileInvoiceDollar,
-} from "@fortawesome/free-solid-svg-icons";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
@@ -86,6 +81,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     }, []);
 
     return (
+        // TODO: Restyle this page
         <View className="flex-col">
             <Title extraClassName="text-center mt-4">Production Dashboard</Title>
             {loading ? (
@@ -93,9 +89,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             ) : (
                 <>
                     <View className="flex-row justify-around my-2">
-                        <Subtitle>
-                            Production: {production.playName}
-                        </Subtitle>
+                        <Subtitle>Production: {production.playName}</Subtitle>
                         <Subtitle>{playCode}</Subtitle>
                     </View>
                     <View className="flex-col m-2">
@@ -126,14 +120,14 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                         setModal(<CreateBudgetModal productionCode={playCode} />)
                                     }
                                 >
-                                    <FontAwesomeIcon icon={faPiggyBank} size={50} />
+                                    <Icon name="plus" size={50} />
                                 </ProductionDashboardButton>
                             )}
                             <ProductionDashboardButton
                                 text="View Budget"
                                 onPress={() => setModal(<ViewBudgetModal productionCode={playCode}/>)}
                             >
-                                <FontAwesomeIcon icon={faSearchDollar} size={50} />
+                                <Icon name="dollar" size={50} />
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Add Expense"
@@ -143,7 +137,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                     })
                                 }
                             >
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                <Icon name="money" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
@@ -152,21 +146,21 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                         navigation.navigate("Admin", { productionCode: playCode })
                                     }
                                 >
-                                    <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                    <Icon name="cogs" size={50} />
                                 </ProductionDashboardButton>
                             )}
                             <ProductionDashboardButton
                                 text="View Schedule"
                                 onPress={() => alert("Need to Implement")}
                             >
-                                <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                <Icon name="cogs" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
                                     text="Create Schedule"
                                     onPress={() => alert("Need to Implement")}
                                 >
-                                    <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                                    <Icon name="cogs" size={50} />
                                 </ProductionDashboardButton>
                             )}
                         </View>

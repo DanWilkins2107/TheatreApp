@@ -8,20 +8,13 @@ import { launchImageLibraryAsync } from "expo-image-picker";
 import { firebase_auth, firebase_db, storage } from "../../firebase.config.js";
 import ProfilePanel from "../../components/ProfileElements/ProfilePanel.jsx";
 import UserDetailsModal from "../../components/ProfileElements/UserDetailsModal.jsx";
-import {
-    faCircleQuestion,
-    faCircleInfo,
-    faPencil,
-    faPhone,
-    faRightFromBracket,
-    faTrash,
-} from "@fortawesome/free-solid-svg-icons";
 import ProfilePicture from "../../components/ProfileElements/ProfilePicture.jsx";
 import ContactInformationModal from "../../components/ProfileElements/ContactInformationModal.jsx";
 import HelpModal from "../../components/ProfileElements/HelpModal.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import Icon from "react-native-vector-icons/FontAwesome";
+
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
@@ -176,7 +169,7 @@ export default function UserProfileScreen({ navigation }) {
                             loadingSize="large"
                         />
                         <View className="absolute right-0 bottom-0 rounded-full bg-white w-14 h-14 z-20 flex justify-center items-center border-2 border-black">
-                            <FontAwesomeIcon icon={faPencil} size={25} />
+                            <Icon name="pencil" size={30} />
                         </View>
                     </TouchableOpacity>
                     <View className="flex-1 flex-col">
@@ -189,21 +182,21 @@ export default function UserProfileScreen({ navigation }) {
                     </View>
                 </View>
                 <ProfilePanel
-                    icon={faCircleInfo}
+                    icon={"info-circle"}
                     text="User Details"
                     onClick={() => {
                         setModal(<UserDetailsModal />);
                     }}
                 />
                 <ProfilePanel
-                    icon={faPhone}
+                    icon={"phone"}
                     text="Contact Information"
                     onClick={() => {
                         setModal(<ContactInformationModal />);
                     }}
                 />
                 <ProfilePanel
-                    icon={faCircleQuestion}
+                    icon={"question-circle"}
                     text="Help"
                     onClick={() => {
                         setModal(<HelpModal />);
@@ -211,13 +204,13 @@ export default function UserProfileScreen({ navigation }) {
                 />
                 <ProfilePanel
                     backgroundColor="bg-red-300"
-                    icon={faRightFromBracket}
+                    icon={"sign-out-alt"}
                     text="Sign Out"
                     onClick={handleSignOut}
                 />
                 <ProfilePanel
                     backgroundColor="bg-red-500"
-                    icon={faTrash}
+                    icon={"trash"}
                     text="Delete Account"
                     onClick={handleDeleteAccount}
                 />
