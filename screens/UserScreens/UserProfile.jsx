@@ -21,7 +21,6 @@ import ContactInformationModal from "../../components/ProfileElements/ContactInf
 import HelpModal from "../../components/ProfileElements/HelpModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 
 export default function UserProfileScreen({ navigation }) {
@@ -129,27 +128,31 @@ export default function UserProfileScreen({ navigation }) {
                                 ),
                                 blob
                             ).then((snapshot) => {
-                                getDownloadURL(snapshot.ref).then((url) => {
-                                    updateProfile(auth.currentUser, {
-                                        photoURL: url,
+                                getDownloadURL(snapshot.ref)
+                                    .then((url) => {
+                                        updateProfile(auth.currentUser, {
+                                            photoURL: url,
+                                        });
+                                        set(
+                                            dbRef(
+                                                db,
+                                                "users/" + auth.currentUser.uid + "/profileURL"
+                                            ),
+                                            url
+                                        );
+                                    })
+                                    .catch((error) => {
+                                        setAlert(
+                                            "Error uploading profile picture",
+                                            "bg-red-500",
+                                            "exclamation-circle"
+                                        );
                                     });
-                                    set(
-                                        dbRef(db, "users/" + auth.currentUser.uid + "/profileURL"),
-                                        url
-                                    );
-                                })
-                                .catch((error) => {
-                                    setAlert("Error uploading profile picture", "bg-red-500", icon({ name: "circle-exclamation"}));
-                                });
                             });
                         });
                     });
                 } catch (error) {
-                    setAlert(
-                        "Error uploading profile picture",
-                        "bg-red-500",
-                        icon({ name: "circle-exclamation" })
-                    );
+                    setAlert("Error uploading profile picture", "bg-red-500", "exclamation-circle");
                 }
             }
         });

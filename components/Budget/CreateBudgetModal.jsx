@@ -6,7 +6,6 @@ import FormButton from "../Form/FormButton";
 import ParticipantSelector from "../Participants/ParticipantSelector";
 import { AlertContext } from "../Alert/AlertProvider";
 import { firebase_db } from "../../firebase.config";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { ModalContext } from "../Modal/ModalProvider";
 import Title from "../TextStyles/Title";
 import { randomUUID } from "expo-crypto";
@@ -23,11 +22,7 @@ export default function CreateBudgetModal({ productionCode }) {
         try {
             onValue(ref(db, `productions/${productionCode}/participants`), (productionSnapshot) => {
                 if (!productionSnapshot.exists()) {
-                    setAlert(
-                        "Could not find production.",
-                        "bg-red-500",
-                        icon({ name: "circle-exclamation" })
-                    );
+                    setAlert("Could not find production.", "bg-red-500", "exclamation-circle");
                     return;
                 }
                 const participantArray = Object.keys(productionSnapshot.val());
@@ -41,7 +36,7 @@ export default function CreateBudgetModal({ productionCode }) {
             setAlert(
                 "Error occurred when fetching participants.",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
             return;
         }
@@ -49,20 +44,12 @@ export default function CreateBudgetModal({ productionCode }) {
 
     const createBudget = () => {
         if (name === "" || budget === "") {
-            setAlert(
-                "Please fill out all fields.",
-                "bg-red-500",
-                icon({ name: "circle-exclamation" })
-            );
+            setAlert("Please fill out all fields.", "bg-red-500", "exclamation-circle");
             return;
         }
 
         if (isNaN(budget)) {
-            setAlert(
-                "Please enter a valid budget amount",
-                "bg-red-500",
-                icon({ name: "circle-exclamation" })
-            );
+            setAlert("Please enter a valid budget amount", "bg-red-500", "exclamation-circle");
             return;
         }
 
@@ -81,22 +68,16 @@ export default function CreateBudgetModal({ productionCode }) {
                 budget: budget,
                 participants: participantsToAdd,
             });
-            setAlert("Budget created!", "bg-green-500", icon({ name: "circle-exclamation" }));
+            setAlert("Budget created!", "bg-green-500", "check");
             setModal(null);
         } catch {
-            setAlert(
-                "Error occurred when creating budget.",
-                "bg-red-500",
-                icon({ name: "circle-exclamation" })
-            );
+            setAlert("Error occurred when creating budget.", "bg-red-500", "exclamation-circle");
         }
     };
 
     return (
         <View className="flex p-3">
-            <Title extraClassName="mb-4 text-center">
-                Create Budget
-            </Title>
+            <Title extraClassName="mb-4 text-center">Create Budget</Title>
             <Text className="text-lg font-semibold text-center">Name</Text>
             <FormField
                 value={name}

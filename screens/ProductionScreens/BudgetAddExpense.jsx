@@ -2,7 +2,6 @@ import { Text, View, ScrollView } from "react-native";
 import { useContext, useState } from "react";
 import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FormField from "../../components/Form/FormField.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
@@ -18,7 +17,6 @@ import {
 } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
 import { randomUUID } from "expo-crypto";
-
 
 export default function BudgetAddExpense({ navigation, route }) {
     const expenseID = randomUUID();
@@ -44,11 +42,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                 url = await getDownloadURL(snapshot.ref);
                 throw Error();
             } catch (error) {
-                setAlert(
-                    "Error uploading receipt",
-                    "bg-red-500",
-                    icon({ name: "circle-exclamation" })
-                );
+                setAlert("Error uploading receipt", "bg-red-500", "exclamation-circle");
             }
         }
     };
@@ -59,7 +53,7 @@ export default function BudgetAddExpense({ navigation, route }) {
             setAlert(
                 "Please grant permission to access your photo library to upload a receipt",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
             return;
         }
@@ -73,7 +67,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                     setAlert(
                         "An error occurred while uploading the receipt. Please try again.",
                         "bg-red-500",
-                        icon({ name: "circle-exclamation" })
+                        "exclamation-circle"
                     );
                 }
             }
@@ -86,7 +80,7 @@ export default function BudgetAddExpense({ navigation, route }) {
             setAlert(
                 "Please grant permission to access your camera to upload a receipt",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
             return;
         }
@@ -100,7 +94,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                     setAlert(
                         "An error occurred while uploading the receipt. Please try again.",
                         "bg-red-500",
-                        icon({ name: "circle-exclamation" })
+                        "exclamation-circle"
                     );
                 }
             }
