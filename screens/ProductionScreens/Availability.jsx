@@ -8,7 +8,7 @@ import { randomUUID } from "expo-crypto";
 import { AlertContext } from "../../components/Alert/AlertProvider";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
-export default function Availability({navigation, route}) {
+export default function Availability({ navigation, route }) {
     const [availabilityInfo, setAvailabilityInfo] = useState({});
     const [initialAvailabilityInfo, setInitialAvailabilityInfo] = useState({});
     const db = firebase_db;
@@ -16,39 +16,35 @@ export default function Availability({navigation, route}) {
     const playCode = route.params.productionCode;
     const { setAlert } = useContext(AlertContext);
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
         const dbRef = ref(db);
         let availabilityUID;
         try {
-            get(child(dbRef, `/productions/${playCode}/availability/`)).then(
-                (snapshot) => {
-                    const data = snapshot.val();
-                    if (!data) {
-                        console.log("No availability found, creating new availability entry.")
-                        availabilityUID = randomUUID();
-                        set(
-                            ref(
-                                db,
-                                `/productions/${playCode}/availability/${auth.currentUser.uid}`
-                            ),
-                            availabilityUID
-                        );
-                    } else {
-                        availabilityUID = data[auth.currentUser.uid];
-                    }
-                    set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
-                    setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
-                    setInitialAvailabilityInfo({...availabilityInfo});
-                }
-            )
+            const snapshot = await get(child(dbRef, `/productions/${playCode}/availability/`));
+            const data = snapshot.val();
+            if (!data) {
+                availabilityUID = randomUUID();
+                await set(
+                    ref(db, `/productions/${playCode}/availability/${auth.currentUser.uid}`),
+                    availabilityUID
+                );
+            } else {
+                availabilityUID = data[auth.currentUser.uid];
+            }
+            await set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
+            setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
+            setInitialAvailabilityInfo(JSON.parse(JSON.stringify(availabilityInfo)));
         } catch (error) {
-            setAlert("Could not update availability", "bg-red-500", icon({ name: "circle-exclamation" }));
+            setAlert(
+                "Could not update availability",
+                "bg-red-500",
+                icon({ name: "circle-exclamation" })
+            );
         }
     };
 
     const onReset = () => {
-        console.log("Resetting availability info", initialAvailabilityInfo, "to", availabilityInfo);
-        setAvailabilityInfo({...initialAvailabilityInfo});
+        setAvailabilityInfo(JSON.parse(JSON.stringify(initialAvailabilityInfo)));
     };
 
     useEffect(() => {
@@ -58,8 +54,8 @@ export default function Availability({navigation, route}) {
             if (data) {
                 const availabilityUID = data[auth.currentUser.uid];
                 get(ref(db, `/availabilities/${availabilityUID}/`)).then((snapshot) => {
-                    setInitialAvailabilityInfo(snapshot.val());
-                    setAvailabilityInfo(snapshot.val());
+                    setInitialAvailabilityInfo(JSON.parse(JSON.stringify(snapshot.val())));
+                    setAvailabilityInfo(JSON.parse(snapshot.val()));
                 });
             }
         });
