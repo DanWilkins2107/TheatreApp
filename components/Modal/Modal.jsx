@@ -1,4 +1,4 @@
-import Icon from "react-native-vector-icons/FontAwesome";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { TouchableOpacity, View, Keyboard, Pressable } from "react-native";
 import { ModalContext } from "./ModalProvider";
 import { useContext } from "react";
@@ -22,7 +22,7 @@ export default function Modal() {
                             }}
                             className="w-12 h-12 justify-center items-center"
                         >
-                            <Icon name="times" size={30} />
+                            <IconFA5 name="times" size={30} />
                         </TouchableOpacity>
                     </View>
                     <View className="flex-initial pb-8">{modal}</View>

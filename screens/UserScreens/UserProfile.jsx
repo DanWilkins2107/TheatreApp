@@ -14,7 +14,8 @@ import HelpModal from "../../components/ProfileElements/HelpModal.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Icon from "react-native-vector-icons/FontAwesome";
-
+import IconE from "react-native-vector-icons/Entypo";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
 
 export default function UserProfileScreen({ navigation }) {
     const [userName, setUserName] = useState("");
@@ -182,38 +183,43 @@ export default function UserProfileScreen({ navigation }) {
                     </View>
                 </View>
                 <ProfilePanel
-                    icon={"info-circle"}
                     text="User Details"
                     onClick={() => {
                         setModal(<UserDetailsModal />);
                     }}
-                />
+                >
+                    <IconFA5 size={"70%"} name="info-circle"/>
+                </ProfilePanel>
                 <ProfilePanel
-                    icon={"phone"}
                     text="Contact Information"
                     onClick={() => {
                         setModal(<ContactInformationModal />);
                     }}
-                />
+                >
+                    <IconFA5 size={"70%"} name="phone"/>
+                </ProfilePanel>
                 <ProfilePanel
-                    icon={"question-circle"}
                     text="Help"
                     onClick={() => {
                         setModal(<HelpModal />);
                     }}
-                />
+                >
+                    <IconE size={"70%"} name="help-with-circle"/>
+                </ProfilePanel>
                 <ProfilePanel
                     backgroundColor="bg-red-300"
-                    icon={"sign-out-alt"}
                     text="Sign Out"
                     onClick={handleSignOut}
-                />
+                >
+                    <IconFA5 size={"70%"} name="sign-out-alt"/>
+                </ProfilePanel>
                 <ProfilePanel
                     backgroundColor="bg-red-500"
-                    icon={"trash"}
                     text="Delete Account"
                     onClick={handleDeleteAccount}
-                />
+                >
+                    <IconFA5 size={"70%"} name="trash"/>
+                </ProfilePanel>
             </ScrollView>
         </>
     );

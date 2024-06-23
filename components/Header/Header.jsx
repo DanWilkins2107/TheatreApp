@@ -1,5 +1,6 @@
 import { View, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
 
 
 export default function Header({ navigation, firstScreen, profileScreen }) {
@@ -28,7 +29,7 @@ export default function Header({ navigation, firstScreen, profileScreen }) {
                     className="w-10 h-10 rounded-full flex-row align-middle justify-center pt-2"
                     onPress={() => navigation.navigate("UserProfile")}
                 >
-                    <Icon name="user" size={23} />
+                    <IconFA5 name="user-alt" size={23} />
                 </TouchableOpacity>}
             </View>
         </View>

@@ -6,6 +6,7 @@ import ProductionDashboardButton from "../../components/Budget/ProductionDashboa
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import Icon from "react-native-vector-icons/FontAwesome";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
@@ -120,14 +121,14 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                         setModal(<CreateBudgetModal productionCode={playCode} />)
                                     }
                                 >
-                                    <Icon name="plus" size={50} />
+                                    <IconFA5 name="plus" size={50}/>
                                 </ProductionDashboardButton>
                             )}
                             <ProductionDashboardButton
                                 text="View Budget"
                                 onPress={() => setModal(<ViewBudgetModal productionCode={playCode}/>)}
                             >
-                                <Icon name="dollar" size={50} />
+                                <IconFA5 name="search-dollar" size={50} />
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Add Expense"
@@ -137,7 +138,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                     })
                                 }
                             >
-                                <Icon name="money" size={50} />
+                                <IconFA5 name="file-invoice-dollar" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
@@ -153,14 +154,14 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 text="View Schedule"
                                 onPress={() => alert("Need to Implement")}
                             >
-                                <Icon name="cogs" size={50} />
+                                <IconFA5 name="eye" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
                                     text="Create Schedule"
                                     onPress={() => alert("Need to Implement")}
                                 >
-                                    <Icon name="cogs" size={50} />
+                                    <IconFA5 name="business-time" size={50} />
                                 </ProductionDashboardButton>
                             )}
                         </View>
