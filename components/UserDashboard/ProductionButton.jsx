@@ -2,16 +2,14 @@ import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
 import Subtitle from "../TextStyles/Subtitle";
 
-export default function ProductionButton({ navigation, production }) {
+export default function ProductionButton({ navigation, production, onPress }) {
     const noOfParticipants = Object.keys(production.participants).length;
-    const participantString = `${noOfParticipants} participant${
-        noOfParticipants === 1 ? "" : "s"
-    }`;
+    const participantString = `${noOfParticipants} participant${noOfParticipants === 1 ? "" : "s"}`;
     return (
         <TouchableOpacity
-            onPress={() =>
-                navigation.navigate("ProductionDashboard", { playCode: production.playCode })
-            }
+            onPress={() => {
+                onPress(production);
+            }}
             className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 "
         >
             <Text className="text-2xl font-extrabold text-ellipsis" numberOfLines={1}>
@@ -39,9 +37,7 @@ export default function ProductionButton({ navigation, production }) {
 
                 {noOfParticipants > 5 && (
                     <View className="w-10 h-10 rounded-full bg-white justify-center items-center border-2 border-black">
-                        <Text className="font-semibold">
-                            {`+${noOfParticipants - 5}`}
-                        </Text>
+                        <Text className="font-semibold">{`+${noOfParticipants - 5}`}</Text>
                     </View>
                 )}
             </View>

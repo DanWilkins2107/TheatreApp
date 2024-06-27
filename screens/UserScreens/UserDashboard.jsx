@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
-import { useState, useEffect, useContext } from "react";
+import { View, Text, ScrollView, ActivityIndicator, Button } from "react-native";
+import { useState, useCallback, useContext } from "react";
 import { onValue, get, ref, child } from "firebase/database";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import IconFA6 from "react-native-vector-icons/FontAwesome6";
@@ -9,10 +9,11 @@ import ProductionButton from "../../components/UserDashboard/ProductionButton";
 import JoinProductionModal from "../../components/ProductionModals/JoinProductionModal";
 import CreateProductionModal from "../../components/ProductionModals/CreateProductionModal";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
+import { AlertContext } from "../../components/Alert/AlertProvider";
+import { useFocusEffect } from "@react-navigation/native";
+import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import Title from "../../components/TextStyles/Title.jsx";
-
-//TODO:
-// - order participants by last action/ time joined
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function UserDashboardScreen({ navigation }) {
     const [productions, setProductions] = useState([]);
@@ -20,10 +21,11 @@ export default function UserDashboardScreen({ navigation }) {
     const auth = firebase_auth;
     const db = firebase_db;
     const { setModal } = useContext(ModalContext);
+    const { setAlert } = useContext(AlertContext);
 
-    // TODO: Order Productions
-    useEffect(() => {
+    const fetchProductions = async () => {
         setLoading(true);
+
         onValue(ref(db, `users/${auth.currentUser.uid}/productions`), async (userSnapshot) => {
             if (!userSnapshot.exists()) {
                 setLoading(false);
@@ -31,31 +33,62 @@ export default function UserDashboardScreen({ navigation }) {
             }
 
             const userData = userSnapshot.val();
+            const localProductions = JSON.parse(await AsyncStorage.getItem("productions")) || {};
+            
+            let combinedProductions = { ...userData };
+            Object.keys(userData).forEach((playCode) => {
+                if (localProductions[playCode]) {
+                    combinedProductions[playCode] = localProductions[playCode];
+                }
+            });
 
-            const newProds = await Promise.all(
+            let areAnyInvalid = false;
+            const dbProductions = await Promise.all(
                 Object.keys(userData).map(async (productionCode) => {
                     return get(child(ref(db), `productions/${productionCode}`))
                         .then((playSnapshot) => {
-                            if (!playSnapshot.exists()) return;
+                            if (!playSnapshot.exists()) return null;
                             const playData = playSnapshot.val();
                             return { ...playData, playCode: playSnapshot.key };
                         })
                         .catch((error) => {
-                            console.log("uh oh: ", error.message);
+                            areAnyInvalid = true;
                         });
                 })
             );
 
-            setProductions(
-                newProds.sort(
-                    (a, b) =>
-                        b.participants[auth.currentUser.uid] - a.participants[auth.currentUser.uid]
-                )
-            );
-
+            if (areAnyInvalid) {
+                setAlert(
+                    "Error occurred when fetching productions.",
+                    "bg-red-500",
+                    icon({ name: "circle-exclamation" })
+                );
+            }
+            
+            const validProductions = dbProductions.filter((prod) => prod !== null);
+            const sortedProductions = validProductions.sort((a, b) => {
+                return combinedProductions[b.playCode] - combinedProductions[a.playCode];
+            });
+            setProductions(sortedProductions);
             setLoading(false);
         });
-    }, []);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchProductions();
+        }, [])
+    );
+
+    const productionButtonOnClick = async (production) => {
+        navigation.navigate("ProductionDashboard", { playCode: production.playCode });
+        const existingData = await AsyncStorage.getItem("productions");
+        const newData = {
+            ...JSON.parse(existingData),
+            [production.playCode]: Date.now(),
+        };
+        await AsyncStorage.setItem("productions", JSON.stringify(newData));
+    };
 
     return (
         <View className="flex-col p-4 gap h-[95%] z-10">
@@ -96,6 +129,7 @@ export default function UserDashboardScreen({ navigation }) {
                                 navigation={navigation}
                                 production={production}
                                 key={index}
+                                onPress={productionButtonOnClick}
                             />
                         );
                     })
