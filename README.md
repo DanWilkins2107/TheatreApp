@@ -3,4 +3,5 @@
 Useful commands:
 npx expo start
 
-React Native Docs: https://reactnavigation.org/docs/getting-started/
+FontAwesome List:
+https://oblador.github.io/react-native-vector-icons/#FontAwesome

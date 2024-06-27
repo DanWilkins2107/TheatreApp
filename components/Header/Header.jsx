@@ -1,6 +1,7 @@
 import { View, Image, TouchableOpacity } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft, faUser } from "@fortawesome/free-solid-svg-icons";
+import Icon from "react-native-vector-icons/FontAwesome";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
+
 
 export default function Header({ navigation, firstScreen, profileScreen }) {
     return (
@@ -13,7 +14,7 @@ export default function Header({ navigation, firstScreen, profileScreen }) {
                             navigation.goBack();
                         }}
                     >
-                        <FontAwesomeIcon icon={faChevronLeft} size={25} />
+                        <Icon name="chevron-left" size={23} />
                     </TouchableOpacity>
                 )}
             </View>
@@ -28,7 +29,7 @@ export default function Header({ navigation, firstScreen, profileScreen }) {
                     className="w-10 h-10 rounded-full flex-row align-middle justify-center pt-2"
                     onPress={() => navigation.navigate("UserProfile")}
                 >
-                    <FontAwesomeIcon icon={faUser} size={23} />
+                    <IconFA5 name="user-alt" size={23} />
                 </TouchableOpacity>}
             </View>
         </View>

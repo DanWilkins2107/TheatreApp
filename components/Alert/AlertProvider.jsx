@@ -3,7 +3,7 @@ import { createContext, useState, useRef, useEffect } from "react";
 const initialState = {
     text: "",
     color: "",
-    icon: "",
+    name: "",
     totalAlerts: 0,
 };
 
@@ -12,7 +12,7 @@ export const AlertContext = createContext();
 export const AlertProvider = ({ children }) => {
     const [text, setText] = useState(initialState.text);
     const [color, setColor] = useState(initialState.color);
-    const [icon, setIcon] = useState(initialState.icon);
+    const [name, setName] = useState(initialState.name);
     const [alertNo, setAlertNo] = useState(initialState.totalAlerts);
     const alertRef = useRef(alertNo);
 
@@ -20,17 +20,17 @@ export const AlertProvider = ({ children }) => {
         alertRef.current = alertNo;
     }, [alertNo]);
 
-    const setAlert = (text, color, icon) => {
+    const setAlert = (text, color, name) => {
         setText(text);
         setColor(color);
-        setIcon(icon);
+        setName(name);
         setAlertNo((alertNo) => alertNo + 1);
 
         setTimeout(() => {
             if (alertRef.current - 1 === alertNo) {
                 setText(initialState.text);
                 setColor(initialState.color);
-                setIcon(initialState.icon);
+                setName(initialState.name);
             }
         }, 3000);
     };
@@ -38,11 +38,11 @@ export const AlertProvider = ({ children }) => {
     const resetAlert = () => {
         setText(initialState.text);
         setColor(initialState.color);
-        setIcon(initialState.icon);
+        setName(initialState.name);
     }
 
     return (
-        <AlertContext.Provider value={{ text, color, icon, setAlert, resetAlert }}>
+        <AlertContext.Provider value={{ text, color, name, setAlert, resetAlert }}>
             {children}
         </AlertContext.Provider>
     );

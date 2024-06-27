@@ -2,14 +2,12 @@ import { Text, View, ScrollView } from "react-native";
 import { useContext, useState } from "react";
 import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FormField from "../../components/Form/FormField.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
 import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCamera, faImages, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 import {
     launchImageLibraryAsync,
     launchCameraAsync,
@@ -18,7 +16,6 @@ import {
 } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
 import { randomUUID } from "expo-crypto";
-
 
 export default function BudgetAddExpense({ navigation, route }) {
     const expenseID = randomUUID();
@@ -44,11 +41,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                 url = await getDownloadURL(snapshot.ref);
                 throw Error();
             } catch (error) {
-                setAlert(
-                    "Error uploading receipt",
-                    "bg-red-500",
-                    icon({ name: "circle-exclamation" })
-                );
+                setAlert("Error uploading receipt", "bg-red-500", "exclamation-circle");
             }
         }
     };
@@ -59,7 +52,7 @@ export default function BudgetAddExpense({ navigation, route }) {
             setAlert(
                 "Please grant permission to access your photo library to upload a receipt",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
             return;
         }
@@ -73,7 +66,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                     setAlert(
                         "An error occurred while uploading the receipt. Please try again.",
                         "bg-red-500",
-                        icon({ name: "circle-exclamation" })
+                        "exclamation-circle"
                     );
                 }
             }
@@ -86,7 +79,7 @@ export default function BudgetAddExpense({ navigation, route }) {
             setAlert(
                 "Please grant permission to access your camera to upload a receipt",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
             return;
         }
@@ -100,7 +93,7 @@ export default function BudgetAddExpense({ navigation, route }) {
                     setAlert(
                         "An error occurred while uploading the receipt. Please try again.",
                         "bg-red-500",
-                        icon({ name: "circle-exclamation" })
+                        "exclamation-circle"
                     );
                 }
             }
@@ -148,16 +141,16 @@ export default function BudgetAddExpense({ navigation, route }) {
                                     setReceiptURI("");
                                 }}
                             >
-                                <FontAwesomeIcon icon={faTrash} size={50} />
+                                <Icon name="trash" size={50} />
                             </AddRecieptButton>
                         </View>
                     ) : (
                         <View className="flex-row justify-around mt-[-50]">
                             <AddRecieptButton onPress={setReceiptCamera}>
-                                <FontAwesomeIcon icon={faCamera} size={50} />
+                                <Icon name="camera" size={50} />
                             </AddRecieptButton>
                             <AddRecieptButton onPress={setReceiptLibrary}>
-                                <FontAwesomeIcon icon={faImages} size={50} />
+                                <Icon name="image" size={50} />
                             </AddRecieptButton>
                         </View>
                     )}

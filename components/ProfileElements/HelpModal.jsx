@@ -7,7 +7,6 @@ import SmallFormButton from "../Form/SmallFormButton.jsx";
 import FormField from "../../components/Form/FormField";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 const furtherInfo = {
     ReportError:
@@ -33,7 +32,7 @@ export default function HelpModal() {
 
     const report = () => {
         if (title === "") {
-            alert("Please enter a title");
+            setAlert("Please enter a title", "bg-red-500", "exclamation-circle");
             return;
         }
 
@@ -44,10 +43,10 @@ export default function HelpModal() {
                 title: title,
                 description: description ? description : "none",
             });
-            setAlert("Report submitted!", "bg-green-500", icon({ name: "circle-check" }));
+            setAlert("Report submitted!", "bg-green-500", "check-circle");
             setModal(null);
         } catch (error) {
-            setAlert("Error sending report", "bg-red-500", icon({ name: "circle-exclamation" }));
+            setAlert("Error sending report", "bg-red-500", "exclamation-circle");
         }
     };
 

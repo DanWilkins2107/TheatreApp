@@ -5,7 +5,6 @@ import EditInfo from "../Form/EditInfo.jsx";
 import { set, ref, get } from "firebase/database";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function UserDetailsModal() {
     const db = firebase_db;
@@ -37,13 +36,13 @@ export default function UserDetailsModal() {
             setAlert(
                 string + " updated successfully",
                 "bg-green-500",
-                icon({ name: "circle-check" })
+                "check-circle"
             );
         } catch (error) {
             setAlert(
                 "Error updating " + string + ". Please Try Again.",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
         }
     };
@@ -59,7 +58,7 @@ export default function UserDetailsModal() {
                         variableToEdit={firstName}
                         initialValue={initialFirstName}
                         onChange={setFirstName}
-                        onSubmit={() => submitName("firstName", firstName, setInitialFirstName)}
+                        onSubmit={() => submitName("First name", firstName, setInitialFirstName)}
                     />
                     <View className="h-8"></View>
                     <EditInfo
@@ -67,7 +66,7 @@ export default function UserDetailsModal() {
                         variableToEdit={lastName}
                         initialValue={initialLastName}
                         onChange={setLastName}
-                        onSubmit={() => submitName("lastName", lastName, setInitialLastName)}
+                        onSubmit={() => submitName("Last name", lastName, setInitialLastName)}
                     />
                 </View>
             )}

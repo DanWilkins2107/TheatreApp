@@ -6,7 +6,6 @@ import { set, ref, get } from "firebase/database";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { updateProfile } from "firebase/auth";
 import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function ContactInformationModal() {
     const db = firebase_db;
@@ -49,13 +48,13 @@ export default function ContactInformationModal() {
                                 setAlert(
                                     "Contact number updated successfully",
                                     "bg-green-500",
-                                    icon({ name: "circle-check" })
+                                    "check-circle"
                                 );
                             } catch (error) {
                                 setAlert(
                                     "Error updating Contact Number. Please Try Again.",
                                     "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
+                                    "exclamation-circle"
                                 );
                             }
                         }}
@@ -74,13 +73,13 @@ export default function ContactInformationModal() {
                                 setAlert(
                                     "Email updated successfully",
                                     "bg-green-500",
-                                    icon({ name: "circle-check" })
+                                    "check-circle"
                                 );
                             } catch (error) {
                                 setAlert(
                                     "Could not update email. Please Try Again.",
                                     "bg-red-500",
-                                    icon({ name: "circle-exclamation" })
+                                    "exclamation-circle"
                                 );
                             }
                         }}
