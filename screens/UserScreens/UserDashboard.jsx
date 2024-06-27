@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, ActivityIndicator, Button } from "react-native";
 import { useState, useCallback, useContext } from "react";
-import { onValue, get, ref, child, set } from "firebase/database";
+import { onValue, get, ref, child } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClapperboard, faMasksTheater } from "@fortawesome/free-solid-svg-icons";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
@@ -34,7 +34,13 @@ export default function UserDashboardScreen({ navigation }) {
 
             const userData = userSnapshot.val();
             const localProductions = JSON.parse(await AsyncStorage.getItem("productions")) || {};
-            const combinedProductions = { ...userData, ...localProductions };
+            
+            let combinedProductions = { ...userData };
+            Object.keys(userData).forEach((playCode) => {
+                if (localProductions[playCode]) {
+                    combinedProductions[playCode] = localProductions[playCode];
+                }
+            });
 
             let areAnyInvalid = false;
             const dbProductions = await Promise.all(
