@@ -6,11 +6,7 @@ import ProductionDashboardButton from "../../components/Budget/ProductionDashboa
 import CreateBudgetModal from "../../components/Budget/CreateBudgetModal.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-    faPiggyBank,
-    faSearchDollar,
-    faFileInvoiceDollar,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPiggyBank, faSearchDollar, faFileInvoiceDollar, faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
@@ -144,6 +140,12 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 }
                             >
                                 <FontAwesomeIcon icon={faFileInvoiceDollar} size={50} />
+                            </ProductionDashboardButton>
+                            <ProductionDashboardButton
+                                text="Set Availability"
+                                onPress={() => navigation.navigate("Availability", { productionCode: playCode })}
+                            >
+                                <FontAwesomeIcon icon={faCalendarCheck} size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
