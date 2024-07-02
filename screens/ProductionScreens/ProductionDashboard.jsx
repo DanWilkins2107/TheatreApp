@@ -17,7 +17,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const playCode = route.params.playCode;
+    const productionCode = route.params.playCode;
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -25,7 +25,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     useEffect(() => {
         onValue(
-            ref(db, `/productions/${playCode}`),
+            ref(db, `/productions/${productionCode}`),
             (snapshot) => {
                 if (!snapshot.exists()) {
                     setLoading(false);
@@ -37,7 +37,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             { onlyOnce: true }
         );
 
-        onValue(ref(db, `/productions/${playCode}/admins`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionCode}/admins`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const adminData = snapshot.val();
             const newAdmins = await Promise.all(
@@ -59,7 +59,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             setAdmins(newAdmins);
         });
 
-        onValue(ref(db, `/productions/${playCode}/participants`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionCode}/participants`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const participantData = snapshot.val();
             const newParticipants = await Promise.all(
@@ -81,6 +81,59 @@ export default function ProductionDashboardScreen({ navigation, route }) {
         });
     }, []);
 
+    const fetchBudgets = async () => {
+        try {
+            const prodSnapshot = await get(ref(db, `productions/${productionCode}/budgets`));
+            if (!prodSnapshot.exists()) {
+                return {};
+            }
+            let newBudgets = {};
+            const budgetUUIDs = Object.keys(prodSnapshot.val());
+            await Promise.all(
+                budgetUUIDs.map(async (budgetUUID) => {
+                    const budgetInfo = await get(ref(db, `budgets/${budgetUUID}`));
+                    if (!budgetInfo.exists()) {
+                        return;
+                    }
+                    if (
+                        budgetInfo.val().participants &&
+                        Object.keys(budgetInfo.val().participants).includes(auth.currentUser.uid)
+                    ) {
+                        newBudgets[budgetUUID] = budgetInfo.val();
+                    }
+                })
+            );
+            return newBudgets;
+        } catch (error) {
+            console.log(error.message);
+            setAlert("Could not find all the budgets", "bg-red-400");
+            return {};
+        }
+    };
+
+    const handleChooseBudgetPress = async () => {
+        setModal(
+            <ViewBudgetModal
+                budgets={{}}
+                loading={true}
+                onPress={(budget) => {
+                    setModal(null);
+                }}
+            />
+        );
+        const newBudgets = await fetchBudgets();
+        setModal(
+            <ViewBudgetModal
+                budgets={newBudgets}
+                loading={false}
+                onPress={(budget) => {
+                    navigation.navigate("BudgetMain", { budgetUUID: budget });
+                    setModal(null)
+                }}
+            />
+        );
+    };
+
     return (
         // TODO: Restyle this page
         <View className="flex-col">
@@ -91,7 +144,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 <>
                     <View className="flex-row justify-around my-2">
                         <Subtitle>Production: {production.playName}</Subtitle>
-                        <Subtitle>{playCode}</Subtitle>
+                        <Subtitle>{productionCode}</Subtitle>
                     </View>
                     <View className="flex-col m-2">
                         <Subtitle>Admins:</Subtitle>
@@ -118,15 +171,15 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Create Budget"
                                     onPress={() =>
-                                        setModal(<CreateBudgetModal productionCode={playCode} />)
+                                        setModal(<CreateBudgetModal productionCode={productionCode} />)
                                     }
                                 >
-                                    <IconFA5 name="plus" size={50}/>
+                                    <IconFA5 name="plus" size={50} />
                                 </ProductionDashboardButton>
                             )}
                             <ProductionDashboardButton
                                 text="View Budget"
-                                onPress={() => setModal(<ViewBudgetModal productionCode={playCode}/>)}
+                                onPress={handleChooseBudgetPress}
                             >
                                 <IconFA5 name="search-dollar" size={50} />
                             </ProductionDashboardButton>
@@ -134,7 +187,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 text="Add Expense"
                                 onPress={() =>
                                     navigation.navigate("BudgetAddExpense", {
-                                        productionCode: playCode,
+                                        productionCode: productionCode,
                                     })
                                 }
                             >
@@ -144,7 +197,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Admin Stuff"
                                     onPress={() =>
-                                        navigation.navigate("Admin", { productionCode: playCode })
+                                        navigation.navigate("Admin", { productionCode: productionCode })
                                     }
                                 >
                                     <Icon name="cogs" size={50} />

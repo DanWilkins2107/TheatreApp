@@ -1,20 +1,18 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-export default function BudgetInfo(props) {
-    const budget = props.budget;
+export default function BudgetInfo({budget, onClick}) {
     const participants = budget.participants || {};
-
     return (
         <TouchableOpacity
-            onPress={props.onClick}
-            className="flex bg-neutral-100 p-3 border-2 rounded-lg my-2"
+            onPress={onClick}
+            className="flex bg-neutral-100 p-3 border-2 rounded-lg my-2 w-full "
         >
             <View className="flex flex-row justify-between items-center">
                 <Text className="text-2xl font-bold">{budget.name}</Text>
-                <FontAwesomeIcon icon={icon({ name: "chevron-right" })} size={20} />
+                {/* Not sure we need the arrow all the time? Idk tho again what do u think?*/}
+                <Icon name="chevron-right" size={20} />
             </View>
             <Text className="text-lg font-light">Budget: £{budget.budget}</Text>
             <View className="w-max flex flex-row mt-1">
