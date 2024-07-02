@@ -9,15 +9,15 @@ import { firebase_auth } from "./firebase.config.js";
 import UserDashboardScreen from "./screens/UserScreens/UserDashboard.jsx";
 import Header from "./components/Header/Header.jsx";
 import UserProfileScreen from "./screens/UserScreens/UserProfile.jsx";
-import BudgetHomeScreen from "./screens/ProductionScreens/BudgetHomeScreen.jsx";
 import ProductionDashboardScreen from "./screens/ProductionScreens/ProductionDashboard.jsx";
 import { View } from "react-native";
 import { AlertProvider } from "./components/Alert/AlertProvider.jsx";
 import Alert from "./components/Alert/Alert.jsx";
 import { ModalProvider } from "./components/Modal/ModalProvider.jsx";
 import Modal from "./components/Modal/Modal.jsx";
-import BudgetAddExpense from "./screens/ProductionScreens/BudgetAddExpense.jsx";
+import BudgetAddExpenseScreen from "./screens/ProductionScreens/BudgetAddExpense.jsx";
 import AdminScreen from "./screens/AdminScreens/AdminScreen.jsx";
+import BudgetMainScreen from "./screens/ProductionScreens/BudgetMain.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -73,8 +73,8 @@ export default function App() {
                                     })}
                                 />
                                 <Stack.Screen
-                                    name="BudgetHome"
-                                    component={BudgetHomeScreen}
+                                    name="BudgetAddExpense"
+                                    component={BudgetAddExpenseScreen}
                                     options={({ navigation }) => ({
                                         headerTitle: () => (
                                             <Header navigation={navigation} />
@@ -83,8 +83,8 @@ export default function App() {
                                     })}
                                 />
                                 <Stack.Screen
-                                    name="BudgetAddExpense"
-                                    component={BudgetAddExpense}
+                                    name="BudgetMain"
+                                    component={BudgetMainScreen}
                                     options={({ navigation }) => ({
                                         headerTitle: () => (
                                             <Header navigation={navigation} />
@@ -92,6 +92,7 @@ export default function App() {
                                         headerBackVisible: false,
                                     })}
                                 />
+                                
                                 <Stack.Screen
                                     name="Admin"
                                     component={AdminScreen}
