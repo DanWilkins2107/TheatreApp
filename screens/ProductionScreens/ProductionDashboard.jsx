@@ -197,7 +197,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 text="Set Availability"
                                 onPress={() => navigation.navigate("Availability", { productionCode: playCode })}
                             >
-                                <FontAwesomeIcon icon={faCalendarCheck} size={50} />
+                                <IconFA5 name="calendar-alt" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton

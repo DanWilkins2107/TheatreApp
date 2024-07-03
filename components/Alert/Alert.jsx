@@ -6,7 +6,7 @@ import IconFA5 from "react-native-vector-icons/FontAwesome";
 export default function Alert() {
     const { text, color, name, resetAlert } = useContext(AlertContext);
 
-    if (icon !== "") {
+    if (name !== "") {
         return (
             <View className={`${color} self-center w-5/6 h-20 mt-10 border-2 flex flex-row items-center p-2 rounded-md`}>
                 <IconFA5 name={name} size={30} className="ml-2" />

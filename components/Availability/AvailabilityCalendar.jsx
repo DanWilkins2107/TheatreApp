@@ -1,8 +1,7 @@
 import { View, Text, ScrollView, Pressable, TouchableOpacity } from "react-native";
 import { useState, useRef, useCallback } from "react";
 import DateCircles from "./DateCircles";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCircleChevronLeft, faCircleChevronRight } from "@fortawesome/free-solid-svg-icons";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -23,12 +22,6 @@ const getWeekStartDate = (date) => {
     return new Date(date.setDate(diff));
 };
 
-const findColour = (colour) => {
-    if (colour != "none") {
-        return "bg-" + colour + "-400";
-    } else return "bg-white";
-};
-
 const dateString = (date) => {
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -38,77 +31,82 @@ const dateString = (date) => {
 
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
     const [date, setDate] = useState(new Date());
-    const dateBarRef = useRef(null);
-    const timeBarRef = useRef(null);
-    const mainAreaRefHorizontal = useRef(null);
-    const mainAreaRefVertical = useRef(null);
+    const scrollRef = useRef(null);
 
-    const handleDateScroll = (event) => {
-        const offsetX = event.nativeEvent.contentOffset.x;
-        mainAreaRefHorizontal.current.scrollTo({ x: offsetX, animated: false });
+    const findColour = (colour) => {
+        if (colour != "none") {
+            return "bg-" + colour + "-400";
+        } else return "bg-white";
     };
 
-    const handleTimeScroll = (event) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        mainAreaRefVertical.current.scrollTo({ y: offsetY, animated: false });
-    };
+    const handleOnPress = useCallback(
+        (hour, daysToChange) => {
+            const correctDate = editDate(date, daysToChange);
+            const dayData = splitDate(correctDate);
+            const value = checkAvailability(hour, correctDate);
 
-    const handleHorizontalMainScroll = (event) => {
-        const offsetX = event.nativeEvent.contentOffset.x;
-        dateBarRef.current.scrollTo({ x: offsetX, animated: false });
-    };
+            newInfo = { ...availabilityInfo };
 
-    const handleVerticalMainScroll = (event) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        timeBarRef.current.scrollTo({ y: offsetY, animated: false });
-    };
-
-    const handleOnPress = useCallback((hour, daysToChange) => {
-        const correctDate = editDate(date, daysToChange);
-        const dayData = splitDate(correctDate);
-        const value = checkAvailability(hour, correctDate);
-
-        newInfo = { ...availabilityInfo };
-
-        if (value === "none") {
-            if (newInfo[dayData[0]] === undefined) {
-                newInfo = { ...newInfo, [dayData[0]]: {} };
+            if (value === "none") {
+                if (newInfo[dayData[0]] === undefined) {
+                    newInfo = { ...newInfo, [dayData[0]]: {} };
+                }
+                if (newInfo[dayData[0]][dayData[1]] === undefined) {
+                    newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
+                }
+                if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
+                    newInfo[dayData[0]][dayData[1]] = {
+                        ...newInfo[dayData[0]][dayData[1]],
+                        [dayData[2]]: {},
+                    };
+                }
+                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
             }
-            if (newInfo[dayData[0]][dayData[1]] === undefined) {
-                newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
+            if (value === "green") {
+                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
             }
-            if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
-                newInfo[dayData[0]][dayData[1]] = {
-                    ...newInfo[dayData[0]][dayData[1]],
-                    [dayData[2]]: {},
-                };
+            if (value === "red") {
+                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
             }
-            newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
-        }
-        if (value === "green") {
-            newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
-        }
-        if (value === "red") {
-            newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
-        }
-        setAvailabilityInfo(newInfo);
-    }, [date, availabilityInfo]);
+            setAvailabilityInfo(newInfo);
+        },
+        [date, availabilityInfo]
+    );
 
-    const checkAvailability = useCallback((hour, date) => {
-        const dayInfo = splitDate(date);
-        const year = dayInfo[0];
-        const month = dayInfo[1];
-        const day = dayInfo[2];
-        if (
-            availabilityInfo[year] &&
-            availabilityInfo[year][month] &&
-            availabilityInfo[year][month][day] &&
-            availabilityInfo[year][month][day][hour]
-        ) {
-            return availabilityInfo[year][month][day][hour];
-        }
-        return "none";
-    }, [availabilityInfo]);
+    const checkAvailability = useCallback(
+        (hour, date) => {
+            const dayInfo = splitDate(date);
+            const year = dayInfo[0];
+            const month = dayInfo[1];
+            const day = dayInfo[2];
+            if (
+                availabilityInfo[year] &&
+                availabilityInfo[year][month] &&
+                availabilityInfo[year][month][day] &&
+                availabilityInfo[year][month][day][hour]
+            ) {
+                return availabilityInfo[year][month][day][hour];
+            }
+            return "none";
+        },
+        [availabilityInfo]
+    );
+
+    // Work out date line
+    const currentHour = new Date().getHours();
+    const currentMinute = new Date().getMinutes();
+
+    const heightNeeded = Math.floor(80 * currentHour + (currentMinute / 60) * 80) - 2;
+    const thirtySixesNeeded = Math.floor(heightNeeded / (36 * 4));
+    const remainder = heightNeeded % (36 * 4);
+
+    const fivesNeeded = Math.floor(remainder / (5 * 4));
+    const remainder2 = remainder % (5 * 4);
+
+    const onesNeeded = Math.floor(remainder2 / 4);
+    const remainder3 = remainder2 % 4;
+
+    console.log(remainder3);
 
     return (
         <View className="flex-1">
@@ -119,7 +117,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         setDate(editDate(date, -7));
                     }}
                 >
-                    <FontAwesomeIcon icon={faCircleChevronLeft} size={25}/>
+                    <Icon name="arrow-circle-left" size={25} />
                 </TouchableOpacity>
                 <Text className="flex-1 text-center font-semibold text-xl">
                     {dateString(getWeekStartDate(date))} -{" "}
@@ -131,38 +129,44 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         setDate(editDate(date, 7));
                     }}
                 >
-                    <FontAwesomeIcon icon={faCircleChevronRight} size={25}/>
+                    <Icon name="arrow-circle-right" size={25} />
                 </TouchableOpacity>
             </View>
-            <View className="flex-1 border-r">
-                <ScrollView
-                    ref={dateBarRef}
-                    horizontal
-                    onScroll={handleDateScroll}
-                    scrollEventThrottle={16}
-                    bounces={false}
-                    className="absolute top-0 h-14 z-10 left-[63] right-0 border-l bg-slate-100 border-y"
-                >
-                    <View className="flex-row h-14">
-                        {[...Array(7).keys()].map((day) => {
-                            const newDate = editDate(getWeekStartDate(date), day);
-                            return (
-                                <View className="h-14 w-16 justify-center items-center" key={day}>
-                                    <DateCircles number={splitDate(newDate)[2]} />
-                                </View>
-                            );
-                        })}
-                    </View>
-                </ScrollView>
-                <ScrollView
-                    ref={timeBarRef}
-                    vertical
-                    onScroll={handleTimeScroll}
-                    scrollEventThrottle={16}
-                    bounces={false}
-                    className="absolute top-[55] left-0 bottom-0 w-16 bg-slate-100 z-10 border-x border-t"
-                >
-                    <View className="flex-col">
+
+            <View className="flex-row w-full h-14 justify-around ">
+                <View className="w-16 border-r border-l border-t bg-slate-100" />
+                <View className="flex-row flex-1 border-t border-r bg-slate-100">
+                    {[...Array(7).keys()].map((day) => {
+                        const newDate = editDate(getWeekStartDate(date), day);
+                        return (
+                            <View
+                                className={`justify-center items-center ${
+                                    day != 0 && "border-l"
+                                } flex-1`}
+                                key={day}
+                            >
+                                <DateCircles
+                                    number={splitDate(newDate)[2]}
+                                    letter={["M", "T", "W", "T", "F", "S", "S"][day]}
+                                />
+                            </View>
+                        );
+                    })}
+                </View>
+            </View>
+            <ScrollView
+                ref={scrollRef}
+                className="flex-1"
+                bounces={false}
+                onLayout={() => {
+                    const amountToScroll = 4 * currentHour * 20 - 90; // 4 is for unit conversion, 90 so it's not at the very top
+                    if (amountToScroll > 0) {
+                        scrollRef.current.scrollTo({ x: 0, y: amountToScroll, animated: false });
+                    }
+                }}
+            >
+                <View className="flex-row flex">
+                    <View className="w-16 bg-slate-100 border-l border-t border-r">
                         {[...Array(24).keys()].map((hour) => {
                             return (
                                 <View className={`h-20 ${hour != 0 && "border-t"}`} key={hour}>
@@ -171,49 +175,60 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                             );
                         })}
                     </View>
-                </ScrollView>
-                <ScrollView
-                    ref={mainAreaRefHorizontal}
-                    horizontal
-                    onScroll={handleHorizontalMainScroll}
-                    scrollEventThrottle={16}
-                    className="flex-1 bg-blue-500 z-0 absolute top-14 left-16 right-0 bottom-0 "
-                    bounces={false}
-                    contentContainerStyle="flex-row"
-                >
-                    <ScrollView
-                        ref={mainAreaRefVertical}
-                        onScroll={handleVerticalMainScroll}
-                        scrollEventThrottle={16}
-                        bounces={false}
-                    >
-                        <View className="flex-row flex">
-                            {[...Array(7).keys()].map((day) => {
-                                const newDate = editDate(getWeekStartDate(date), day);
-                                return (
-                                    <View className="flex-col" key={day}>
-                                        {[...Array(48).keys()].map((hour) => {
-                                            return (
-                                                <Pressable
-                                                    key={hour}
-                                                    className={`h-10 ${hour != 0 && "border-t"} ${
-                                                        day != 0 && "border-l"
-                                                    } w-16 ${findColour(
-                                                        checkAvailability(hour, newDate)
-                                                    )}`}
-                                                    onPress={() => {
-                                                        handleOnPress(hour, day);
-                                                    }}
-                                                />
-                                            );
-                                        })}
-                                    </View>
-                                );
-                            })}
-                        </View>
-                    </ScrollView>
-                </ScrollView>
-            </View>
+                    <View className="flex-1 flex-row border-t border-r">
+                        {[...Array(7).keys()].map((day) => {
+                            const newDate = editDate(getWeekStartDate(date), day);
+                            return (
+                                <View className="flex-col flex-1" key={day}>
+                                    {[...Array(48).keys()].map((hour) => {
+                                        return (
+                                            <Pressable
+                                                key={hour}
+                                                className={`h-10 ${hour != 0 && "border-t"} ${
+                                                    day != 0 && "border-l"
+                                                } flex-1 ${findColour(
+                                                    checkAvailability(hour, newDate)
+                                                )} `}
+                                                onPress={() => {
+                                                    handleOnPress(hour, day);
+                                                }}
+                                            >
+                                                <Text className="text-center font-semibold">
+                                                    {checkAvailability(hour, newDate) ===
+                                                    "green" ? (
+                                                        <Icon name="check" size={10} />
+                                                    ) : checkAvailability(hour, newDate) ===
+                                                      "red" ? (
+                                                        <Icon name="times" size={10} />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </Text>
+                                            </Pressable>
+                                        );
+                                    })}
+                                </View>
+                            );
+                        })}
+                    </View>
+                </View>
+                <View className="absolute w-full bg-orange-300">
+                    {/* Working Out Date Line */}
+                    <View className="h-[1]" pointerEvents="none"/>
+                    {[...Array(thirtySixesNeeded).keys()].map((i) => {
+                        return <View className="h-36" key={i} pointerEvents="none"/>;
+                    })}
+                    {[...Array(fivesNeeded).keys()].map((i) => {
+                        return <View className="h-5" key={i} pointerEvents="none"/>;
+                    })}
+                    {[...Array(onesNeeded).keys()].map((i) => {
+                        return <View className="h-1" key={i} pointerEvents="none"/>;
+                    })}
+                    <View style={{height: remainder3}} className="" pointerEvents="none"/>
+                    <View className="h-[2] bg-red-500"/>
+                    
+                </View>
+            </ScrollView>
         </View>
     );
 }
