@@ -6,7 +6,6 @@ import { ref, set, get, child } from "firebase/database";
 import { firebase_auth, firebase_db } from "../../firebase.config";
 import { randomUUID } from "expo-crypto";
 import { AlertContext } from "../../components/Alert/AlertProvider";
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export default function Availability({ navigation, route }) {
     const [availabilityInfo, setAvailabilityInfo] = useState({});
@@ -32,13 +31,13 @@ export default function Availability({ navigation, route }) {
                 availabilityUID = data[auth.currentUser.uid];
             }
             await set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
-            setAlert("Availability updated", "bg-green-500", icon({ name: "check-circle" }));
+            setAlert("Availability updated", "bg-green-500", "check-circle");
             setInitialAvailabilityInfo(JSON.parse(JSON.stringify(availabilityInfo)));
         } catch (error) {
             setAlert(
                 "Could not update availability",
                 "bg-red-500",
-                icon({ name: "circle-exclamation" })
+                "exclamation-circle"
             );
         }
     };

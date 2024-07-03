@@ -2,6 +2,7 @@ import { View, Text, ScrollView, Pressable, TouchableOpacity } from "react-nativ
 import { useState, useRef, useCallback } from "react";
 import DateCircles from "./DateCircles";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { set } from "firebase/database";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -27,6 +28,15 @@ const dateString = (date) => {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+};
+
+const hasTimePassed = (date, day, hour) => {
+    const current = new Date();
+    let copyDate = new Date(date);
+    let newDate = editDate(getWeekStartDate(copyDate), day);
+    newDate.setHours(hour / 2);
+    newDate.setMinutes((hour % 2) * 30 + 30);
+    return newDate < current;
 };
 
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
@@ -96,17 +106,17 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
     const currentHour = new Date().getHours();
     const currentMinute = new Date().getMinutes();
 
-    const heightNeeded = Math.floor(80 * currentHour + (currentMinute / 60) * 80) - 2;
-    const thirtySixesNeeded = Math.floor(heightNeeded / (36 * 4));
-    const remainder = heightNeeded % (36 * 4);
+    const heightNeeded = Math.floor(80 * currentHour + (currentMinute / 60) * 80) + 1; // 80 is the height of each hour, 1 is for the border
+    let dateOffset = 8;
 
-    const fivesNeeded = Math.floor(remainder / (5 * 4));
-    const remainder2 = remainder % (5 * 4);
+    if (heightNeeded < 8) {
+        dateOffset = heightNeeded;
+    }
 
-    const onesNeeded = Math.floor(remainder2 / 4);
-    const remainder3 = remainder2 % 4;
-
-    console.log(remainder3);
+    if (heightNeeded > 80 * 24 - 8) {
+        console.log("heightNeeded", heightNeeded);
+        dateOffset = heightNeeded - 1912 + 8;
+    }
 
     return (
         <View className="flex-1">
@@ -133,18 +143,13 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                 </TouchableOpacity>
             </View>
 
-            <View className="flex-row w-full h-14 justify-around ">
-                <View className="w-16 border-r border-l border-t bg-slate-100" />
+            <View className="flex-row w-full h-14 justify-around border-b ">
+                <View className="w-16 border-r" />
                 <View className="flex-row flex-1 border-t border-r bg-slate-100">
                     {[...Array(7).keys()].map((day) => {
                         const newDate = editDate(getWeekStartDate(date), day);
                         return (
-                            <View
-                                className={`justify-center items-center ${
-                                    day != 0 && "border-l"
-                                } flex-1`}
-                                key={day}
-                            >
+                            <View className={`justify-center items-center flex-1`} key={day}>
                                 <DateCircles
                                     number={splitDate(newDate)[2]}
                                     letter={["M", "T", "W", "T", "F", "S", "S"][day]}
@@ -166,7 +171,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                 }}
             >
                 <View className="flex-row flex">
-                    <View className="w-16 bg-slate-100 border-l border-t border-r">
+                    <View className="w-16 bg-slate-100 border-l border-r">
                         {[...Array(24).keys()].map((hour) => {
                             return (
                                 <View className={`h-20 ${hour != 0 && "border-t"}`} key={hour}>
@@ -175,35 +180,34 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                             );
                         })}
                     </View>
-                    <View className="flex-1 flex-row border-t border-r">
+                    <View className="flex-1 flex-row border-r">
                         {[...Array(7).keys()].map((day) => {
                             const newDate = editDate(getWeekStartDate(date), day);
                             return (
                                 <View className="flex-col flex-1" key={day}>
                                     {[...Array(48).keys()].map((hour) => {
+                                        const availability = checkAvailability(hour, newDate);
+                                        const timePassed = hasTimePassed(newDate, day, hour);
                                         return (
                                             <Pressable
                                                 key={hour}
-                                                className={`h-10 ${hour != 0 && "border-t"} ${
-                                                    day != 0 && "border-l"
-                                                } flex-1 ${findColour(
-                                                    checkAvailability(hour, newDate)
-                                                )} `}
+                                                className={`h-10 justify-center items-center ${
+                                                    hour != 0 && "border-t"
+                                                } ${day != 0 && "border-l"} flex-1 ${findColour(
+                                                    availability
+                                                )} ${timePassed && "opacity-20"} `}
                                                 onPress={() => {
-                                                    handleOnPress(hour, day);
+                                                    if (!timePassed) {
+                                                        handleOnPress(hour, day);
+                                                    }
                                                 }}
                                             >
-                                                <Text className="text-center font-semibold">
-                                                    {checkAvailability(hour, newDate) ===
-                                                    "green" ? (
-                                                        <Icon name="check" size={10} />
-                                                    ) : checkAvailability(hour, newDate) ===
-                                                      "red" ? (
-                                                        <Icon name="times" size={10} />
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </Text>
+                                                {availability === "green" && (
+                                                    <Icon name="check" size={15} />
+                                                )}
+                                                {availability === "red" && (
+                                                    <Icon name="times" size={15} />
+                                                )}
                                             </Pressable>
                                         );
                                     })}
@@ -212,21 +216,27 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         })}
                     </View>
                 </View>
-                <View className="absolute w-full bg-orange-300">
-                    {/* Working Out Date Line */}
-                    <View className="h-[1]" pointerEvents="none"/>
-                    {[...Array(thirtySixesNeeded).keys()].map((i) => {
-                        return <View className="h-36" key={i} pointerEvents="none"/>;
-                    })}
-                    {[...Array(fivesNeeded).keys()].map((i) => {
-                        return <View className="h-5" key={i} pointerEvents="none"/>;
-                    })}
-                    {[...Array(onesNeeded).keys()].map((i) => {
-                        return <View className="h-1" key={i} pointerEvents="none"/>;
-                    })}
-                    <View style={{height: remainder3}} className="" pointerEvents="none"/>
-                    <View className="h-[2] bg-red-500"/>
-                    
+                {/* Any Thoughts on whether we want this line when the week is not current? */}
+                <View className="absolute w-full" pointerEvents="none">
+                    <View className="h-[1]" />
+                    <View style={{ height: heightNeeded - dateOffset }} className="" />
+                    <View className="h-4 w-full flex-row">
+                        <View className="w-16">
+                            <View style={{ height: dateOffset - 2 }} />
+                            <View className="h-1 bg-red-600" />
+                        </View>
+                        <View className="h-full px-1 text-center justify-center">
+                            <Text className="text-center text-red-600 font-semibold">{`${
+                                String(currentHour).length === 1 ? "0" : ""
+                            }${currentHour}:${
+                                String(currentMinute).length === 1 ? "0" : ""
+                            }${currentMinute}`}</Text>
+                        </View>
+                        <View className="flex-1">
+                            <View style={{ height: dateOffset - 2 }} />
+                            <View className="h-1 bg-red-600" />
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </View>
