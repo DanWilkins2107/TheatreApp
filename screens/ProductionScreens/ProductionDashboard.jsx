@@ -11,6 +11,14 @@ import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
 
+// TODO:
+// - Modal popup on press of playcode
+//      > Change playcode option for admin
+//      > [future] QR code for joining
+// - Refactor play keys in database
+//      > UUIDv7 (no import)
+
+
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
     const [isAdmin, setIsAdmin] = useState(false);
