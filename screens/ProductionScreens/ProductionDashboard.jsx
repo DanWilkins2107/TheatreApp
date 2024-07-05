@@ -75,7 +75,6 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         });
                 })
             );
-
             setParticipants(newParticipants);
             setLoading(false);
         });

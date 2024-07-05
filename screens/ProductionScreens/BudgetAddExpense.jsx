@@ -1,5 +1,5 @@
 import { Text, View, ScrollView, TouchableOpacity } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useState, useCallback } from "react";
 import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
 import FormField from "../../components/Form/FormField.jsx";
@@ -16,12 +16,14 @@ import {
 } from "expo-image-picker";
 import { storage } from "../../firebase.config.js";
 import { randomUUID } from "expo-crypto";
-import { get } from "firebase/database";
+import { get, set } from "firebase/database";
 import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import { ref as dbRef } from "firebase/database";
 import BudgetInfo from "../../components/Budget/BudgetInfo.jsx";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
+import Checkbox from "../../components/Participants/Checkbox.jsx";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function BudgetAddExpenseScreen({ navigation, route }) {
     const expenseID = randomUUID();
@@ -31,6 +33,8 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     const [description, setDescription] = useState("");
     const [receiptURI, setReceiptURI] = useState("");
     const [cost, setCost] = useState("");
+    const [isPlaceholder, setIsPlaceholder] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { setAlert } = useContext(AlertContext);
     const storageRef = ref(storage);
     const productionCode = route.params.productionCode;
@@ -38,22 +42,73 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     const auth = firebase_auth;
     const { setModal } = useContext(ModalContext);
 
+    const resetValues = () => {
+        setBudget("");
+        setReference("");
+        setDescription("");
+        setIsPlaceholder(false);
+        setCost("");
+        setReceiptURI("");
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            resetValues();
+        }, [])
+    );
+
     const submitForm = async () => {
-        // TODO: Complete Submit Form Functionality
-        const url = "";
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        if (!budget) {
+            setAlert("Please select a budget", "bg-red-500", "exclamation-circle");
+            return;
+        }
+
+        if (!reference) {
+            setAlert("Please enter a reference", "bg-red-500", "exclamation-circle");
+            return;
+        }
+
+        if (!cost) {
+            setAlert("Please enter the cost of the expense", "bg-red-500", "exclamation-circle");
+            return;
+        }
+
+        let url = "";
         if (receiptURI) {
             try {
-                const blob = receiptURI.blob();
+                const image = await fetch(receiptURI);
+                const blob = await image.blob();
                 const extension = receiptURI.substring(receiptURI.lastIndexOf("."));
                 const snapshot = await uploadBytes(
                     ref(storageRef, "receipts/" + expenseID + extension),
                     blob
                 );
                 url = await getDownloadURL(snapshot.ref);
-                throw Error();
             } catch (error) {
                 setAlert("Error uploading receipt", "bg-red-500", "exclamation-circle");
             }
+        }
+
+        try {
+            await set(dbRef(db, `expenses/${expenseID}`), {
+                budget: budget,
+                reference: reference,
+                description: description,
+                cost: cost,
+                placeholder: isPlaceholder,
+                receipt: url,
+                user: auth.currentUser.uid,
+            });
+            await set(dbRef(db, `budgets/${budget}/expenses/${expenseID}`), Date.now());
+            setAlert("Expense added successfully", "bg-green-500", "check-circle");
+            setIsSubmitting(false);
+            navigation.navigate("BudgetMain", { budgetUUID: budget });
+        } catch (error) {
+            setAlert("Error occurred when adding expense", "bg-red-500", "exclamation-circle");
+            console.error(error);
+            setIsSubmitting(false);
         }
     };
 
@@ -168,9 +223,9 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
 
     return (
         <View className="py-2 flex justify-center items-center">
-            <Title extraClassName="mb-2">Add Expense</Title>
+            <Title extraClassName="mb-4">Add Expense</Title>
             <ScrollView className="h-5/6 w-full px-8">
-                <View className="h-40 items-center justify-center">
+                <View className="items-center justify-center mb-4">
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
                     {budget ? (
                         <BudgetInfo
@@ -186,7 +241,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                         </TouchableOpacity>
                     )}
                 </View>
-                <View>
+                <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Reference</Text>
                     <FormField
                         value={reference}
@@ -194,7 +249,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                         onChangeText={setReference}
                     />
                 </View>
-                <View>
+                <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Description</Text>
                     <FormField
                         value={description}
@@ -205,12 +260,26 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                         autoCapitalize="sentences"
                     />
                 </View>
-                <View>
+                <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Cost</Text>
-                    <FormField value={cost} placeholder="Cost (£)" onChangeText={setCost} />
+                    <FormField value={cost} placeholder="Cost (£)" onChangeText={(value) => {
+                        if (value.match(/^[0-9]*\.?[0-9]{0,2}$/)) {
+                            setCost(value);
+                        }
+                    }} />
+                    <View className="flex-row justify-center items-center">
+                        <Text className="text-lg font-semibold mr-4">Is this a placeholder?</Text>
+                        <Checkbox
+                            checked={isPlaceholder}
+                            setChecked={() => {
+                                setIsPlaceholder(!isPlaceholder);
+                            }}
+                            size={18}
+                        />
+                    </View>
                 </View>
                 <View className="h-80 mb-24">
-                    <Text className="text-lg font-semibold text-center">Receipt</Text>
+                    <Text className="text-lg font-semibold text-center mb-1">Receipt</Text>
                     <ReceiptViewer recieptURL={receiptURI} />
                     {receiptURI ? (
                         <View className="flex-row justify-around mt-[-50]">
@@ -239,7 +308,9 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     title="Submit"
                     backgroundColor="bg-green-400"
                     onPress={submitForm}
+                    loading={isSubmitting}
                 />
+                <View className="w-4" />
                 <SmallFormButton
                     title="Reset"
                     onPress={() => {
