@@ -8,8 +8,6 @@ import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import Icon from "react-native-vector-icons/FontAwesome";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
-import Title from "../../components/TextStyles/Title.jsx";
-import Subtitle from "../../components/TextStyles/Subtitle.jsx";
 import ProfilePictureArray from "../../components/Participants/ProfilePictureArray.jsx";
 import PlayCodeButton from "../../components/UserDashboard/PlayCodeButton.jsx";
 import PlaycodeModal from "../../components/ProductionModals/PlaycodeModal.jsx";
@@ -28,7 +26,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const productionCode = route.params.productionCode;
+    const productionCode = route.params.playCode;
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -125,14 +123,14 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 <ActivityIndicator color="#000000" size="large" />
             ) : (
                 <>
-                    <View className="flex-col items-center justify-between mb-2 mt-4 px-6">
+                    <View className="flex-col border-2 rounded-3xl items-center justify-between mb- mt-4 px-16 pt-2 pb-4">
                         <Text className="text-3xl font-extrabold">{production.playName}</Text>
                         <View className="py-1" />
                         <PlayCodeButton playCode={productionCode} onPress={() => setModal(<PlaycodeModal playCode={productionCode} />)}/>
                         <View className="py-1" />
                         <ProfilePictureArray participants={participants} size={12} />
                     </View>
-                    <View className="flex-col m-2">
+                    <View className="flex-col m-2"> 
                         <View className="flex flex-col m-2">
                             {isAdmin && (
                                 <ProductionDashboardButton

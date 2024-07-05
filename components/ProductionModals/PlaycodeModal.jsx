@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Text } from "react-native";
 
 // TODO:
 // - Check admin + change playcode option
@@ -6,10 +6,12 @@ import { View } from "react-native";
 // - Big Letters
 
 export default function PlayCodeModal({ playcode }) {
-	return (
-		<View className="flex-col p-3">
-			<View className="bg-slate-400 h-96 w-96" />
-			<Text className="text-6xl">{playcode}</Text>
-		</View>
-	);
+    console.log(playcode);
+
+    return (
+        <View className="flex-col items-center p-3">
+            <View className="bg-slate-400 h-36 w-36" />
+            <Text className="text-xl text-black">{playcode}</Text>
+        </View>
+    );
 }
