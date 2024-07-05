@@ -18,6 +18,7 @@ import Modal from "./components/Modal/Modal.jsx";
 import BudgetAddExpenseScreen from "./screens/ProductionScreens/BudgetAddExpense.jsx";
 import AdminScreen from "./screens/AdminScreens/AdminScreen.jsx";
 import BudgetMainScreen from "./screens/ProductionScreens/BudgetMain.jsx";
+import Container from "./components/General/Container.jsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,29 @@ export default function App() {
         });
     }, []);
 
+    const makeScreen = (screen) => {
+        return (props) => (
+            <Container>
+                <screen.component {...props} />
+            </Container>
+        );
+    };
+
+    const authScreens = [
+        { name: "Login", component: LoginScreen },
+        { name: "SignUp", component: SignUpScreen },
+        { name: "ForgottenPassword", component: ForgottenPasswordScreen },
+    ];
+
+    const userScreens = [
+        { name: "UserDashboard", component: UserDashboardScreen, firstScreen: true, header: true },
+        { name: "UserProfile", component: UserProfileScreen, header: true, profileScreen: true},
+        { name: "ProductionDashboard", component: ProductionDashboardScreen, header: true },
+        { name: "BudgetAddExpense", component: BudgetAddExpenseScreen, header: true },
+        { name: "BudgetMain", component: BudgetMainScreen, header: true },
+        { name: "Admin", component: AdminScreen, header: true },
+    ];
+
     return (
         <AlertProvider>
             <ModalProvider>
@@ -42,86 +66,18 @@ export default function App() {
                 </View>
                 <NavigationContainer className="z-10 absolute">
                     <Stack.Navigator initialRouteName={user ? "UserDashboard" : "Login"}>
-                        {user ? (
-                            <>
-                                <Stack.Screen
-                                    name="UserDashboard"
-                                    component={UserDashboardScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => (
-                                            <Header navigation={navigation} firstScreen />
-                                        ),
-                                        headerBackVisible: false,
-                                    })}
-                                />
-                                <Stack.Screen
-                                    name="ProductionDashboard"
-                                    component={ProductionDashboardScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => <Header navigation={navigation} />,
-                                        headerBackVisible: false,
-                                    })}
-                                />
-                                <Stack.Screen
-                                    name="UserProfile"
-                                    component={UserProfileScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => (
-                                            <Header navigation={navigation} profileScreen />
-                                        ),
-                                        headerBackVisible: false,
-                                    })}
-                                />
-                                <Stack.Screen
-                                    name="BudgetAddExpense"
-                                    component={BudgetAddExpenseScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => (
-                                            <Header navigation={navigation} />
-                                        ),
-                                        headerBackVisible: false,
-                                    })}
-                                />
-                                <Stack.Screen
-                                    name="BudgetMain"
-                                    component={BudgetMainScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => (
-                                            <Header navigation={navigation} />
-                                        ),
-                                        headerBackVisible: false,
-                                    })}
-                                />
+                        {(user ? userScreens : authScreens).map((screen) => (
+                            <Stack.Screen
+                                key={screen.name}
+                                name={screen.name}
+                                component={makeScreen(screen)}
+                                options={{
+                                    header: (props) => <Header {...props} {...screen} />,
+                                    headerTransparent: true
+                                }}
                                 
-                                <Stack.Screen
-                                    name="Admin"
-                                    component={AdminScreen}
-                                    options={({ navigation }) => ({
-                                        headerTitle: () => (
-                                            <Header navigation={navigation} />
-                                        ),
-                                        headerBackVisible: false,
-                                    })}
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <Stack.Screen
-                                    name="Login"
-                                    component={LoginScreen}
-                                    options={{ headerShown: false }}
-                                />
-                                <Stack.Screen
-                                    name="SignUp"
-                                    component={SignUpScreen}
-                                    options={{ headerShown: false }}
-                                />
-                                <Stack.Screen
-                                    name="ForgottenPassword"
-                                    component={ForgottenPasswordScreen}
-                                    options={{ headerShown: false }}
-                                />
-                            </>
+                            />
+                        )
                         )}
                     </Stack.Navigator>
                 </NavigationContainer>
