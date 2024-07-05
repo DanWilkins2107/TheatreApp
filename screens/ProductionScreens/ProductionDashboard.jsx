@@ -10,6 +10,9 @@ import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import Subtitle from "../../components/TextStyles/Subtitle.jsx";
+import ProfilePictureArray from "../../components/Participants/ProfilePictureArray.jsx";
+import PlayCodeButton from "../../components/UserDashboard/PlayCodeButton.jsx";
+import PlaycodeModal from "../../components/ProductionModals/PlaycodeModal.jsx";
 
 // TODO:
 // - Modal popup on press of playcode
@@ -25,7 +28,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const productionCode = route.params.playCode;
+    const productionCode = route.params.productionCode;
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -48,43 +51,16 @@ export default function ProductionDashboardScreen({ navigation, route }) {
         onValue(ref(db, `/productions/${productionCode}/admins`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const adminData = snapshot.val();
-            const newAdmins = await Promise.all(
-                Object.keys(adminData).map(async (admin) => {
-                    return get(ref(db, `users/${admin}`))
-                        .then((userSnapshot) => {
-                            if (!userSnapshot.exists()) return;
-                            const userData = userSnapshot.val();
-                            return [userData.firstName, userData.lastName];
-                        })
-                        .catch((error) => {
-                            console.log("uh oh: ", error.message);
-                        });
-                })
-            );
             if (adminData[auth.currentUser.uid]) {
                 setIsAdmin(true);
             }
-            setAdmins(newAdmins);
+            setAdmins(Object.keys(adminData));
         });
 
         onValue(ref(db, `/productions/${productionCode}/participants`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const participantData = snapshot.val();
-            const newParticipants = await Promise.all(
-                Object.keys(participantData).map(async (participant) => {
-                    return get(ref(db, `users/${participant}`))
-                        .then((userSnapshot) => {
-                            if (!userSnapshot.exists()) return;
-                            const userData = userSnapshot.val();
-                            return [userData.firstName, userData.lastName];
-                        })
-                        .catch((error) => {
-                            console.log("uh oh: ", error.message);
-                        });
-                })
-            );
-
-            setParticipants(newParticipants);
+            setParticipants(Object.keys(participantData));
             setLoading(false);
         });
     }, []);
@@ -144,36 +120,19 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     return (
         // TODO: Restyle this page
-        <View className="flex-col">
-            <Title extraClassName="text-center mt-4">Production Dashboard</Title>
+        <View className="flex-col items-center">
             {loading ? (
                 <ActivityIndicator color="#000000" size="large" />
             ) : (
                 <>
-                    <View className="flex-row justify-around my-2">
-                        <Subtitle>Production: {production.playName}</Subtitle>
-                        <Subtitle>{productionCode}</Subtitle>
+                    <View className="flex-col items-center justify-between mb-2 mt-4 px-6">
+                        <Text className="text-3xl font-extrabold">{production.playName}</Text>
+                        <View className="py-1" />
+                        <PlayCodeButton playCode={productionCode} onPress={() => setModal(<PlaycodeModal playCode={productionCode} />)}/>
+                        <View className="py-1" />
+                        <ProfilePictureArray participants={participants} size={12} />
                     </View>
                     <View className="flex-col m-2">
-                        <Subtitle>Admins:</Subtitle>
-                        {admins.map((admin, index) => {
-                            return (
-                                <Text key={index}>
-                                    {admin[0]} {admin[1]}
-                                </Text>
-                            );
-                        })}
-                    </View>
-                    <View className="flex-col m-2">
-                        <Subtitle>Participants:</Subtitle>
-                        {participants.map((participant, index) => {
-                            return (
-                                <Text key={index}>
-                                    {participant[0]} {participant[1]}
-                                </Text>
-                            );
-                        })}
-
                         <View className="flex flex-col m-2">
                             {isAdmin && (
                                 <ProductionDashboardButton

@@ -1,3 +1,4 @@
+import React from "react";
 import { Image, Text, View } from "react-native";
 import LoadingWheel from "../Loading/LoadingWheel.jsx";
 import { useState, useEffect } from "react";
