@@ -12,7 +12,7 @@ export default function Modal() {
                 onPress={() => setModal(null)}
             >
                 <Pressable
-                    className="flex w-10/12 border-2 rounded-xl bg-white"
+                    className="flex w-11/12 border-2 rounded-xl bg-white"
                     onPress={Keyboard.dismiss}
                 >
                     <View classname="flex-none bg-red-500">
