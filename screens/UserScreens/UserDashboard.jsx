@@ -91,7 +91,7 @@ export default function UserDashboardScreen({ navigation }) {
     };
 
     return (
-        <View className="flex-col p-4 gap h-[95%] z-10">
+        <View className="flex-col p-4 gap h-full z-10">
             <View className="flex-row justify-around mb-10">
                 <CreateAndJoinButtons
                     title="Create"
@@ -113,7 +113,7 @@ export default function UserDashboardScreen({ navigation }) {
             <View className="border-b-2">
                 <Title extraClassName="mb-4 text-center">Your Productions</Title>
             </View>
-            <ScrollView className="flex-col space-y-12 grow">
+            <ScrollView className="flex-col flex-1">
                 {loading ? (
                     <View className="my-6">
                         <ActivityIndicator size="large" color="#000000" />
