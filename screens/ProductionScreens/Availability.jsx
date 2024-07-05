@@ -10,12 +10,15 @@ import { AlertContext } from "../../components/Alert/AlertProvider";
 export default function Availability({ navigation, route }) {
     const [availabilityInfo, setAvailabilityInfo] = useState({});
     const [initialAvailabilityInfo, setInitialAvailabilityInfo] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const db = firebase_db;
     const auth = firebase_auth;
     const playCode = route.params.productionCode;
     const { setAlert } = useContext(AlertContext);
 
     const onSubmit = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         const dbRef = ref(db);
         let availabilityUID;
         try {
@@ -33,16 +36,19 @@ export default function Availability({ navigation, route }) {
             await set(ref(db, `/availabilities/${availabilityUID}/`), availabilityInfo);
             setAlert("Availability updated", "bg-green-500", "check-circle");
             setInitialAvailabilityInfo(JSON.parse(JSON.stringify(availabilityInfo)));
+            setIsSubmitting(false);
         } catch (error) {
             setAlert(
                 "Could not update availability",
                 "bg-red-500",
                 "exclamation-circle"
             );
+            setIsSubmitting(false);
         }
     };
 
     const onReset = () => {
+        if (isSubmitting) return;
         setAvailabilityInfo(JSON.parse(JSON.stringify(initialAvailabilityInfo)));
     };
 

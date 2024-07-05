@@ -2,7 +2,6 @@ import { View, Text, ScrollView, Pressable, TouchableOpacity } from "react-nativ
 import { useState, useRef, useCallback } from "react";
 import DateCircles from "./DateCircles";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { set } from "firebase/database";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -144,8 +143,8 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
             </View>
 
             <View className="flex-row w-full h-14 justify-around border-b ">
-                <View className="w-16 border-r" />
-                <View className="flex-row flex-1 border-t border-r bg-slate-100">
+                <View className="w-16" />
+                <View className="flex-row flex-1  bg-slate-100">
                     {[...Array(7).keys()].map((day) => {
                         const newDate = editDate(getWeekStartDate(date), day);
                         return (
@@ -216,7 +215,6 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                         })}
                     </View>
                 </View>
-                {/* Any Thoughts on whether we want this line when the week is not current? */}
                 <View className="absolute w-full" pointerEvents="none">
                     <View className="h-[1]" />
                     <View style={{ height: heightNeeded - dateOffset }} className="" />
