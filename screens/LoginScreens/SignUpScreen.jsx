@@ -6,6 +6,7 @@ import { firebase_auth, firebase_db } from "../../firebase.config.js";
 import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
+import TextButton from "../../components/Form/TextButton.jsx";
 
 function ChooseProfileColor() {
     const colorArray = [
@@ -108,8 +109,8 @@ export default function SignUpScreen({ navigation }) {
                 ) : (
                     <>
                         <FormButton title="Create Account" onPress={handleSignUp} />
-                        <Button
-                            title="Back to Login"
+                        <TextButton
+                            text="Back to Login"
                             onPress={() => navigation.navigate("Login")}
                         />
                     </>

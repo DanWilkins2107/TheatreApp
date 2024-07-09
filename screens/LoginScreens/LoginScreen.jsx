@@ -5,6 +5,7 @@ import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
+import TextButton from "../../components/Form/TextButton.jsx"
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -50,11 +51,8 @@ export default function LoginScreen({ navigation }) {
                 ) : (
                     <>
                         <FormButton title="Login" onPress={handleLogin} />
-                        <Button
-                            title="Forgotten Password"
-                            onPress={() => navigation.navigate("ForgottenPassword")}
-                        />
-                        <Button title="Sign Up" onPress={() => navigation.navigate("SignUp")} />
+                        <TextButton text="Forgotten Password" onPress={() => navigation.navigate("ForgottenPassword")} />
+                        <TextButton text="Sign Up" onPress={() => navigation.navigate("SignUp")}/>
                     </>
                 )}
             </KeyboardAvoidingView>

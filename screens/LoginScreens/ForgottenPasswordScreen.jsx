@@ -5,6 +5,7 @@ import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 import { sendPasswordResetEmail } from "@firebase/auth";
+import TextButton from "../../components/Form/TextButton.jsx";
 
 export default function ForgottenPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
                 ) : (
                     <FormButton title="Send Reset Link" onPress={handlePasswordReset} />
                 )}
-                <Button title="Back to Login" onPress={() => navigation.navigate("Login")} />
+                <TextButton text="Back to Login" onPress={() => navigation.navigate("Login")} />
             </View>
         </View>
     );
