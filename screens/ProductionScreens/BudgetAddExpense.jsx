@@ -18,7 +18,7 @@ import { storage } from "../../firebase.config.js";
 import { randomUUID } from "expo-crypto";
 import { get, set } from "firebase/database";
 import { firebase_db, firebase_auth } from "../../firebase.config.js";
-import { ref as dbRef } from "firebase/database";
+import { ref as dbRef, runTransaction } from "firebase/database";
 import BudgetInfo from "../../components/Budget/BudgetInfo.jsx";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
@@ -50,7 +50,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
         setIsPlaceholder(false);
         setCost("");
         setReceiptURI("");
-    }
+    };
 
     useFocusEffect(
         useCallback(() => {
@@ -63,16 +63,19 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
         setIsSubmitting(true);
         if (!budget) {
             setAlert("Please select a budget", "bg-red-500", "exclamation-circle");
+            setIsSubmitting(false);
             return;
         }
 
         if (!reference) {
             setAlert("Please enter a reference", "bg-red-500", "exclamation-circle");
+            setIsSubmitting(false);
             return;
         }
 
         if (!cost) {
             setAlert("Please enter the cost of the expense", "bg-red-500", "exclamation-circle");
+            setIsSubmitting(false);
             return;
         }
 
@@ -105,6 +108,22 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             await set(dbRef(db, `budgets/${budget}/expenses/${expenseID}`), Date.now());
             setAlert("Expense added successfully", "bg-green-500", "check-circle");
             setIsSubmitting(false);
+
+            await runTransaction(
+                dbRef(
+                    db,
+                    `budgets/${budget}/${
+                        isPlaceholder ? "placeholderExpenses" : "nonPlaceholderExpenses"
+                    }`
+                ),
+                (currentValue) => {
+                    if (currentValue) {
+                        return Number(currentValue) + Number(cost);
+                    }
+                    return cost
+                }
+            );
+
             navigation.navigate("BudgetMain", { budgetUUID: budget });
         } catch (error) {
             setAlert("Error occurred when adding expense", "bg-red-500", "exclamation-circle");
@@ -263,11 +282,15 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 </View>
                 <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Cost</Text>
-                    <FormField value={cost} placeholder="Cost (£)" onChangeText={(value) => {
-                        if (value.match(/^[0-9]*\.?[0-9]{0,2}$/)) {
-                            setCost(value);
-                        }
-                    }} />
+                    <FormField
+                        value={cost}
+                        placeholder="Cost (£)"
+                        onChangeText={(value) => {
+                            if (value.match(/^[0-9]*\.?[0-9]{0,2}$/)) {
+                                setCost(value);
+                            }
+                        }}
+                    />
                     <View className="flex-row justify-center items-center">
                         <Text className="text-lg font-semibold mr-4">Is this a placeholder?</Text>
                         <Checkbox

@@ -8,17 +8,19 @@ import ExpenseSummary from "../../components/Budget/ExpenseSummary";
 import Subtitle from "../../components/TextStyles/Subtitle";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Checkbox from "../../components/Participants/Checkbox";
+import BudgetLineGraph from "../../components/Budget/BudgetLineGraph";
 
 export default function BudgetMainScreen({ route }) {
     const budgetUUID = route.params.budgetUUID;
     const [budgetInfo, setBudgetInfo] = useState({});
     const [expenses, setExpenses] = useState([]);
     const db = firebase_db;
-    const auth = firebase_auth
+    const auth = firebase_auth;
     const [loading, setLoading] = useState(true);
     const [filtersOpen, setFiltersOpen] = useState(false);
     const [hidePlaceholders, setHidePlaceholders] = useState(false);
     const [hideOthers, setHideOthers] = useState(false);
+    const [isPlaceholder, setIsPlaceholder] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -58,7 +60,7 @@ export default function BudgetMainScreen({ route }) {
             filteredExpenses.push(expenses[i]);
         }
         return filteredExpenses;
-    }
+    };
 
     return (
         <View className="flex-1 items-center">
@@ -66,9 +68,31 @@ export default function BudgetMainScreen({ route }) {
                 <LoadingWheel size="large" />
             ) : (
                 <>
-                    <Title>{budgetInfo.name}</Title>
-                    <Text>PIE CHART</Text>
-                    <Text>___ Spent out of £{budgetInfo.budget}</Text>
+                    <View className="bg-slate-100 w-[90%] border-2 rounded-xl justify-center items-center mb-8 mt-4">
+                        <Title extraClassName="mt-4">{budgetInfo.name}</Title>
+                        <View className="w-[90%] mt-4">
+                            <BudgetLineGraph
+                                budget={Number(budgetInfo.budget)}
+                                placeholder={Number(budgetInfo.placeholderExpenses)}
+                                nonPlaceholder={Number(budgetInfo.nonPlaceholderExpenses)}
+                                isPlaceholder={isPlaceholder}
+                            />
+                        </View>
+                        <Subtitle>
+                            £
+                            {Number(budgetInfo.nonPlaceholderExpenses) +
+                                (isPlaceholder && Number(budgetInfo.placeholderExpenses))}{" "}
+                            Spent out of £{budgetInfo.budget}
+                        </Subtitle>
+                        <View className="w-full flex-row justify-center items-center my-4">
+                            <Checkbox
+                                checked={isPlaceholder}
+                                setChecked={() => setIsPlaceholder(!isPlaceholder)}
+                                size={20}
+                            />
+                            <Subtitle extraClassName="ml-2">Include Placeholders?</Subtitle>
+                        </View>
+                    </View>
                     <View className="border-b-2 w-[90%]">
                         <Title extraClassName="mb-4 text-center">Expenses</Title>
                     </View>
@@ -89,19 +113,33 @@ export default function BudgetMainScreen({ route }) {
                                     />
                                 </View>
                             </View>
-                            {filtersOpen && <View className="flex-col">
-                                <View className="flex-row justify-start items-center px-2 mt-2">
-                                    <Checkbox checked={hidePlaceholders} setChecked={() => setHidePlaceholders(!hidePlaceholders)} />
-                                    <Subtitle extraClassName="ml-4">Hide Placeholder Expenses</Subtitle>
+                            {filtersOpen && (
+                                <View className="flex-col">
+                                    <View className="flex-row justify-start items-center px-2 mt-2">
+                                        <Checkbox
+                                            checked={hidePlaceholders}
+                                            setChecked={() =>
+                                                setHidePlaceholders(!hidePlaceholders)
+                                            }
+                                        />
+                                        <Subtitle extraClassName="ml-4">
+                                            Hide Placeholder Expenses
+                                        </Subtitle>
+                                    </View>
+                                    <View className="flex-row justify-start items-center px-2 mt-2">
+                                        <Checkbox
+                                            checked={hideOthers}
+                                            setChecked={() => setHideOthers(!hideOthers)}
+                                        />
+                                        <Subtitle extraClassName="ml-4">
+                                            Hide Others' Expenses
+                                        </Subtitle>
+                                    </View>
                                 </View>
-                                <View className="flex-row justify-start items-center px-2 mt-2">
-                                    <Checkbox checked={hideOthers} setChecked={() => setHideOthers(!hideOthers)} />
-                                    <Subtitle extraClassName="ml-4">Hide Others' Expenses</Subtitle>
-                                </View>
-                            </View>}
+                            )}
                         </View>
                     </TouchableOpacity>
-                    <View className="border-1 border-b w-[90%] mt-2 mb-2"/>
+                    
                     <ScrollView className="flex-col flex-1 w-full">
                         {filterExpenses(expenses).length === 0 ? (
                             <Text className="text-center text-2xl my-6 font-bold">
@@ -112,8 +150,14 @@ export default function BudgetMainScreen({ route }) {
                                 {filterExpenses(expenses).map((expense) => {
                                     if (!expense) return null;
                                     if (hidePlaceholders && expense.placeholder) return null;
-                                    if (hideOthers && expense.user !== auth.currentUser.uid) return null;
-                                    return <ExpenseSummary expense={expense} key={expense.expenseUUID}/>;
+                                    if (hideOthers && expense.user !== auth.currentUser.uid)
+                                        return null;
+                                    return (
+                                        <ExpenseSummary
+                                            expense={expense}
+                                            key={expense.expenseUUID}
+                                        />
+                                    );
                                 })}
                             </>
                         )}
