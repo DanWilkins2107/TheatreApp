@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from "react-native";
 
 export default function PlayCodeButton({ playCode, onPress }) {
+	console.log(playCode);
+
 	return (
 		<Pressable className="flex-row" onPress={onPress}>
 			{playCode.split("").map((char, i) => {

@@ -5,13 +5,13 @@ import { View, Text } from "react-native";
 // - QR code for joining
 // - Big Letters
 
-export default function PlayCodeModal({ playcode }) {
-    console.log(playcode);
+export default function PlayCodeModal({ productionCode }) {
+    console.log(productionCode);
 
     return (
         <View className="flex-col items-center p-3">
-            <View className="bg-slate-400 h-36 w-36" />
-            <Text className="text-xl text-black">{playcode}</Text>
+            <View className="bg-slate-400 h-44 w-44 mb-8" />
+            <Text className="text-3xl font-extrabold text-black">{productionCode}</Text>
         </View>
     );
 }

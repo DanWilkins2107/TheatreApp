@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { ScrollView, View, Text, ActivityIndicator } from "react-native";
 import { get, ref, onValue } from "firebase/database";
 import { firebase_db, firebase_auth } from "../../firebase.config.js";
 import ProductionDashboardButton from "../../components/Budget/ProductionDashboardButton.jsx";
@@ -126,11 +126,11 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                     <View className="flex-col border-2 rounded-3xl items-center justify-between mb- mt-4 px-16 pt-2 pb-4">
                         <Text className="text-3xl font-extrabold">{production.playName}</Text>
                         <View className="py-1" />
-                        <PlayCodeButton playCode={productionCode} onPress={() => setModal(<PlaycodeModal playCode={productionCode} />)}/>
+                        <PlayCodeButton playCode={productionCode} onPress={() => setModal(<PlaycodeModal productionCode={productionCode} />)}/>
                         <View className="py-1" />
                         <ProfilePictureArray participants={participants} size={12} />
                     </View>
-                    <View className="flex-col m-2"> 
+                    <ScrollView className="flex-col m-2"> 
                         <View className="flex flex-col m-2">
                             {isAdmin && (
                                 <ProductionDashboardButton
@@ -183,7 +183,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 </ProductionDashboardButton>
                             )}
                         </View>
-                    </View>
+                    </ScrollView>
                 </>
             )}
         </View>
