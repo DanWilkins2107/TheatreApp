@@ -136,7 +136,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             return newBudgets;
         } catch (error) {
             console.log(error.message);
-            setAlert("Could not find all the budgets", "bg-red-400");
+            setAlert("Could not find all the budgets", "bg-red-400", "exclamation-circle");
             return {};
         }
     };

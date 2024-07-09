@@ -18,6 +18,7 @@ import Modal from "./components/Modal/Modal.jsx";
 import BudgetAddExpenseScreen from "./screens/ProductionScreens/BudgetAddExpense.jsx";
 import AdminScreen from "./screens/AdminScreens/AdminScreen.jsx";
 import BudgetMainScreen from "./screens/ProductionScreens/BudgetMain.jsx";
+import Availability from "./screens/ProductionScreens/Availability.jsx";
 import Container from "./components/General/Container.jsx";
 
 const Stack = createNativeStackNavigator();
@@ -53,6 +54,7 @@ export default function App() {
         { name: "BudgetAddExpense", component: BudgetAddExpenseScreen, header: true },
         { name: "BudgetMain", component: BudgetMainScreen, header: true },
         { name: "Admin", component: AdminScreen, header: true },
+        { name: "Availability", component: Availability, header: true}
     ];
 
     return (
