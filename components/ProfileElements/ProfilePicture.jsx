@@ -31,7 +31,7 @@ export default function ProfilePicture({ dimensions, textSize, userId, loadingSi
                 <View
                     className={`w-${dimensions} h-${dimensions} rounded-full border-2 items-center justify-center`}
                 >
-                    <LoadingWheel size={loadingSize}/>
+                    <LoadingWheel size={loadingSize} />
                 </View>
             ) : profileURL ? (
                 <Image
