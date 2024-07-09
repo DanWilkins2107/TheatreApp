@@ -46,6 +46,20 @@ export default function BudgetMainScreen({ route }) {
         fetchData();
     }, []);
 
+    const filterExpenses = (expenses) => {
+        let filteredExpenses = [];
+        for (i = 0; i < expenses.length; i++) {
+            if (hidePlaceholders && expenses[i].placeholder) {
+                continue;
+            }
+            if (hideOthers && expenses[i].user !== auth.currentUser.uid) {
+                continue;
+            }
+            filteredExpenses.push(expenses[i]);
+        }
+        return filteredExpenses;
+    }
+
     return (
         <View className="flex-1 items-center">
             {loading ? (
@@ -89,17 +103,17 @@ export default function BudgetMainScreen({ route }) {
                     </TouchableOpacity>
                     <View className="border-1 border-b w-[90%] mt-2 mb-2"/>
                     <ScrollView className="flex-col flex-1 w-full">
-                        {expenses.length === 0 ? (
+                        {filterExpenses(expenses).length === 0 ? (
                             <Text className="text-center text-2xl my-6 font-bold">
                                 No transactions yet...
                             </Text>
                         ) : (
                             <>
-                                {expenses.map((expense) => {
+                                {filterExpenses(expenses).map((expense) => {
                                     if (!expense) return null;
                                     if (hidePlaceholders && expense.placeholder) return null;
                                     if (hideOthers && expense.user !== auth.currentUser.uid) return null;
-                                    return <ExpenseSummary expense={expense} />;
+                                    return <ExpenseSummary expense={expense} key={expense.expenseUUID}/>;
                                 })}
                             </>
                         )}
