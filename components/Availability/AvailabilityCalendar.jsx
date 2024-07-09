@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useContext } from "react";
 import DateCircles from "./DateCircles";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { AlertContext } from "../Alert/AlertProvider";
+import LoadingWheel from "../Loading/LoadingWheel";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -39,7 +40,7 @@ const hasTimePassed = (date, day, hour) => {
     return newDate < current;
 };
 
-export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
+export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo, loading }) {
     const [date, setDate] = useState(new Date());
     const scrollRef = useRef(null);
     const { setAlert } = useContext(AlertContext);
@@ -55,34 +56,40 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
             try {
                 const correctDate = editDate(date, daysToChange);
                 const dayData = splitDate(correctDate);
-                const value = checkAvailability(hour, correctDate);
 
-                newInfo = { ...availabilityInfo };
+                const newInfo = { ...availabilityInfo };
 
-                if (value === "none") {
-                    if (newInfo[dayData[0]] === undefined) {
-                        newInfo = { ...newInfo, [dayData[0]]: {} };
+                if (
+                    newInfo[dayData[0]] &&
+                    newInfo[dayData[0]][dayData[1]] &&
+                    newInfo[dayData[0]][dayData[1]][dayData[2]] &&
+                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour]
+                ) {
+                    if (newInfo[dayData[0]][dayData[1]][dayData[2]][hour] === "green") {
+                        newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
+                    } else {
+                        delete newInfo[dayData[0]][dayData[1]][dayData[2]][hour];
                     }
-                    if (newInfo[dayData[0]][dayData[1]] === undefined) {
-                        newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
+                } else {
+                    if (!newInfo[dayData[0]]) {
+                        newInfo[dayData[0]] = {};
                     }
-                    if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
-                        newInfo[dayData[0]][dayData[1]] = {
-                            ...newInfo[dayData[0]][dayData[1]],
-                            [dayData[2]]: {},
-                        };
+                    if (!newInfo[dayData[0]][dayData[1]]) {
+                        newInfo[dayData[0]][dayData[1]] = {};
+                    }
+                    if (!newInfo[dayData[0]][dayData[1]][dayData[2]]) {
+                        newInfo[dayData[0]][dayData[1]][dayData[2]] = {};
                     }
                     newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
                 }
-                if (value === "green") {
-                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
-                }
-                if (value === "red") {
-                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
-                }
                 setAvailabilityInfo(newInfo);
-            } catch {
-                setAlert("An error occured when changing availability", "bg-red-400", "exclamation-circle");
+            } catch (error) {
+                setAlert(
+                    "An error occured when changing availability",
+                    "bg-red-400",
+                    "exclamation-circle"
+                );
+                console.error(error.message);
             }
         },
         [date, availabilityInfo]
@@ -119,7 +126,6 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
     }
 
     if (heightNeeded > 80 * 24 - 8) {
-        console.log("heightNeeded", heightNeeded);
         dateOffset = heightNeeded - 1912 + 8;
     }
 
@@ -150,7 +156,7 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
 
             <View className="flex-row w-full h-14 justify-around border-b ">
                 <View className="w-16" />
-                <View className="flex-row flex-1  bg-slate-100">
+                <View className="flex-row flex-1">
                     {[...Array(7).keys()].map((day) => {
                         const newDate = editDate(getWeekStartDate(date), day);
                         return (
@@ -164,85 +170,96 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                     })}
                 </View>
             </View>
-            <ScrollView
-                ref={scrollRef}
-                className="flex-1"
-                bounces={false}
-                onLayout={() => {
-                    const amountToScroll = 4 * currentHour * 20 - 90; // 4 is for unit conversion, 90 so it's not at the very top
-                    if (amountToScroll > 0) {
-                        scrollRef.current.scrollTo({ x: 0, y: amountToScroll, animated: false });
-                    }
-                }}
-            >
-                <View className="flex-row flex">
-                    <View className="w-16 bg-slate-100 border-l border-r">
-                        {[...Array(24).keys()].map((hour) => {
-                            return (
-                                <View className={`h-20 ${hour != 0 && "border-t"}`} key={hour}>
-                                    <Text className="font-semibold">{`${hour}:00`}</Text>
-                                </View>
-                            );
-                        })}
-                    </View>
-                    <View className="flex-1 flex-row border-r">
-                        {[...Array(7).keys()].map((day) => {
-                            const newDate = editDate(getWeekStartDate(date), day);
-                            return (
-                                <View className="flex-col flex-1" key={day}>
-                                    {[...Array(48).keys()].map((hour) => {
-                                        const availability = checkAvailability(hour, newDate);
-                                        const timePassed = hasTimePassed(newDate, day, hour);
-                                        return (
-                                            <Pressable
-                                                key={hour}
-                                                className={`h-10 justify-center items-center ${
-                                                    hour != 0 && "border-t"
-                                                } ${day != 0 && "border-l"} flex-1 ${findColour(
-                                                    availability
-                                                )} ${timePassed && "opacity-20"} `}
-                                                onPress={() => {
-                                                    if (!timePassed) {
-                                                        handleOnPress(hour, day);
-                                                    }
-                                                }}
-                                            >
-                                                {availability === "green" && (
-                                                    <Icon name="check" size={15} />
-                                                )}
-                                                {availability === "red" && (
-                                                    <Icon name="times" size={15} />
-                                                )}
-                                            </Pressable>
-                                        );
-                                    })}
-                                </View>
-                            );
-                        })}
-                    </View>
+
+            {loading ? (
+                <View className="flex-1 w-full border-x">
+                    <LoadingWheel size="large" />
                 </View>
-                <View className="absolute w-full" pointerEvents="none">
-                    <View className="h-[1]" />
-                    <View style={{ height: heightNeeded - dateOffset }} className="" />
-                    <View className="h-4 w-full flex-row">
-                        <View className="w-16">
-                            <View style={{ height: dateOffset - 2 }} />
-                            <View className="h-1 bg-red-600" />
+            ) : (
+                <ScrollView
+                    ref={scrollRef}
+                    className="flex-1"
+                    bounces={false}
+                    onLayout={() => {
+                        const amountToScroll = 4 * currentHour * 20 - 90; // 4 is for unit conversion, 90 so it's not at the very top
+                        if (amountToScroll > 0) {
+                            scrollRef.current.scrollTo({
+                                x: 0,
+                                y: amountToScroll,
+                                animated: false,
+                            });
+                        }
+                    }}
+                >
+                    <View className="flex-row flex">
+                        <View className="w-16 bg-slate-100 border-l border-r">
+                            {[...Array(24).keys()].map((hour) => {
+                                return (
+                                    <View className={`h-20 ${hour != 0 && "border-t"}`} key={hour}>
+                                        <Text className="font-semibold">{`${hour}:00`}</Text>
+                                    </View>
+                                );
+                            })}
                         </View>
-                        <View className="h-full px-1 text-center justify-center">
-                            <Text className="text-center text-red-600 font-semibold">{`${
-                                String(currentHour).length === 1 ? "0" : ""
-                            }${currentHour}:${
-                                String(currentMinute).length === 1 ? "0" : ""
-                            }${currentMinute}`}</Text>
-                        </View>
-                        <View className="flex-1">
-                            <View style={{ height: dateOffset - 2 }} />
-                            <View className="h-1 bg-red-600" />
+                        <View className="flex-1 flex-row border-r">
+                            {[...Array(7).keys()].map((day) => {
+                                const newDate = editDate(getWeekStartDate(date), day);
+                                return (
+                                    <View className="flex-col flex-1" key={day}>
+                                        {[...Array(48).keys()].map((hour) => {
+                                            const availability = checkAvailability(hour, newDate);
+                                            const timePassed = hasTimePassed(newDate, day, hour);
+                                            return (
+                                                <Pressable
+                                                    key={hour}
+                                                    className={`h-10 justify-center items-center ${
+                                                        hour != 0 && "border-t"
+                                                    } ${day != 0 && "border-l"} flex-1 ${findColour(
+                                                        availability
+                                                    )} ${timePassed && "opacity-20"} `}
+                                                    onPress={() => {
+                                                        if (!timePassed) {
+                                                            handleOnPress(hour, day);
+                                                        }
+                                                    }}
+                                                >
+                                                    {availability === "green" && (
+                                                        <Icon name="check" size={15} />
+                                                    )}
+                                                    {availability === "red" && (
+                                                        <Icon name="times" size={15} />
+                                                    )}
+                                                </Pressable>
+                                            );
+                                        })}
+                                    </View>
+                                );
+                            })}
                         </View>
                     </View>
-                </View>
-            </ScrollView>
+                    <View className="absolute w-full" pointerEvents="none">
+                        <View className="h-[1]" />
+                        <View style={{ height: heightNeeded - dateOffset }} className="" />
+                        <View className="h-4 w-full flex-row">
+                            <View className="w-16">
+                                <View style={{ height: dateOffset - 2 }} />
+                                <View className="h-1 bg-red-600" />
+                            </View>
+                            <View className="h-full px-1 text-center justify-center">
+                                <Text className="text-center text-red-600 font-semibold">{`${
+                                    String(currentHour).length === 1 ? "0" : ""
+                                }${currentHour}:${
+                                    String(currentMinute).length === 1 ? "0" : ""
+                                }${currentMinute}`}</Text>
+                            </View>
+                            <View className="flex-1">
+                                <View style={{ height: dateOffset - 2 }} />
+                                <View className="h-1 bg-red-600" />
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+            )}
         </View>
     );
 }

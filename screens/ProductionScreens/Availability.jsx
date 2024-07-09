@@ -15,6 +15,7 @@ export default function Availability({ navigation, route }) {
     const auth = firebase_auth;
     const playCode = route.params.productionCode;
     const { setAlert } = useContext(AlertContext);
+    const [loading, setLoading] = useState(true)
 
     const onSubmit = async () => {
         if (isSubmitting) return;
@@ -60,8 +61,11 @@ export default function Availability({ navigation, route }) {
                 const availabilityUID = data[auth.currentUser.uid];
                 get(ref(db, `/availabilities/${availabilityUID}/`)).then((snapshot) => {
                     setInitialAvailabilityInfo(JSON.parse(JSON.stringify(snapshot.val())));
-                    setAvailabilityInfo(JSON.parse(snapshot.val()));
+                    setAvailabilityInfo(JSON.parse(JSON.stringify(snapshot.val())));
+                    setLoading(false)
                 });
+            } else {
+                setLoading(false)
             }
         });
     }, []);
@@ -73,6 +77,7 @@ export default function Availability({ navigation, route }) {
                 <AvailabilityCalendar
                     availabilityInfo={availabilityInfo}
                     setAvailabilityInfo={setAvailabilityInfo}
+                    loading={loading}
                 />
             </View>
             <View className="flex flex-row justify-around w-full mb-8">
