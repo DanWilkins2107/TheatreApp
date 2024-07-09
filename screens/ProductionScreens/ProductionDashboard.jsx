@@ -19,14 +19,13 @@ import PlaycodeModal from "../../components/ProductionModals/PlaycodeModal.jsx";
 // - Refactor play keys in database
 //      > UUIDv7 (no import)
 
-
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
     const [isAdmin, setIsAdmin] = useState(false);
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const productionCode = route.params.playCode;
+    const productionCode = route.params.productionCode;
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -110,7 +109,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 loading={false}
                 onPress={(budget) => {
                     navigation.navigate("BudgetMain", { budgetUUID: budget });
-                    setModal(null)
+                    setModal(null);
                 }}
             />
         );
@@ -126,63 +125,66 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                     <View className="flex-col border-2 rounded-3xl items-center justify-between mb- mt-4 px-16 pt-2 pb-4">
                         <Text className="text-3xl font-extrabold">{production.playName}</Text>
                         <View className="py-1" />
-                        <PlayCodeButton playCode={productionCode} onPress={() => setModal(<PlaycodeModal productionCode={productionCode} />)}/>
+                        <PlayCodeButton
+                            playCode={productionCode}
+                            onPress={() =>
+                                setModal(<PlaycodeModal productionCode={productionCode} />)
+                            }
+                        />
                         <View className="py-1" />
                         <ProfilePictureArray participants={participants} size={12} />
                     </View>
-                    <ScrollView className="flex-col m-2"> 
-                        <View className="flex flex-col m-2">
-                            {isAdmin && (
-                                <ProductionDashboardButton
-                                    text="Create Budget"
-                                    onPress={() =>
-                                        setModal(<CreateBudgetModal productionCode={productionCode} />)
-                                    }
-                                >
-                                    <IconFA5 name="plus" size={50} />
-                                </ProductionDashboardButton>
-                            )}
+                    <ScrollView className="flex flex-col m-2">
+                        {isAdmin && (
                             <ProductionDashboardButton
-                                text="View Budget"
-                                onPress={handleChooseBudgetPress}
-                            >
-                                <IconFA5 name="search-dollar" size={50} />
-                            </ProductionDashboardButton>
-                            <ProductionDashboardButton
-                                text="Add Expense"
+                                text="Create Budget"
                                 onPress={() =>
-                                    navigation.navigate("BudgetAddExpense", {
-                                        productionCode: productionCode,
-                                    })
+                                    setModal(<CreateBudgetModal productionCode={productionCode} />)
                                 }
                             >
-                                <IconFA5 name="file-invoice-dollar" size={50} />
+                                <IconFA5 name="plus" size={50} />
                             </ProductionDashboardButton>
-                            {isAdmin && (
-                                <ProductionDashboardButton
-                                    text="Admin Stuff"
-                                    onPress={() =>
-                                        navigation.navigate("Admin", { productionCode: productionCode })
-                                    }
-                                >
-                                    <Icon name="cogs" size={50} />
-                                </ProductionDashboardButton>
-                            )}
+                        )}
+                        <ProductionDashboardButton
+                            text="View Budget"
+                            onPress={handleChooseBudgetPress}
+                        >
+                            <IconFA5 name="search-dollar" size={50} />
+                        </ProductionDashboardButton>
+                        <ProductionDashboardButton
+                            text="Add Expense"
+                            onPress={() =>
+                                navigation.navigate("BudgetAddExpense", {
+                                    productionCode: productionCode,
+                                })
+                            }
+                        >
+                            <IconFA5 name="file-invoice-dollar" size={50} />
+                        </ProductionDashboardButton>
+                        {isAdmin && (
                             <ProductionDashboardButton
-                                text="View Schedule"
+                                text="Admin Stuff"
+                                onPress={() =>
+                                    navigation.navigate("Admin", { productionCode: productionCode })
+                                }
+                            >
+                                <Icon name="cogs" size={50} />
+                            </ProductionDashboardButton>
+                        )}
+                        <ProductionDashboardButton
+                            text="View Schedule"
+                            onPress={() => alert("Need to Implement")}
+                        >
+                            <IconFA5 name="eye" size={50} />
+                        </ProductionDashboardButton>
+                        {isAdmin && (
+                            <ProductionDashboardButton
+                                text="Create Schedule"
                                 onPress={() => alert("Need to Implement")}
                             >
-                                <IconFA5 name="eye" size={50} />
+                                <IconFA5 name="business-time" size={50} />
                             </ProductionDashboardButton>
-                            {isAdmin && (
-                                <ProductionDashboardButton
-                                    text="Create Schedule"
-                                    onPress={() => alert("Need to Implement")}
-                                >
-                                    <IconFA5 name="business-time" size={50} />
-                                </ProductionDashboardButton>
-                            )}
-                        </View>
+                        )}
                     </ScrollView>
                 </>
             )}

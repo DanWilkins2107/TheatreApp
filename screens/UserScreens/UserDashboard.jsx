@@ -36,9 +36,9 @@ export default function UserDashboardScreen({ navigation }) {
             const localProductions = JSON.parse(await AsyncStorage.getItem("productions")) || {};
             
             let combinedProductions = { ...userData };
-            Object.keys(userData).forEach((playCode) => {
-                if (localProductions[playCode]) {
-                    combinedProductions[playCode] = localProductions[playCode];
+            Object.keys(userData).forEach((productionCode) => {
+                if (localProductions[productionCode]) {
+                    combinedProductions[productionCode] = localProductions[productionCode];
                 }
             });
 
@@ -46,12 +46,11 @@ export default function UserDashboardScreen({ navigation }) {
             const dbProductions = await Promise.all(
                 Object.keys(userData).map(async (productionCode) => {
                     return get(child(ref(db), `productions/${productionCode}`))
-                        .then((playSnapshot) => {
-                            if (!playSnapshot.exists()) return null;
-                            const playData = playSnapshot.val();
-                            return { ...playData, playCode: playSnapshot.key };
+                        .then((productionSnapshot) => {
+                            if (!productionSnapshot.exists()) return null;
+                            return productionSnapshot.val();
                         })
-                        .catch((error) => {
+                        .catch(() => {
                             areAnyInvalid = true;
                         });
                 })
@@ -67,7 +66,7 @@ export default function UserDashboardScreen({ navigation }) {
             
             const validProductions = dbProductions.filter((prod) => prod !== null);
             const sortedProductions = validProductions.sort((a, b) => {
-                return combinedProductions[b.playCode] - combinedProductions[a.playCode];
+                return combinedProductions[b.productionCode] - combinedProductions[a.productionCode];
             });
             setProductions(sortedProductions);
             setLoading(false);
@@ -81,11 +80,11 @@ export default function UserDashboardScreen({ navigation }) {
     );
 
     const productionButtonOnClick = async (production) => {
-        navigation.navigate("ProductionDashboard", { playCode: production.playCode });
+        navigation.navigate("ProductionDashboard", { productionCode: production.productionCode });
         const existingData = await AsyncStorage.getItem("productions");
         const newData = {
             ...JSON.parse(existingData),
-            [production.playCode]: Date.now(),
+            [production.productionCode]: Date.now(),
         };
         await AsyncStorage.setItem("productions", JSON.stringify(newData));
     };

@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
 import Subtitle from "../TextStyles/Subtitle";
 
-export default function ProductionButton({ navigation, production, onPress }) {
+export default function ProductionButton({ production, onPress }) {
     const noOfParticipants = Object.keys(production.participants).length;
     const participantString = `${noOfParticipants} participant${noOfParticipants === 1 ? "" : "s"}`;
     return (
@@ -13,7 +13,7 @@ export default function ProductionButton({ navigation, production, onPress }) {
             className="w-max bg-slate-200 flex-col justify-between p-4 h-36 rounded-lg mt-3 border-2 "
         >
             <Text className="text-2xl font-extrabold text-ellipsis" numberOfLines={1}>
-                {production.playName}
+                {production.productionName || production.playName /* can remove playName once fully implemented */}
             </Text>
             <Subtitle>{participantString}</Subtitle>
             <View className="w-max flex flex-row">

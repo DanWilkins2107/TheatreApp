@@ -7,43 +7,43 @@ import { get, ref, set, child } from "firebase/database";
 import { ModalContext } from "../Modal/ModalProvider";
 import Title from "../TextStyles/Title";
 
+// TODO: Error handling
+
 export default function JoinProductionModal() {
     const [code, setCode] = useState("");
-    const [errorText, setErrorText] = useState("");
     const db = firebase_db;
     const auth = firebase_auth;
     const { setModal } = useContext(ModalContext);
 
     const JoinProduction = () => {
-        setErrorText("");
         const dbRef = ref(db);
-        get(child(dbRef, `/productions/${code}`))
-            .then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
+        get(child(dbRef, "productionCodes/" + code)).then((codeSnapshot) => {
+            const productionID = codeSnapshot.val();
+            if (!productionID) {
+                // handle error
+                return;
+            } else {
+                get(child(dbRef, "productions/" + productionID)).then((snapshot) => {
+                    const data = snapshot.val();
                     if (data.participants && data.participants[auth.currentUser.uid]) {
-                        setErrorText("You are already in this production");
+                        // handle error
                     } else {
                         set(
                             ref(
                                 db,
-                                "productions/" + code + "/participants/" + auth.currentUser.uid
+                                "productions/" + productionID + "/participants/" + auth.currentUser.uid
                             ),
                             Date.now()
                         );
                         set(
-                            ref(db, "users/" + auth.currentUser.uid + "/productions/" + code),
+                            ref(db, "users/" + auth.currentUser.uid + "/productions/" + productionID),
                             Date.now()
                         );
                         setModal(null);
                     }
-                } else {
-                    setErrorText("Invalid code entered: Production not found");
-                }
-            })
-            .catch((error) => {
-                setErrorText("Error getting data: " + error);
-            });
+                });
+            }
+        });
     };
 
     return (
@@ -60,7 +60,6 @@ export default function JoinProductionModal() {
                 onChangeText={setCode}
             />
             <FormButton title="Join" onPress={JoinProduction} />
-            <Text className="text-red-500 text-center">{errorText}</Text>
         </View>
     );
 }
