@@ -5,8 +5,10 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
 import ImageViewer from "./ImageViewer";
 
-export default function ExpenseSummary({ expense }) {
+export default function ExpenseSummary({ expense, isUser }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const timeString = new Date(expense.time).toLocaleString();
     return (
         <View className="p-2">
             <TouchableOpacity
@@ -30,6 +32,20 @@ export default function ExpenseSummary({ expense }) {
                         </View>
                     </View>
                     <View className="flex-row items-center">
+                        {isUser && <TouchableOpacity
+                            className={`w-10 h-10 rounded-md border-2 mr-4 justify-center items-center ${
+                                expense.placeholder && "border-gray-600"
+                            }`}
+                            onPress={() => {
+                                alert("Implement editing expense");
+                            }}
+                        >
+                            <Icon
+                                name="pencil"
+                                size={30}
+                                color={expense.placeholder ? "#757575" : "black"}
+                            />
+                        </TouchableOpacity>}
                         <Subtitle extraClassName={expense.placeholder && "text-gray-600"}>
                             £{expense.cost}
                         </Subtitle>
@@ -49,6 +65,8 @@ export default function ExpenseSummary({ expense }) {
                             <Text>{expense.reference}</Text>
                             <Text className="font-semibold text-base mt-2">Description:</Text>
                             <Text>{expense.description}</Text>
+                            <Text className="font-semibold text-base mt-2">Time:</Text>
+                            <Text>{timeString}</Text>
                         </View>
                         {expense.receipt && (
                             <View className="flex-1 justify-center items-center">

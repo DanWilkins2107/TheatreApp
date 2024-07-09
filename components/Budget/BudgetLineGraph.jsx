@@ -14,7 +14,7 @@ export default function BudgetLineGraph({ budget, placeholder, nonPlaceholder, i
         const backgroundColor = interpolateColor(
             animatedValue.value,
             [0, 33, 75, 100],
-            ['#00CC00', '#FFFF33', '#FFBB33', '#FF6666']
+            ['#00CC00', '#DDDD33', '#FFBB33', '#FF6666']
         );
         return {
             width: `${animatedValue.value}%`,
@@ -30,11 +30,11 @@ export default function BudgetLineGraph({ budget, placeholder, nonPlaceholder, i
 
 
     return (
-        <>
+        <View className="border-2 mb-1">
             <View className="w-full h-8 bg-slate-200"></View>
             <Animated.View
                 style={animatedStyle} className={`h-8 absolute`}
             ></Animated.View>
-        </>
+        </View>
     );
 }

@@ -37,7 +37,7 @@ export default function BudgetMainScreen({ route }) {
                         return get(ref(db, `expenses/${expenseUUID}`)).then((expenseSnapshot) => {
                             if (!expenseSnapshot.exists()) return null;
                             const expenseData = expenseSnapshot.val();
-                            return { ...expenseData, expenseUUID: expenseSnapshot.key };
+                            return { ...expenseData, expenseUUID: expenseSnapshot.key, time: data.expenses[expenseUUID]  };
                         });
                     })
                 );
@@ -156,6 +156,7 @@ export default function BudgetMainScreen({ route }) {
                                         <ExpenseSummary
                                             expense={expense}
                                             key={expense.expenseUUID}
+                                            isUser = {expense.user === auth.currentUser.uid}
                                         />
                                     );
                                 })}
