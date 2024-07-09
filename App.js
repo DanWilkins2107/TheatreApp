@@ -41,9 +41,9 @@ export default function App() {
     };
 
     const authScreens = [
-        { name: "Login", component: LoginScreen },
-        { name: "SignUp", component: SignUpScreen },
-        { name: "ForgottenPassword", component: ForgottenPasswordScreen },
+        { name: "Login", component: LoginScreen, header: false },
+        { name: "SignUp", component: SignUpScreen, header: false },
+        { name: "ForgottenPassword", component: ForgottenPasswordScreen, header: false },
     ];
 
     const userScreens = [
@@ -73,7 +73,8 @@ export default function App() {
                                 component={makeScreen(screen)}
                                 options={{
                                     header: (props) => <Header {...props} {...screen} />,
-                                    headerTransparent: true
+                                    headerTransparent: true,
+                                    headerShown : screen.header,
                                 }}
                                 
                             />
