@@ -10,9 +10,9 @@ export default function ExpenseSummary({ expense, isUser }) {
 
     const timeString = new Date(expense.time).toLocaleString();
     return (
-        <View className="p-2">
+        <View className="py-1">
             <TouchableOpacity
-                className={`justify-between w-max ${
+                className={`justify-between w-full ${
                     expense.placeholder ? "bg-slate-50" : "bg-slate-200"
                 } rounded-lg p-2 border-2`}
                 onPress={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -65,7 +65,7 @@ export default function ExpenseSummary({ expense, isUser }) {
                             <Text>{expense.reference}</Text>
                             <Text className="font-semibold text-base mt-2">Description:</Text>
                             <Text>{expense.description}</Text>
-                            <Text className="font-semibold text-base mt-2">Time:</Text>
+                            <Text className="font-semibold text-base mt-2">Submitted:</Text>
                             <Text>{timeString}</Text>
                         </View>
                         {expense.receipt && (

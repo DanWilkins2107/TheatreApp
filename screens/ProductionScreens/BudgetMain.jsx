@@ -37,7 +37,11 @@ export default function BudgetMainScreen({ route }) {
                         return get(ref(db, `expenses/${expenseUUID}`)).then((expenseSnapshot) => {
                             if (!expenseSnapshot.exists()) return null;
                             const expenseData = expenseSnapshot.val();
-                            return { ...expenseData, expenseUUID: expenseSnapshot.key, time: data.expenses[expenseUUID]  };
+                            return {
+                                ...expenseData,
+                                expenseUUID: expenseSnapshot.key,
+                                time: data.expenses[expenseUUID],
+                            };
                         });
                     })
                 );
@@ -97,7 +101,7 @@ export default function BudgetMainScreen({ route }) {
                         <Title extraClassName="mb-4 text-center">Expenses</Title>
                     </View>
                     <TouchableOpacity
-                        className="justify-between w-[90%] mt-2 bg-slate-200 rounded-lg p-2 border-2"
+                        className="justify-between w-[90%] my-2 bg-slate-200 rounded-lg p-2 border-2"
                         onPress={() => {
                             setFiltersOpen(!filtersOpen);
                         }}
@@ -139,8 +143,8 @@ export default function BudgetMainScreen({ route }) {
                             )}
                         </View>
                     </TouchableOpacity>
-                    
-                    <ScrollView className="flex-col flex-1 w-full">
+
+                    <ScrollView className="flex-col flex-1 w-[90%]">
                         {filterExpenses(expenses).length === 0 ? (
                             <Text className="text-center text-2xl my-6 font-bold">
                                 No transactions yet...
@@ -156,7 +160,7 @@ export default function BudgetMainScreen({ route }) {
                                         <ExpenseSummary
                                             expense={expense}
                                             key={expense.expenseUUID}
-                                            isUser = {expense.user === auth.currentUser.uid}
+                                            isUser={expense.user === auth.currentUser.uid}
                                         />
                                     );
                                 })}
