@@ -1,4 +1,4 @@
-import { Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { useContext, useState, useCallback } from "react";
 import SmallFormButton from "../../components/Form/SmallFormButton.jsx";
 import { AlertContext } from "../../components/Alert/AlertProvider";
@@ -24,6 +24,7 @@ import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import Checkbox from "../../components/Participants/Checkbox.jsx";
 import { useFocusEffect } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function BudgetAddExpenseScreen({ navigation, route }) {
     const expenseID = randomUUID();
@@ -224,7 +225,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     return (
         <View className="py-2 flex justify-center items-center">
             <Title extraClassName="mb-4">Add Expense</Title>
-            <ScrollView className="h-5/6 w-full px-8">
+            <KeyboardAwareScrollView className="h-5/6 w-full px-8">
                 <View className="items-center justify-center mb-4">
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
                     {budget ? (
@@ -302,7 +303,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                         </View>
                     )}
                 </View>
-            </ScrollView>
+            </KeyboardAwareScrollView>
             <View className="flex flex-row w-max justify-around">
                 <SmallFormButton
                     title="Submit"

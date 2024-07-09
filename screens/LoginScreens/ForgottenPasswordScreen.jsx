@@ -1,4 +1,4 @@
-import { Text, View, Button, KeyboardAvoidingView } from "react-native";
+import { Text, View, Button } from "react-native";
 import { useState } from "react";
 import FormField from "../../components/Form/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
@@ -28,7 +28,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
 
     return (
         <View className="flex-1 mx-10 justify-center">
-            <KeyboardAvoidingView behavior="position">
+            <View>
                 <Text className="text-xl text-center font-extrabold">Forgotten Password</Text>
                 <Text className="text-center my-5">
                     Enter your email below and you will be sent a link to reset your password.
@@ -45,7 +45,7 @@ export default function ForgottenPasswordScreen({ navigation }) {
                     <FormButton title="Send Reset Link" onPress={handlePasswordReset} />
                 )}
                 <Button title="Back to Login" onPress={() => navigation.navigate("Login")} />
-            </KeyboardAvoidingView>
+            </View>
         </View>
     );
 }
