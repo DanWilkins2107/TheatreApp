@@ -25,7 +25,7 @@ export default function Modal() {
                             <IconFA5 name="times" size={30} />
                         </TouchableOpacity>
                     </View>
-                    <View className="flex-initial pb-8">{modal}</View>
+                    <View className="flex-initial">{modal}</View>
                 </Pressable>
             </Pressable>
         );
