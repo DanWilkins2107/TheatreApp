@@ -54,6 +54,7 @@ export default function App() {
         { name: "BudgetAddExpense", component: BudgetAddExpenseScreen, header: true },
         { name: "BudgetMain", component: BudgetMainScreen, header: true },
         { name: "Admin", component: AdminScreen, header: true },
+        { name: "Availability", component: Availability, header: true}
     ];
 
     return (

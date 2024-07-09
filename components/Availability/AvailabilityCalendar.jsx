@@ -1,7 +1,8 @@
 import { View, Text, ScrollView, Pressable, TouchableOpacity } from "react-native";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useContext } from "react";
 import DateCircles from "./DateCircles";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { AlertContext } from "../Alert/AlertProvider";
 
 const splitDate = (date) => {
     year = date.getFullYear();
@@ -41,6 +42,7 @@ const hasTimePassed = (date, day, hour) => {
 export default function AvailabilityCalendar({ availabilityInfo, setAvailabilityInfo }) {
     const [date, setDate] = useState(new Date());
     const scrollRef = useRef(null);
+    const { setAlert } = useContext(AlertContext);
 
     const findColour = (colour) => {
         if (colour != "none") {
@@ -50,34 +52,38 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
 
     const handleOnPress = useCallback(
         (hour, daysToChange) => {
-            const correctDate = editDate(date, daysToChange);
-            const dayData = splitDate(correctDate);
-            const value = checkAvailability(hour, correctDate);
+            try {
+                const correctDate = editDate(date, daysToChange);
+                const dayData = splitDate(correctDate);
+                const value = checkAvailability(hour, correctDate);
 
-            newInfo = { ...availabilityInfo };
+                newInfo = { ...availabilityInfo };
 
-            if (value === "none") {
-                if (newInfo[dayData[0]] === undefined) {
-                    newInfo = { ...newInfo, [dayData[0]]: {} };
+                if (value === "none") {
+                    if (newInfo[dayData[0]] === undefined) {
+                        newInfo = { ...newInfo, [dayData[0]]: {} };
+                    }
+                    if (newInfo[dayData[0]][dayData[1]] === undefined) {
+                        newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
+                    }
+                    if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
+                        newInfo[dayData[0]][dayData[1]] = {
+                            ...newInfo[dayData[0]][dayData[1]],
+                            [dayData[2]]: {},
+                        };
+                    }
+                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
                 }
-                if (newInfo[dayData[0]][dayData[1]] === undefined) {
-                    newInfo[dayData[0]] = { ...newInfo[dayData[0]], [dayData[1]]: {} };
+                if (value === "green") {
+                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
                 }
-                if (newInfo[dayData[0]][dayData[1]][dayData[2]] === undefined) {
-                    newInfo[dayData[0]][dayData[1]] = {
-                        ...newInfo[dayData[0]][dayData[1]],
-                        [dayData[2]]: {},
-                    };
+                if (value === "red") {
+                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
                 }
-                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
+                setAvailabilityInfo(newInfo);
+            } catch {
+                setAlert("An error occured when changing availability", "bg-red-400", "exclamation-circle");
             }
-            if (value === "green") {
-                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
-            }
-            if (value === "red") {
-                newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "none";
-            }
-            setAvailabilityInfo(newInfo);
         },
         [date, availabilityInfo]
     );
