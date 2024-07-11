@@ -13,11 +13,8 @@ import ProductionCodeButton from "../../components/UserDashboard/ProductionCodeB
 import ProductionCodeModal from "../../components/ProductionModals/ProductionCodeModal.jsx";
 
 // TODO:
-// - Modal popup on press of playcode
-//      > Change playcode option for admin
-//      > [future] QR code for joining
-// - Refactor play keys in database
-//      > UUIDv7 (no import)
+// - Change playcode option for admin
+// - [future] QR code for joining
 
 export default function ProductionDashboardScreen({ navigation, route }) {
     const [production, setProduction] = useState({});
@@ -26,7 +23,6 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
     const productionID = route.params.productionID;
-    console.log("production id: " + productionID)
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -41,7 +37,6 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                     return;
                 }
                 const data = snapshot.val();
-                console.log(data)
                 setProduction(data);
             },
             { onlyOnce: true }
@@ -129,7 +124,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                         <View className="py-1" />
                         <ProductionCodeButton
                             productionCode={production.productionCode}
-                            onPress={() =>
+                            onPress={() => 
                                 setModal(<ProductionCodeModal productionCode={production.productionCode} />)
                             }
                         />

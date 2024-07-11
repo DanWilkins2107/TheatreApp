@@ -6,7 +6,7 @@ import { View, Text } from "react-native";
 // - Big Letters
 
 export default function ProductionCodeModal({ productionCode }) {
-    console.log(productionCode);
+    console.log("production code modal: " + productionCode);
 
     return (
         <View className="flex-col items-center p-3">

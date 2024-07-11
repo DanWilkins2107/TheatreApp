@@ -17,7 +17,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import IconE from "react-native-vector-icons/Entypo";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
 
-export default function UserProfileScreen({ navigation }) {
+export default function UserProfileScreen() {
     const [userName, setUserName] = useState("");
     const auth = firebase_auth;
     const db = firebase_db;
@@ -53,11 +53,11 @@ export default function UserProfileScreen({ navigation }) {
                 }
                 const productions = snapshot.val();
                 // Delete user from all productions
-                Object.keys(productions).forEach((playCode) => {
+                Object.keys(productions).forEach((productionCode) => {
                     remove(
-                        dbRef(db, `productions/${playCode}/participants/${auth.currentUser.uid}`)
+                        dbRef(db, `productions/${productionCode}/participants/${auth.currentUser.uid}`)
                     );
-                    get(child(dbRef(db), `productions/${playCode}/admins`)).then((snapshot) => {
+                    get(child(dbRef(db), `productions/${productionCode}/admins`)).then((snapshot) => {
                         if (!snapshot.exists()) {
                             return;
                         }
@@ -65,17 +65,17 @@ export default function UserProfileScreen({ navigation }) {
                         if (admins.includes(auth.currentUser.uid)) {
                             if (admins.length === 1) {
                                 // If only one admin, add someone in from participants or delete production
-                                get(child(dbRef(db), `productions/${playCode}/participants`)).then(
+                                get(child(dbRef(db), `productions/${productionCode}/participants`)).then(
                                     (snapshot) => {
                                         if (snapshot.exists()) {
                                             const participants = Object.keys(snapshot.val());
                                             // If there are other participants, make first one an admin
-                                            set(dbRef(db, `productions/${playCode}/admins`), {
+                                            set(dbRef(db, `productions/${productionCode}/admins`), {
                                                 [participants[0]]: Date.now(),
                                             });
                                         } else {
                                             // If there are no participants, delete production.
-                                            remove(dbRef(db, `productions/${playCode}`));
+                                            remove(dbRef(db, `productions/${productionCode}`));
                                         }
                                     }
                                 );
@@ -84,7 +84,7 @@ export default function UserProfileScreen({ navigation }) {
                                 remove(
                                     dbRef(
                                         db,
-                                        `productions/${playCode}/admins/${auth.currentUser.uid}`
+                                        `productions/${productionCode}/admins/${auth.currentUser.uid}`
                                     )
                                 );
                             }
