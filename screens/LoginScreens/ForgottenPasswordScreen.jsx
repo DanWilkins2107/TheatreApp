@@ -1,26 +1,28 @@
 import { Text, View, Button } from "react-native";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import FormField from "../../components/Form/FormField.jsx";
 import { firebase_auth } from "../../firebase.config.js";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 import { sendPasswordResetEmail } from "@firebase/auth";
 import TextButton from "../../components/Form/TextButton.jsx";
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 
 export default function ForgottenPasswordScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const auth = firebase_auth;
+    const { setAlert } = useContext(AlertContext);
 
     const handlePasswordReset = async () => {
         setLoading(true);
         sendPasswordResetEmail(auth, email)
             .then(() => {
-                alert("Reset Link Sent");
+                setAlert("Password reset link sent to email.", "bg-red-500", "exclamation-circle")
                 navigation.navigate("Login");
             })
             .catch((error) => {
-                console.log(error.code, error.message);
+                setAlert("Could not send the reset link.", "bg-red-500", "exclamation-circle")
             })
             .finally(() => {
                 setLoading(false);

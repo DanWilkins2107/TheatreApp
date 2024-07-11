@@ -1,5 +1,5 @@
-import { Text, View, Button, KeyboardAvoidingView } from "react-native";
-import React, { useState } from "react";
+import { Text, View, KeyboardAvoidingView } from "react-native";
+import { useState, useContext } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { firebase_auth, firebase_db } from "../../firebase.config.js";
@@ -7,6 +7,7 @@ import FormField from "../../components/Form/FormField.jsx";
 import FormButton from "../../components/Form/FormButton.jsx";
 import LoadingWheel from "../../components/Loading/LoadingWheel.jsx";
 import TextButton from "../../components/Form/TextButton.jsx";
+import { AlertContext } from "../../components/Alert/AlertProvider.jsx";
 
 function ChooseProfileColor() {
     const colorArray = [
@@ -37,10 +38,11 @@ export default function SignUpScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
     const auth = firebase_auth;
     const db = firebase_db;
+    const { setAlert } = useContext(AlertContext);
 
     const handleSignUp = async () => {
         if (isPasswordMatching) {
-            alert("Passwords do not match");
+            setAlert("Passwords do not match", "bg-red-500", "exclamation-circle");
             return;
         }
 
@@ -56,9 +58,25 @@ export default function SignUpScreen({ navigation }) {
                 profileBackground: color,
             });
         } catch (error) {
-            alert(`Sign up failed: ${error.message}`);
+            if (error.code === "auth/email-already-in-use") {
+                setAlert("Email already in use.", "bg-red-500", "exclamation-circle");
+                return;
+            }
+            if (error.code === "auth/invalid-email") {
+                setAlert("Please enter a valid email", "bg-red-500", "exclamation-circle");
+                return;
+            }
+            if (error.code === "auth/weak-password" || error.code === "auth/missing-password") {
+                setAlert(
+                    "Password must be at least 6 characters long",
+                    "bg-red-500",
+                    "exclamation-circle"
+                );
+                return;
+            }
+            setAlert("Could not create account", "bg-red-500", "exclamation-circle");
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
     };
 
