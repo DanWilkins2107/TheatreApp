@@ -13,8 +13,8 @@ export default function BudgetLineGraph({ budget, placeholder, nonPlaceholder, i
     const animatedStyle = useAnimatedStyle(() => {
         const backgroundColor = interpolateColor(
             animatedValue.value,
-            [0, 33, 75, 100],
-            ['#00CC00', '#DDDD33', '#FFBB33', '#FF6666']
+            [0, 60, 100],
+            ['#00CC00', '#DDDD33', '#FF6666']
         );
         return {
             width: `${animatedValue.value}%`,

@@ -147,7 +147,12 @@ export default function BudgetMainScreen({ route }) {
                             </View>
                             {filtersOpen && (
                                 <View className="flex-col">
-                                    <View className="flex-row justify-start items-center px-2 mt-2">
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setHidePlaceholders(!hidePlaceholders);
+                                        }}
+                                        className="flex-row justify-start items-center px-2 mt-2"
+                                    >
                                         <Checkbox
                                             checked={hidePlaceholders}
                                             setChecked={() =>
@@ -157,8 +162,13 @@ export default function BudgetMainScreen({ route }) {
                                         <Subtitle extraClassName="ml-4">
                                             Hide Placeholder Expenses
                                         </Subtitle>
-                                    </View>
-                                    <View className="flex-row justify-start items-center px-2 mt-2">
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setHideOthers(!hideOthers);
+                                        }}
+                                        className="flex-row justify-start items-center px-2 mt-2"
+                                    >
                                         <Checkbox
                                             checked={hideOthers}
                                             setChecked={() => setHideOthers(!hideOthers)}
@@ -166,7 +176,7 @@ export default function BudgetMainScreen({ route }) {
                                         <Subtitle extraClassName="ml-4">
                                             Hide Others' Expenses
                                         </Subtitle>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                             )}
                         </View>
