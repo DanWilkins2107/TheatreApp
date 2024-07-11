@@ -21,6 +21,7 @@ export default function BudgetMainScreen({ route }) {
     const [hidePlaceholders, setHidePlaceholders] = useState(false);
     const [hideOthers, setHideOthers] = useState(false);
     const [isPlaceholder, setIsPlaceholder] = useState(false);
+    const [budgetString, setBudgetString] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,8 +64,38 @@ export default function BudgetMainScreen({ route }) {
             }
             filteredExpenses.push(expenses[i]);
         }
+        filteredExpenses.sort((a, b) => {
+            return b.time - a.time;
+        });
         return filteredExpenses;
     };
+
+    useEffect(() => {
+        const expenseValue =
+            Number(budgetInfo.nonPlaceholderExpenses) +
+            (isPlaceholder && Number(budgetInfo.placeholderExpenses));
+
+        const expensesString = (expenseValue || "").toString();
+        const budgetString = (budgetInfo.budget || "").toString();
+
+        const addZeroExpenseParts = expensesString.split(".");
+        const addZeroBudgetParts = budgetString.split(".");
+
+        const addZeroExpenses =
+            addZeroExpenseParts.length > 1 && addZeroExpenseParts[1].length === 1;
+        const addZeroBudget = addZeroBudgetParts.length > 1 && addZeroBudgetParts[1].length === 1;
+
+        setBudgetString(
+            `£${expenseValue}${addZeroExpenses ? "0" : ""} Spent out of £${budgetInfo.budget}${
+                addZeroBudget ? "0" : ""
+            }`
+        );
+    }, [
+        isPlaceholder,
+        budgetInfo.placeholderExpenses,
+        budgetInfo.nonPlaceholderExpenses,
+        budgetInfo.budget,
+    ]);
 
     return (
         <View className="flex-1 items-center">
@@ -72,8 +103,10 @@ export default function BudgetMainScreen({ route }) {
                 <LoadingWheel size="large" />
             ) : (
                 <>
-                    <View className="bg-slate-100 w-[90%] border-2 rounded-xl justify-center items-center mb-8 mt-4">
-                        <Title extraClassName="mt-4">{budgetInfo.name}</Title>
+                    <View className="bg-slate-100 w-[90%] border-2 rounded-xl justify-center items-center mb-6 mt-4">
+                        <Title extraClassName="mt-4 mx-2" oneLine>
+                            {budgetInfo.name}
+                        </Title>
                         <View className="w-[90%] mt-4">
                             <BudgetLineGraph
                                 budget={Number(budgetInfo.budget)}
@@ -82,12 +115,7 @@ export default function BudgetMainScreen({ route }) {
                                 isPlaceholder={isPlaceholder}
                             />
                         </View>
-                        <Subtitle>
-                            £
-                            {Number(budgetInfo.nonPlaceholderExpenses) +
-                                (isPlaceholder && Number(budgetInfo.placeholderExpenses))}{" "}
-                            Spent out of £{budgetInfo.budget}
-                        </Subtitle>
+                        <Subtitle extraClassName="text-center mx-2">{budgetString}</Subtitle>
                         <View className="w-full flex-row justify-center items-center my-4">
                             <Checkbox
                                 checked={isPlaceholder}
@@ -164,6 +192,7 @@ export default function BudgetMainScreen({ route }) {
                                         />
                                     );
                                 })}
+                                <View className="h-10" />
                             </>
                         )}
                     </ScrollView>

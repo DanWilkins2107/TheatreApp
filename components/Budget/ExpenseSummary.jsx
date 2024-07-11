@@ -18,34 +18,23 @@ export default function ExpenseSummary({ expense, isUser }) {
                 onPress={() => setIsDropdownOpen(!isDropdownOpen)}
             >
                 <View className="flex-row justify-between">
-                    <View className="flex-row items-center">
+                    <View className="flex-row items-center flex-1">
                         <ProfilePicture
                             userId={expense.user}
                             dimensions={10}
                             textSize="2xl"
                             loadingSize="small"
                         />
-                        <View className="ml-2">
-                            <Subtitle extraClassName={expense.placeholder && "text-gray-600"}>
+                        <View className="ml-2 flex-1">
+                            <Subtitle
+                                extraClassName={expense.placeholder && "text-gray-600"}
+                                oneLine
+                            >
                                 {expense.reference}
                             </Subtitle>
                         </View>
                     </View>
-                    <View className="flex-row items-center">
-                        {isUser && <TouchableOpacity
-                            className={`w-10 h-10 rounded-md border-2 mr-4 justify-center items-center ${
-                                expense.placeholder && "border-gray-600"
-                            }`}
-                            onPress={() => {
-                                alert("Implement editing expense");
-                            }}
-                        >
-                            <Icon
-                                name="pencil"
-                                size={30}
-                                color={expense.placeholder ? "#757575" : "black"}
-                            />
-                        </TouchableOpacity>}
+                    <View className="flex-row items-center ml-2">
                         <Subtitle extraClassName={expense.placeholder && "text-gray-600"}>
                             £{expense.cost}
                         </Subtitle>
@@ -59,26 +48,39 @@ export default function ExpenseSummary({ expense, isUser }) {
                     </View>
                 </View>
                 {isDropdownOpen && (
-                    <View className="justify-between mt-2 flex-row">
-                        <View className="flex-1">
-                            <Text className="font-semibold text-base">Reference:</Text>
-                            <Text>{expense.reference}</Text>
-                            <Text className="font-semibold text-base mt-2">Description:</Text>
-                            <Text>{expense.description}</Text>
-                            <Text className="font-semibold text-base mt-2">Submitted:</Text>
-                            <Text>{timeString}</Text>
-                        </View>
-                        {expense.receipt && (
-                            <View className="flex-1 justify-center items-center">
-                                <Text className="font-semibold text-base text-center mb-2">
-                                    Receipt:
-                                </Text>
-                                <View className="w-40 h-40">
-                                    <ImageViewer URL={expense.receipt} centered />
-                                </View>
-                            </View>
+                    <>
+                        {isUser && (
+                            <TouchableOpacity
+                                className={`w-full h-10 rounded-md border-2 mt-4 justify-center items-center flex-row bg-slate-100`}
+                                onPress={() => {
+                                    alert("Implement editing expense");
+                                }}
+                            >
+                                <Subtitle extraClassName="mr-4">Edit Expense</Subtitle>
+                                <Icon name="pencil" size={30} color="black" />
+                            </TouchableOpacity>
                         )}
-                    </View>
+                        <View className="justify-between mt-2 flex-row">
+                            <View className="flex-1">
+                                <Text className="font-semibold text-base">Reference:</Text>
+                                <Text>{expense.reference}</Text>
+                                <Text className="font-semibold text-base mt-2">Description:</Text>
+                                <Text>{expense.description}</Text>
+                                <Text className="font-semibold text-base mt-2">Submitted:</Text>
+                                <Text>{timeString}</Text>
+                            </View>
+                            {expense.receipt && (
+                                <View className="flex-1 justify-center items-center">
+                                    <Text className="font-semibold text-base text-center mb-2">
+                                        Receipt:
+                                    </Text>
+                                    <View className="w-40 h-40">
+                                        <ImageViewer URL={expense.receipt} centered />
+                                    </View>
+                                </View>
+                            )}
+                        </View>
+                    </>
                 )}
             </TouchableOpacity>
         </View>
