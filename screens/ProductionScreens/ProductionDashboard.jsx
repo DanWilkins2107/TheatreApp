@@ -9,8 +9,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { ModalContext } from "../../components/Modal/ModalProvider.jsx";
 import ProfilePictureArray from "../../components/Participants/ProfilePictureArray.jsx";
-import PlayCodeButton from "../../components/UserDashboard/PlayCodeButton.jsx";
-import PlaycodeModal from "../../components/ProductionModals/PlaycodeModal.jsx";
+import ProductionCodeButton from "../../components/UserDashboard/ProductionCodeButton.jsx";
+import ProductionCodeModal from "../../components/ProductionModals/ProductionCodeModal.jsx";
 
 // TODO:
 // - Modal popup on press of playcode
@@ -25,7 +25,8 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const productionCode = route.params.productionCode;
+    const productionID = route.params.productionID;
+    console.log("production id: " + productionID)
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -33,19 +34,20 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     useEffect(() => {
         onValue(
-            ref(db, `/productions/${productionCode}`),
+            ref(db, `/productions/${productionID}`),
             (snapshot) => {
                 if (!snapshot.exists()) {
                     setLoading(false);
                     return;
                 }
                 const data = snapshot.val();
+                console.log(data)
                 setProduction(data);
             },
             { onlyOnce: true }
         );
 
-        onValue(ref(db, `/productions/${productionCode}/admins`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionID}/admins`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const adminData = snapshot.val();
             if (adminData[auth.currentUser.uid]) {
@@ -54,7 +56,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             setAdmins(Object.keys(adminData));
         });
 
-        onValue(ref(db, `/productions/${productionCode}/participants`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionID}/participants`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const participantData = snapshot.val();
             setParticipants(Object.keys(participantData));
@@ -64,7 +66,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     const fetchBudgets = async () => {
         try {
-            const prodSnapshot = await get(ref(db, `productions/${productionCode}/budgets`));
+            const prodSnapshot = await get(ref(db, `productions/${productionID}/budgets`));
             if (!prodSnapshot.exists()) {
                 return {};
             }
@@ -123,12 +125,12 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             ) : (
                 <>
                     <View className="flex-col border-2 rounded-3xl items-center justify-between mb- mt-4 px-16 pt-2 pb-4">
-                        <Text className="text-3xl font-extrabold">{production.playName}</Text>
+                        <Text className="text-3xl font-extrabold">{production.productionName}</Text>
                         <View className="py-1" />
-                        <PlayCodeButton
-                            playCode={productionCode}
+                        <ProductionCodeButton
+                            productionCode={production.productionCode}
                             onPress={() =>
-                                setModal(<PlaycodeModal productionCode={productionCode} />)
+                                setModal(<ProductionCodeModal productionCode={production.productionCode} />)
                             }
                         />
                         <View className="py-1" />
@@ -139,7 +141,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             <ProductionDashboardButton
                                 text="Create Budget"
                                 onPress={() =>
-                                    setModal(<CreateBudgetModal productionCode={productionCode} />)
+                                    setModal(<CreateBudgetModal productionID={productionID} />)
                                 }
                             >
                                 <IconFA5 name="plus" size={50} />
@@ -155,7 +157,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             text="Add Expense"
                             onPress={() =>
                                 navigation.navigate("BudgetAddExpense", {
-                                    productionCode: productionCode,
+                                    productionID: productionID,
                                 })
                             }
                         >
@@ -165,7 +167,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             <ProductionDashboardButton
                                 text="Admin Stuff"
                                 onPress={() =>
-                                    navigation.navigate("Admin", { productionCode: productionCode })
+                                    navigation.navigate("Admin", { productionID: productionID })
                                 }
                             >
                                 <Icon name="cogs" size={50} />

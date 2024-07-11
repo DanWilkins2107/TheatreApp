@@ -5,7 +5,7 @@ import { View, Text } from "react-native";
 // - QR code for joining
 // - Big Letters
 
-export default function PlayCodeModal({ productionCode }) {
+export default function ProductionCodeModal({ productionCode }) {
     console.log(productionCode);
 
     return (

@@ -36,19 +36,19 @@ export default function UserDashboardScreen({ navigation }) {
             const localProductions = JSON.parse(await AsyncStorage.getItem("productions")) || {};
             
             let combinedProductions = { ...userData };
-            Object.keys(userData).forEach((productionCode) => {
-                if (localProductions[productionCode]) {
-                    combinedProductions[productionCode] = localProductions[productionCode];
+            Object.keys(userData).forEach((productionID) => {
+                if (localProductions[productionID]) {
+                    combinedProductions[productionID] = localProductions[productionID];
                 }
             });
 
             let areAnyInvalid = false;
             const dbProductions = await Promise.all(
-                Object.keys(userData).map(async (productionCode) => {
-                    return get(child(ref(db), `productions/${productionCode}`))
+                Object.keys(userData).map(async (productionID) => {
+                    return get(child(ref(db), `productions/${productionID}`))
                         .then((productionSnapshot) => {
                             if (!productionSnapshot.exists()) return null;
-                            return productionSnapshot.val();
+                            return {...productionSnapshot.val(), productionID: productionID};
                         })
                         .catch(() => {
                             areAnyInvalid = true;
@@ -66,7 +66,7 @@ export default function UserDashboardScreen({ navigation }) {
             
             const validProductions = dbProductions.filter((prod) => prod !== null);
             const sortedProductions = validProductions.sort((a, b) => {
-                return combinedProductions[b.productionCode] - combinedProductions[a.productionCode];
+                return combinedProductions[b.productionID] - combinedProductions[a.productionID];
             });
             setProductions(sortedProductions);
             setLoading(false);
@@ -80,11 +80,12 @@ export default function UserDashboardScreen({ navigation }) {
     );
 
     const productionButtonOnClick = async (production) => {
-        navigation.navigate("ProductionDashboard", { productionCode: production.productionCode });
+        console.log(production.productionID)
+        navigation.navigate("ProductionDashboard", { productionID: production.productionID });
         const existingData = await AsyncStorage.getItem("productions");
         const newData = {
             ...JSON.parse(existingData),
-            [production.productionCode]: Date.now(),
+            [production.productionID]: Date.now(),
         };
         await AsyncStorage.setItem("productions", JSON.stringify(newData));
     };

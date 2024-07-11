@@ -26,7 +26,6 @@ const generateProductionCode = (db) => {
     return code;
 };
 // TODO: Error handling
-// TODO: Check if production code already exists -> undefined bs raaaa
 
 export default function CreateProductionModal() {
     const [name, setName] = useState("");
@@ -35,7 +34,6 @@ export default function CreateProductionModal() {
     const { setModal } = useContext(ModalContext);
 
     const CreateProduction = () => {
-        const dbRef = ref(db);
         const productionID = randomUUID();
         const productionCode = generateProductionCode(db);
 

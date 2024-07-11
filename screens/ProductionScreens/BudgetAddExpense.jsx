@@ -33,7 +33,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     const [cost, setCost] = useState("");
     const { setAlert } = useContext(AlertContext);
     const storageRef = ref(storage);
-    const productionCode = route.params.productionCode;
+    const productionID = route.params.productionID;
     const db = firebase_db;
     const auth = firebase_auth;
     const { setModal } = useContext(ModalContext);
@@ -113,7 +113,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
 
     const fetchBudgets = async () => {
         try {
-            const prodSnapshot = await get(dbRef(db, `productions/${productionCode}/budgets`));
+            const prodSnapshot = await get(dbRef(db, `productions/${productionID}/budgets`));
             if (!prodSnapshot.exists()) {
                 return {};
             }

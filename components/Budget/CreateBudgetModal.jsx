@@ -10,7 +10,7 @@ import { ModalContext } from "../Modal/ModalProvider";
 import Title from "../TextStyles/Title";
 import { randomUUID } from "expo-crypto";
 
-export default function CreateBudgetModal({ productionCode }) {
+export default function CreateBudgetModal({ productionID }) {
     const [name, setName] = useState("");
     const [budget, setBudget] = useState("");
     const [participants, setParticipants] = useState({});
@@ -20,7 +20,7 @@ export default function CreateBudgetModal({ productionCode }) {
 
     useEffect(() => {
         try {
-            onValue(ref(db, `productions/${productionCode}/participants`), (productionSnapshot) => {
+            onValue(ref(db, `productions/${productionID}/participants`), (productionSnapshot) => {
                 if (!productionSnapshot.exists()) {
                     setAlert("Could not find production.", "bg-red-500", "exclamation-circle");
                     return;
@@ -62,7 +62,7 @@ export default function CreateBudgetModal({ productionCode }) {
 
         const budgetID = randomUUID();
         try {
-            set(ref(db, `productions/${productionCode}/budgets/${budgetID}`), Date.now());
+            set(ref(db, `productions/${productionID}/budgets/${budgetID}`), Date.now());
             set(ref(db, "budgets/" + budgetID), {
                 name: name,
                 budget: budget,
