@@ -1,6 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function BudgetInfo({budget, onClick}) {
     const participants = budget.participants || {};
@@ -11,8 +10,6 @@ export default function BudgetInfo({budget, onClick}) {
         >
             <View className="flex flex-row justify-between items-center">
                 <Text className="text-2xl font-bold">{budget.name}</Text>
-                {/* Not sure we need the arrow all the time? Idk tho again what do u think?*/}
-                <Icon name="chevron-right" size={20} />
             </View>
             <Text className="text-lg font-light">Budget: £{budget.budget}</Text>
             <View className="w-max flex flex-row mt-1">
