@@ -67,6 +67,8 @@ export default function CreateBudgetModal({ productionCode }) {
                 name: name,
                 budget: budget,
                 participants: participantsToAdd,
+                nonPlaceholderExpenses: 0,
+                placeholderExpenses: 0,
             });
             setAlert("Budget created!", "bg-green-500", "check");
             setModal(null);

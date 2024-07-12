@@ -1,14 +1,14 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useContext } from "react";
 import { ModalContext } from "../Modal/ModalProvider";
-import RecieptViewerModal from "./RecieptViewerModal";
+import ReceiptViewerModal from "./ReceiptViewerModal";
 
 export default function ReceiptViewer({ recieptURL }) {
     const { setModal } = useContext(ModalContext);
     return (
         <>
             {recieptURL ? (
-                <TouchableOpacity onPress={() => setModal(<RecieptViewerModal recieptURL={recieptURL}/>)}>
+                <TouchableOpacity onPress={() => setModal(<ReceiptViewerModal recieptURL={recieptURL}/>)}>
                     <Image
                         className="bg-slate-100 h-full rounded-lg border-2"
                         source={{
