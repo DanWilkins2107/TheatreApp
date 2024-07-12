@@ -71,9 +71,6 @@ export default function ExpenseSummary({ expense, isUser }) {
                             </View>
                             {expense.receipt && (
                                 <View className="flex-1 justify-center items-center">
-                                    <Text className="font-semibold text-base text-center mb-2">
-                                        Receipt
-                                    </Text>
                                     <View className="w-40 h-40 mb-2">
                                         <ImageViewer URL={expense.receipt} centered />
                                     </View>
