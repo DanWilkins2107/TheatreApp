@@ -6,7 +6,7 @@ import FormField from "../../components/Form/FormField.jsx";
 import Title from "../../components/TextStyles/Title.jsx";
 import ReceiptViewer from "../../components/Budget/ReceiptViewer.jsx";
 import AddRecieptButton from "../../components/Budget/AddRecieptButton.jsx";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {
     launchImageLibraryAsync,
@@ -25,9 +25,10 @@ import ViewBudgetModal from "../../components/Budget/ViewBudgetModal.jsx";
 import Checkbox from "../../components/Participants/Checkbox.jsx";
 import { useFocusEffect } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import DeleteExpenseModal from "../../components/Budget/DeleteExpenseModal.jsx";
+import DeleteButton from "../../components/Budget/DeleteButton.jsx";
 
 export default function BudgetAddExpenseScreen({ navigation, route }) {
-    const expenseID = randomUUID();
     const [playBudgets, setPlayBudgets] = useState({});
     const [budget, setBudget] = useState("");
     const [reference, setReference] = useState("");
@@ -39,9 +40,14 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     const { setAlert } = useContext(AlertContext);
     const storageRef = ref(storage);
     const productionCode = route.params.productionCode;
+    const id = route.params.id;
+    const expenseID = route.params.id || randomUUID();
     const db = firebase_db;
     const auth = firebase_auth;
     const { setModal } = useContext(ModalContext);
+    const [originalCost, setOriginalCost] = useState(0);
+    const [originalReceipt, setOriginalReceipt] = useState("");
+    const [originalReceiptExtension, setOriginalReceiptExtension] = useState("");
 
     const resetValues = () => {
         setBudget("");
@@ -52,9 +58,39 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
         setReceiptURI("");
     };
 
+    const handleLoad = () => {
+        if (!id) {
+            resetValues();
+            return;
+        }
+        try {
+            resetValues();
+            get(dbRef(db, `expenses/${id}`)).then(async (snapshot) => {
+                if (!snapshot.exists()) {
+                    resetValues();
+                    return;
+                }
+                const data = snapshot.val();
+                const playBudgetsFetch = await fetchBudgets();
+                setPlayBudgets(playBudgetsFetch);
+                setBudget(data.budget);
+                setReference(data.reference);
+                setDescription(data.description);
+                setIsPlaceholder(data.placeholder);
+                setCost(data.cost);
+                setReceiptURI(data.receipt);
+                setOriginalCost(data.cost);
+                setOriginalReceipt(data.receipt);
+                setOriginalReceiptExtension(data.receiptExtension);
+            });
+        } catch {
+            setAlert("Error loading expense", "bg-red-500", "exclamation-circle");
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
-            resetValues();
+            handleLoad();
         }, [])
     );
 
@@ -80,11 +116,12 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
         }
 
         let url = "";
+        let extension = "";
         if (receiptURI) {
             try {
                 const image = await fetch(receiptURI);
                 const blob = await image.blob();
-                const extension = receiptURI.substring(receiptURI.lastIndexOf("."));
+                extension = receiptURI.substring(receiptURI.lastIndexOf("."));
                 const snapshot = await uploadBytes(
                     ref(storageRef, "receipts/" + expenseID + extension),
                     blob
@@ -103,10 +140,15 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 cost: cost,
                 placeholder: isPlaceholder,
                 receipt: url,
+                receiptExtension: extension,
                 user: auth.currentUser.uid,
             });
             await set(dbRef(db, `budgets/${budget}/expenses/${expenseID}`), Date.now());
-            setAlert("Expense added successfully", "bg-green-500", "check-circle");
+            setAlert(
+                `Expense ${id ? "updated" : "added"} successfully`,
+                "bg-green-500",
+                "check-circle"
+            );
             setIsSubmitting(false);
 
             await runTransaction(
@@ -120,14 +162,16 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     if (currentValue) {
                         return Number(currentValue) + Number(cost);
                     }
-                    return cost
+                    return Number(cost);
                 }
             );
 
-            navigation.navigate("BudgetMain", { budgetUUID: budget });
+            navigation.navigate("BudgetMain", {
+                productionCode: productionCode,
+                budgetUUID: budget,
+            });
         } catch (error) {
             setAlert("Error occurred when adding expense", "bg-red-500", "exclamation-circle");
-            console.error(error);
             setIsSubmitting(false);
         }
     };
@@ -241,10 +285,42 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
         );
     };
 
+    const handleDelete = async () => {
+        try {
+            await runTransaction(
+                dbRef(
+                    db,
+                    `budgets/${budget}/${
+                        isPlaceholder ? "placeholderExpenses" : "nonPlaceholderExpenses"
+                    }`
+                ),
+                (currentValue) => {
+                    if (currentValue) {
+                        return Number(currentValue) - Number(originalCost);
+                    }
+                    return -1 * Number(originalCost);
+                }
+            );
+            const receiptRef = ref(storage, `receipts/${id}${originalReceiptExtension}`);
+            await deleteObject(receiptRef);
+            await set(dbRef(db, `expenses/${id}`), null);
+            await set(dbRef(db, `budgets/${budget}/expenses/${id}`), null);
+
+            setAlert("Expense deleted successfully", "bg-green-500", "check-circle");
+            setModal(null);
+            navigation.navigate("BudgetMain", {
+                productionCode: productionCode,
+                budgetUUID: budget,
+            });
+        } catch (error) {
+            setAlert("Could not delete expense", "bg-red-500", "exclamation-circle");
+        }
+    };
+
     return (
-        <View className="py-2 flex justify-center items-center">
-            <Title extraClassName="mb-4">Add Expense</Title>
-            <KeyboardAwareScrollView className="h-5/6 w-full px-8">
+        <View className="py-2 flex h-full justify-center items-center">
+            <Title extraClassName="mb-4">{id ? "Edit" : "Add"} Expense</Title>
+            <KeyboardAwareScrollView className="flex-1 w-full px-8">
                 <View className="items-center justify-center mb-4">
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
                     {budget ? (
@@ -327,23 +403,30 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     )}
                 </View>
             </KeyboardAwareScrollView>
-            <View className="flex flex-row w-max justify-around">
-                <SmallFormButton
-                    title="Submit"
-                    backgroundColor="bg-green-400"
-                    onPress={submitForm}
-                    loading={isSubmitting}
-                />
-                <View className="w-4" />
-                <SmallFormButton
-                    title="Reset"
-                    onPress={() => {
-                        setBudget("");
-                        setReference("");
-                        setCost("");
-                        setReceiptURI("");
-                    }}
-                />
+            <View className="flex-col w-full items-center mb-4 mt-2">
+                <View className="flex-row w-full justify-center">
+                    <SmallFormButton
+                        title="Submit"
+                        backgroundColor="bg-green-400"
+                        onPress={submitForm}
+                        loading={isSubmitting}
+                    />
+                    <View className="w-4" />
+                    <SmallFormButton
+                        title="Reset"
+                        onPress={() => {
+                            setBudget("");
+                            setReference("");
+                            setCost("");
+                            setReceiptURI("");
+                        }}
+                    />
+                </View>
+                {id && (
+                    <DeleteButton
+                        onPress={() => setModal(<DeleteExpenseModal onPress={handleDelete} />)}
+                    />
+                )}
             </View>
         </View>
     );

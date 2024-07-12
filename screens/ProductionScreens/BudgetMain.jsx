@@ -10,7 +10,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Checkbox from "../../components/Participants/Checkbox";
 import BudgetLineGraph from "../../components/Budget/BudgetLineGraph";
 
-export default function BudgetMainScreen({ route }) {
+export default function BudgetMainScreen({ navigation, route }) {
     const budgetUUID = route.params.budgetUUID;
     const [budgetInfo, setBudgetInfo] = useState({});
     const [expenses, setExpenses] = useState([]);
@@ -22,6 +22,7 @@ export default function BudgetMainScreen({ route }) {
     const [hideOthers, setHideOthers] = useState(false);
     const [isPlaceholder, setIsPlaceholder] = useState(false);
     const [budgetString, setBudgetString] = useState("");
+    const productionCode = route.params.productionCode;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -199,6 +200,8 @@ export default function BudgetMainScreen({ route }) {
                                             expense={expense}
                                             key={expense.expenseUUID}
                                             isUser={expense.user === auth.currentUser.uid}
+                                            navigation={navigation}
+                                            productionCode={productionCode}
                                         />
                                     );
                                 })}
