@@ -318,9 +318,9 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     };
 
     return (
-        <View className="py-2 flex justify-center items-center">
+        <View className="py-2 flex h-full justify-center items-center">
             <Title extraClassName="mb-4">{id ? "Edit" : "Add"} Expense</Title>
-            <KeyboardAwareScrollView className="h-5/6 w-full px-8">
+            <KeyboardAwareScrollView className="flex-1 w-full px-8">
                 <View className="items-center justify-center mb-4">
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
                     {budget ? (
