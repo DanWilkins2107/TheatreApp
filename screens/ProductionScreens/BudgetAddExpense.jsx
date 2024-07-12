@@ -403,7 +403,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     )}
                 </View>
             </KeyboardAwareScrollView>
-            <View className="flex-col w-full items-center mb-10 mt-2">
+            <View className="flex-col w-full items-center mb-4 mt-2">
                 <View className="flex-row w-full justify-center">
                     <SmallFormButton
                         title="Submit"
