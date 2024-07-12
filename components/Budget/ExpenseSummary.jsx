@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import ProfilePicture from "../ProfileElements/ProfilePicture";
 import ImageViewer from "./ImageViewer";
 
-export default function ExpenseSummary({ expense, isUser }) {
+export default function ExpenseSummary({ expense, isUser, navigation, productionCode }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const timeString = new Date(expense.time).toLocaleString();
@@ -49,15 +49,21 @@ export default function ExpenseSummary({ expense, isUser }) {
                 </View>
                 {isDropdownOpen && (
                     <>
+                        <Text>{productionCode || "NOT HERE AHAHA"}</Text>
                         {isUser && (
+
                             <TouchableOpacity
                                 className={`w-full h-10 rounded-md border-2 mt-4 justify-center items-center flex-row bg-slate-100`}
                                 onPress={() => {
-                                    alert("Implement editing expense");
+                                    navigation.navigate("BudgetAddExpense", {
+                                        productionCode: productionCode,
+                                        id: expense.expenseUUID,
+                                    });
                                 }}
                             >
                                 <Subtitle extraClassName="mr-4">Edit Expense</Subtitle>
                                 <Icon name="pencil" size={30} color="black" />
+                                <Text>{expense.id}</Text>
                             </TouchableOpacity>
                         )}
                         <View className="justify-between mt-2 flex-row">

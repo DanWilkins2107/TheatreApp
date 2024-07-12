@@ -17,7 +17,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
     const [admins, setAdmins] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
-    const productionCode = route.params.playCode;
+    const productionID = route.params.playCode;
     const db = firebase_db;
     const auth = firebase_auth;
 
@@ -25,7 +25,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     useEffect(() => {
         onValue(
-            ref(db, `/productions/${productionCode}`),
+            ref(db, `/productions/${productionID}`),
             (snapshot) => {
                 if (!snapshot.exists()) {
                     setLoading(false);
@@ -37,7 +37,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             { onlyOnce: true }
         );
 
-        onValue(ref(db, `/productions/${productionCode}/admins`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionID}/admins`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const adminData = snapshot.val();
             const newAdmins = await Promise.all(
@@ -59,7 +59,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
             setAdmins(newAdmins);
         });
 
-        onValue(ref(db, `/productions/${productionCode}/participants`), async (snapshot) => {
+        onValue(ref(db, `/productions/${productionID}/participants`), async (snapshot) => {
             if (!snapshot.exists()) return;
             const participantData = snapshot.val();
             const newParticipants = await Promise.all(
@@ -82,7 +82,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
 
     const fetchBudgets = async () => {
         try {
-            const prodSnapshot = await get(ref(db, `productions/${productionCode}/budgets`));
+            const prodSnapshot = await get(ref(db, `productions/${productionID}/budgets`));
             if (!prodSnapshot.exists()) {
                 return {};
             }
@@ -126,7 +126,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 budgets={newBudgets}
                 loading={false}
                 onPress={(budget) => {
-                    navigation.navigate("BudgetMain", { budgetUUID: budget });
+                    navigation.navigate("BudgetMain", { productionCode: productionID, budgetUUID: budget });
                     setModal(null)
                 }}
             />
@@ -143,7 +143,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 <>
                     <View className="flex-row justify-around my-2">
                         <Subtitle>Production: {production.playName}</Subtitle>
-                        <Subtitle>{productionCode}</Subtitle>
+                        <Subtitle>{productionID}</Subtitle>
                     </View>
                     <View className="flex-col m-2">
                         <Subtitle>Admins:</Subtitle>
@@ -170,7 +170,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Create Budget"
                                     onPress={() =>
-                                        setModal(<CreateBudgetModal productionCode={productionCode} />)
+                                        setModal(<CreateBudgetModal productionCode={productionID} />)
                                     }
                                 >
                                     <IconFA5 name="plus" size={50} />
@@ -186,7 +186,8 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 text="Add Expense"
                                 onPress={() =>
                                     navigation.navigate("BudgetAddExpense", {
-                                        productionCode: productionCode,
+                                        productionCode: productionID,
+                                        id: null
                                     })
                                 }
                             >
@@ -194,7 +195,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Set Availability"
-                                onPress={() => navigation.navigate("Availability", { productionCode: productionCode })}
+                                onPress={() => navigation.navigate("Availability", { productionCode: productionID })}
                             >
                                 <IconFA5 name="calendar-alt" size={50} />
                             </ProductionDashboardButton>
@@ -202,7 +203,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Admin Stuff"
                                     onPress={() =>
-                                        navigation.navigate("Admin", { productionCode: productionCode })
+                                        navigation.navigate("Admin", { productionCode: productionID })
                                     }
                                 >
                                     <Icon name="cogs" size={50} />
