@@ -7,7 +7,7 @@ import { firebase_auth, firebase_db } from "../../firebase.config";
 import { randomUUID } from "expo-crypto";
 import { AlertContext } from "../../components/Alert/AlertProvider";
 
-export default function Availability({ navigation, route }) {
+export default function AvailabilityScreen({ navigation, route }) {
     const [availabilityInfo, setAvailabilityInfo] = useState({});
     const [initialAvailabilityInfo, setInitialAvailabilityInfo] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);

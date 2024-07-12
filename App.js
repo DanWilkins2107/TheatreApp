@@ -18,7 +18,9 @@ import Modal from "./components/Modal/Modal.jsx";
 import BudgetAddExpenseScreen from "./screens/ProductionScreens/BudgetAddExpense.jsx";
 import AdminScreen from "./screens/AdminScreens/AdminScreen.jsx";
 import BudgetMainScreen from "./screens/ProductionScreens/BudgetMain.jsx";
-import Availability from "./screens/ProductionScreens/Availability.jsx";
+import AvailabilityScreen from "./screens/ProductionScreens/Availability.jsx";
+import ViewScheduleScreen from "./screens/ProductionScreens/ViewSchedule.jsx";
+import SetScheduleScreen from "./screens/ProductionScreens/SetSchedule.jsx";
 import Container from "./components/General/Container.jsx";
 
 const Stack = createNativeStackNavigator();
@@ -49,12 +51,14 @@ export default function App() {
 
     const userScreens = [
         { name: "UserDashboard", component: UserDashboardScreen, firstScreen: true, header: true },
-        { name: "UserProfile", component: UserProfileScreen, header: true, profileScreen: true},
+        { name: "UserProfile", component: UserProfileScreen, header: true, profileScreen: true },
         { name: "ProductionDashboard", component: ProductionDashboardScreen, header: true },
         { name: "BudgetAddExpense", component: BudgetAddExpenseScreen, header: true },
         { name: "BudgetMain", component: BudgetMainScreen, header: true },
         { name: "Admin", component: AdminScreen, header: true },
-        { name: "Availability", component: Availability, header: true}
+        { name: "Availability", component: AvailabilityScreen, header: true },
+        { name: "ViewSchedule", component: ViewScheduleScreen, header: true },
+        { name: "SetSchedule", component: SetScheduleScreen, header: true },
     ];
 
     return (
@@ -76,12 +80,10 @@ export default function App() {
                                 options={{
                                     header: (props) => <Header {...props} {...screen} />,
                                     headerTransparent: true,
-                                    headerShown : screen.header,
+                                    headerShown: screen.header,
                                 }}
-                                
                             />
-                        )
-                        )}
+                        ))}
                     </Stack.Navigator>
                 </NavigationContainer>
             </ModalProvider>

@@ -127,7 +127,7 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                 loading={false}
                 onPress={(budget) => {
                     navigation.navigate("BudgetMain", { budgetUUID: budget });
-                    setModal(null)
+                    setModal(null);
                 }}
             />
         );
@@ -170,7 +170,9 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Create Budget"
                                     onPress={() =>
-                                        setModal(<CreateBudgetModal productionCode={productionCode} />)
+                                        setModal(
+                                            <CreateBudgetModal productionCode={productionCode} />
+                                        )
                                     }
                                 >
                                     <IconFA5 name="plus" size={50} />
@@ -194,7 +196,11 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             </ProductionDashboardButton>
                             <ProductionDashboardButton
                                 text="Set Availability"
-                                onPress={() => navigation.navigate("Availability", { productionCode: productionCode })}
+                                onPress={() =>
+                                    navigation.navigate("Availability", {
+                                        productionCode: productionCode,
+                                    })
+                                }
                             >
                                 <IconFA5 name="calendar-alt" size={50} />
                             </ProductionDashboardButton>
@@ -202,7 +208,9 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                                 <ProductionDashboardButton
                                     text="Admin Stuff"
                                     onPress={() =>
-                                        navigation.navigate("Admin", { productionCode: productionCode })
+                                        navigation.navigate("Admin", {
+                                            productionCode: productionCode,
+                                        })
                                     }
                                 >
                                     <Icon name="cogs" size={50} />
@@ -210,14 +218,22 @@ export default function ProductionDashboardScreen({ navigation, route }) {
                             )}
                             <ProductionDashboardButton
                                 text="View Schedule"
-                                onPress={() => alert("Need to Implement")}
+                                onPress={() =>
+                                    navigation.navigate("ViewSchedule", {
+                                        productionCode: productionCode,
+                                    })
+                                }
                             >
                                 <IconFA5 name="eye" size={50} />
                             </ProductionDashboardButton>
                             {isAdmin && (
                                 <ProductionDashboardButton
                                     text="Create Schedule"
-                                    onPress={() => alert("Need to Implement")}
+                                    onPress={() =>
+                                        navigation.navigate("SetSchedule", {
+                                            productionCode: productionCode,
+                                        })
+                                    }
                                 >
                                     <IconFA5 name="business-time" size={50} />
                                 </ProductionDashboardButton>
