@@ -30,35 +30,51 @@ import DeleteButton from "../../components/Budget/DeleteButton.jsx";
 
 export default function BudgetAddExpenseScreen({ navigation, route }) {
     const [playBudgets, setPlayBudgets] = useState({});
-    const [budget, setBudget] = useState("");
-    const [reference, setReference] = useState("");
-    const [description, setDescription] = useState("");
-    const [receiptURI, setReceiptURI] = useState("");
-    const [cost, setCost] = useState("");
-    const [isPlaceholder, setIsPlaceholder] = useState(false);
+
+    const [formInfo, setFormInfo] = useState({
+        budget: "",
+        reference: "",
+        description: "",
+        cost: "",
+        receipt: "",
+        receiptExtension: "",
+        placeholder: false,
+    });
+
+    const [resetFormData, setResetFormData] = useState({
+        budget: "",
+        reference: "",
+        description: "",
+        cost: "",
+        receipt: "",
+        receiptExtension: "",
+        placeholder: false,
+    });
+
+    // Necessary repeated state variables for the edit/delete functionality
+    const [originalCost, setOriginalCost] = useState("");
+    const [originalReceiptExtension, setOriginalReceiptExtension] = useState("");
+    const [originalIsPlaceholder, setOriginalIsPlaceholder] = useState(false);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const { setModal } = useContext(ModalContext);
     const { setAlert } = useContext(AlertContext);
-    const storageRef = ref(storage);
+
     const productionCode = route.params.productionCode;
     const id = route.params.id;
-    const expenseID = route.params.id || randomUUID();
+    const expenseID = id || randomUUID();
+
     const db = firebase_db;
     const auth = firebase_auth;
-    const { setModal } = useContext(ModalContext);
-    const [originalCost, setOriginalCost] = useState(0);
-    const [originalReceipt, setOriginalReceipt] = useState("");
-    const [originalReceiptExtension, setOriginalReceiptExtension] = useState("");
+    const storageRef = ref(storage);
 
     const resetValues = () => {
-        setBudget("");
-        setReference("");
-        setDescription("");
-        setIsPlaceholder(false);
-        setCost("");
-        setReceiptURI("");
+        setFormInfo(JSON.parse(JSON.stringify(resetFormData)));
     };
 
     const handleLoad = () => {
+        const id = route.params.id || null;
         if (!id) {
             resetValues();
             return;
@@ -73,15 +89,30 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 const data = snapshot.val();
                 const playBudgetsFetch = await fetchBudgets();
                 setPlayBudgets(playBudgetsFetch);
-                setBudget(data.budget);
-                setReference(data.reference);
-                setDescription(data.description);
-                setIsPlaceholder(data.placeholder);
-                setCost(data.cost);
-                setReceiptURI(data.receipt);
+
+                setOriginalIsPlaceholder(data.placeholder);
                 setOriginalCost(data.cost);
-                setOriginalReceipt(data.receipt);
                 setOriginalReceiptExtension(data.receiptExtension);
+
+                setFormInfo({
+                    budget: data.budget,
+                    reference: data.reference,
+                    description: data.description,
+                    cost: data.cost,
+                    receipt: data.receipt,
+                    receiptExtension: data.receiptExtension,
+                    placeholder: data.placeholder,
+                });
+
+                setResetFormData({
+                    budget: data.budget,
+                    reference: data.reference,
+                    description: data.description,
+                    cost: data.cost,
+                    receipt: data.receipt,
+                    receiptExtension: data.receiptExtension,
+                    placeholder: data.placeholder,
+                });
             });
         } catch {
             setAlert("Error loading expense", "bg-red-500", "exclamation-circle");
@@ -97,31 +128,37 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
     const submitForm = async () => {
         if (isSubmitting) return;
         setIsSubmitting(true);
-        if (!budget) {
+        if (!formInfo.budget && formInfo.budget !== "0") {
             setAlert("Please select a budget", "bg-red-500", "exclamation-circle");
             setIsSubmitting(false);
             return;
         }
 
-        if (!reference) {
+        if (!formInfo.reference) {
             setAlert("Please enter a reference", "bg-red-500", "exclamation-circle");
             setIsSubmitting(false);
             return;
         }
 
-        if (!cost) {
+        if (!formInfo.cost && formInfo.cost !== "0") {
             setAlert("Please enter the cost of the expense", "bg-red-500", "exclamation-circle");
             setIsSubmitting(false);
             return;
         }
 
+        if (id && originalReceiptExtension) {
+            const receiptRef = ref(storage, `receipts/${id}${originalReceiptExtension}`);
+            await deleteObject(receiptRef);
+        }
+
         let url = "";
         let extension = "";
-        if (receiptURI) {
+
+        if (formInfo.receipt) {
             try {
-                const image = await fetch(receiptURI);
+                const image = await fetch(formInfo.receipt);
                 const blob = await image.blob();
-                extension = receiptURI.substring(receiptURI.lastIndexOf("."));
+                extension = formInfo.receipt.substring(formInfo.receipt.lastIndexOf("."));
                 const snapshot = await uploadBytes(
                     ref(storageRef, "receipts/" + expenseID + extension),
                     blob
@@ -134,16 +171,52 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
 
         try {
             await set(dbRef(db, `expenses/${expenseID}`), {
-                budget: budget,
-                reference: reference,
-                description: description,
-                cost: cost,
-                placeholder: isPlaceholder,
+                ...formInfo,
                 receipt: url,
                 receiptExtension: extension,
                 user: auth.currentUser.uid,
             });
-            await set(dbRef(db, `budgets/${budget}/expenses/${expenseID}`), Date.now());
+            await set(dbRef(db, `budgets/${formInfo.budget}/expenses/${expenseID}`), Date.now());
+
+            let placeholderChange = 0;
+            let nonPlaceholderChange = 0;
+
+            if (originalIsPlaceholder) {
+                placeholderChange -= Number(originalCost);
+            } else {
+                nonPlaceholderChange -= Number(originalCost);
+            }
+
+            if (formInfo.placeholder) {
+                placeholderChange += Number(formInfo.cost);
+            } else {
+                nonPlaceholderChange += Number(formInfo.cost);
+            }
+
+            if (placeholderChange !== 0) {
+                await runTransaction(
+                    dbRef(db, `budgets/${formInfo.budget}/placeholderExpenses`),
+                    (currentValue) => {
+                        if (currentValue) {
+                            return Number(currentValue) + placeholderChange;
+                        }
+                        return placeholderChange;
+                    }
+                );
+            }
+
+            if (nonPlaceholderChange !== 0) {
+                await runTransaction(
+                    dbRef(db, `budgets/${formInfo.budget}/nonPlaceholderExpenses`),
+                    (currentValue) => {
+                        if (currentValue) {
+                            return Number(currentValue) + nonPlaceholderChange;
+                        }
+                        return nonPlaceholderChange;
+                    }
+                );
+            }
+
             setAlert(
                 `Expense ${id ? "updated" : "added"} successfully`,
                 "bg-green-500",
@@ -151,28 +224,14 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             );
             setIsSubmitting(false);
 
-            await runTransaction(
-                dbRef(
-                    db,
-                    `budgets/${budget}/${
-                        isPlaceholder ? "placeholderExpenses" : "nonPlaceholderExpenses"
-                    }`
-                ),
-                (currentValue) => {
-                    if (currentValue) {
-                        return Number(currentValue) + Number(cost);
-                    }
-                    return Number(cost);
-                }
-            );
-
             navigation.navigate("BudgetMain", {
                 productionCode: productionCode,
-                budgetUUID: budget,
+                budgetUUID: formInfo.budget,
             });
         } catch (error) {
             setAlert("Error occurred when adding expense", "bg-red-500", "exclamation-circle");
             setIsSubmitting(false);
+            console.log(error);
         }
     };
 
@@ -190,7 +249,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             if (!response.canceled) {
                 try {
                     fetch(response.assets[0].uri).then(() => {
-                        setReceiptURI(response.assets[0].uri);
+                        setFormInfo({ ...formInfo, receipt: response.assets[0].uri });
                     });
                 } catch (error) {
                     setAlert(
@@ -217,7 +276,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             if (!response.canceled) {
                 try {
                     fetch(response.assets[0].uri).then(() => {
-                        setReceiptURI(response.assets[0].uri);
+                        setFormInfo({ ...formInfo, receipt: response.assets[0].uri });
                     });
                 } catch (error) {
                     setAlert(
@@ -254,7 +313,6 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             );
             return newBudgets;
         } catch (error) {
-            console.log(error.message);
             setAlert("Could not find all the budgets", "bg-red-400", "exclamation-circle");
             return {};
         }
@@ -266,7 +324,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 budgets={{}}
                 loading={true}
                 onPress={(budget) => {
-                    setBudget(budget);
+                    setFormInfo({ ...formInfo, budget: budget });
                     setModal(null);
                 }}
             />
@@ -278,7 +336,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 budgets={newBudgets}
                 loading={false}
                 onPress={(budget) => {
-                    setBudget(budget);
+                    setFormInfo({ ...formInfo, budget: budget });
                     setModal(null);
                 }}
             />
@@ -290,8 +348,8 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             await runTransaction(
                 dbRef(
                     db,
-                    `budgets/${budget}/${
-                        isPlaceholder ? "placeholderExpenses" : "nonPlaceholderExpenses"
+                    `budgets/${formInfo.budget}/${
+                        originalIsPlaceholder ? "placeholderExpenses" : "nonPlaceholderExpenses"
                     }`
                 ),
                 (currentValue) => {
@@ -301,19 +359,23 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     return -1 * Number(originalCost);
                 }
             );
-            const receiptRef = ref(storage, `receipts/${id}${originalReceiptExtension}`);
-            await deleteObject(receiptRef);
+            if (originalReceiptExtension) {
+                const receiptRef = ref(storage, `receipts/${id}${originalReceiptExtension}`);
+                await deleteObject(receiptRef);
+            }
+
             await set(dbRef(db, `expenses/${id}`), null);
-            await set(dbRef(db, `budgets/${budget}/expenses/${id}`), null);
+            await set(dbRef(db, `budgets/${formInfo.budget}/expenses/${id}`), null);
 
             setAlert("Expense deleted successfully", "bg-green-500", "check-circle");
             setModal(null);
             navigation.navigate("BudgetMain", {
                 productionCode: productionCode,
-                budgetUUID: budget,
+                budgetUUID: formInfo.budget,
             });
         } catch (error) {
             setAlert("Could not delete expense", "bg-red-500", "exclamation-circle");
+            console.log(error.message);
         }
     };
 
@@ -323,9 +385,9 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
             <KeyboardAwareScrollView className="flex-1 w-full px-8">
                 <View className="items-center justify-center mb-4">
                     <Text className="text-lg font-semibold text-center">Select Budget</Text>
-                    {budget ? (
+                    {formInfo.budget ? (
                         <BudgetInfo
-                            budget={playBudgets[budget]}
+                            budget={playBudgets[formInfo.budget]}
                             onClick={handleChooseBudgetPress}
                         />
                     ) : (
@@ -340,17 +402,17 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Reference</Text>
                     <FormField
-                        value={reference}
+                        value={formInfo.reference}
                         placeholder="Reference"
-                        onChangeText={setReference}
+                        onChangeText={(value) => setFormInfo({ ...formInfo, reference: value })}
                     />
                 </View>
                 <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Description</Text>
                     <FormField
-                        value={description}
+                        value={formInfo.description}
                         placeholder="Description"
-                        onChangeText={setDescription}
+                        onChangeText={(value) => setFormInfo({ ...formInfo, description: value })}
                         multiline
                         extraClassName="h-20"
                         autoCapitalize="sentences"
@@ -359,20 +421,20 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 <View className="mb-4">
                     <Text className="text-lg font-semibold text-center">Cost</Text>
                     <FormField
-                        value={cost}
+                        value={formInfo.cost}
                         placeholder="Cost (£)"
                         onChangeText={(value) => {
                             if (value.match(/^[0-9]*\.?[0-9]{0,2}$/)) {
-                                setCost(value);
+                                setFormInfo({ ...formInfo, cost: value });
                             }
                         }}
                     />
                     <View className="flex-row justify-center items-center">
                         <Text className="text-lg font-semibold mr-4">Is this a placeholder?</Text>
                         <Checkbox
-                            checked={isPlaceholder}
+                            checked={formInfo.placeholder}
                             setChecked={() => {
-                                setIsPlaceholder(!isPlaceholder);
+                                setFormInfo({ ...formInfo, placeholder: !formInfo.placeholder });
                             }}
                             size={18}
                         />
@@ -380,12 +442,12 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                 </View>
                 <View className="h-80 mb-24">
                     <Text className="text-lg font-semibold text-center mb-1">Receipt</Text>
-                    <ReceiptViewer recieptURL={receiptURI} />
-                    {receiptURI ? (
+                    <ReceiptViewer recieptURL={formInfo.receipt} />
+                    {formInfo.receipt ? (
                         <View className="flex-row justify-around mt-[-50]">
                             <AddRecieptButton
                                 onPress={() => {
-                                    setReceiptURI("");
+                                    setFormInfo({ ...formInfo, receipt: "", receiptExtension: "" });
                                 }}
                             >
                                 <Icon name="trash" size={50} />
@@ -415,10 +477,7 @@ export default function BudgetAddExpenseScreen({ navigation, route }) {
                     <SmallFormButton
                         title="Reset"
                         onPress={() => {
-                            setBudget("");
-                            setReference("");
-                            setCost("");
-                            setReceiptURI("");
+                            resetValues();
                         }}
                     />
                 </View>

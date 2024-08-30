@@ -49,7 +49,6 @@ export default function ExpenseSummary({ expense, isUser, navigation, production
                 </View>
                 {isDropdownOpen && (
                     <>
-                        <Text>{productionCode || "NOT HERE AHAHA"}</Text>
                         {isUser && (
 
                             <TouchableOpacity
