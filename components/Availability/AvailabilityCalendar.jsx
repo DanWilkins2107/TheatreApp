@@ -51,68 +51,49 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
         } else return "bg-white";
     };
 
-    const handleOnPress = useCallback(
-        (hour, daysToChange) => {
-            try {
-                const correctDate = editDate(date, daysToChange);
-                const dayData = splitDate(correctDate);
+    const handleOnPress = (hour, daysToChange) => {
+        try {
+            const correctDate = editDate(date, daysToChange);
+            const dayData = splitDate(correctDate);
 
-                const newInfo = { ...availabilityInfo };
+            const currentStatus = availabilityInfo[dayData[0]]?.[dayData[1]]?.[dayData[2]]?.[hour];
 
-                if (
-                    newInfo[dayData[0]] &&
-                    newInfo[dayData[0]][dayData[1]] &&
-                    newInfo[dayData[0]][dayData[1]][dayData[2]] &&
-                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour]
-                ) {
-                    if (newInfo[dayData[0]][dayData[1]][dayData[2]][hour] === "green") {
-                        newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
-                    } else {
-                        delete newInfo[dayData[0]][dayData[1]][dayData[2]][hour];
-                    }
-                } else {
-                    if (!newInfo[dayData[0]]) {
-                        newInfo[dayData[0]] = {};
-                    }
-                    if (!newInfo[dayData[0]][dayData[1]]) {
-                        newInfo[dayData[0]][dayData[1]] = {};
-                    }
-                    if (!newInfo[dayData[0]][dayData[1]][dayData[2]]) {
-                        newInfo[dayData[0]][dayData[1]][dayData[2]] = {};
-                    }
-                    newInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
+            if (currentStatus === "red") {
+                delete availabilityInfo[dayData[0]][dayData[1]][dayData[2]][hour];
+            } else if (currentStatus === "green") {
+                availabilityInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "red";
+            } else {
+                if (!availabilityInfo[dayData[0]]) {
+                    availabilityInfo[dayData[0]] = {};
                 }
-                setAvailabilityInfo(newInfo);
-            } catch (error) {
-                setAlert(
-                    "An error occured when changing availability",
-                    "bg-red-400",
-                    "exclamation-circle"
-                );
-                console.error(error.message);
+                if (!availabilityInfo[dayData[0]][dayData[1]]) {
+                    availabilityInfo[dayData[0]][dayData[1]] = {};
+                }
+                if (!availabilityInfo[dayData[0]][dayData[1]][dayData[2]]) {
+                    availabilityInfo[dayData[0]][dayData[1]][dayData[2]] = {};
+                }
+                availabilityInfo[dayData[0]][dayData[1]][dayData[2]][hour] = "green";
             }
-        },
-        [date, availabilityInfo]
-    );
 
-    const checkAvailability = useCallback(
-        (hour, date) => {
-            const dayInfo = splitDate(date);
-            const year = dayInfo[0];
-            const month = dayInfo[1];
-            const day = dayInfo[2];
-            if (
-                availabilityInfo[year] &&
-                availabilityInfo[year][month] &&
-                availabilityInfo[year][month][day] &&
-                availabilityInfo[year][month][day][hour]
-            ) {
-                return availabilityInfo[year][month][day][hour];
-            }
-            return "none";
-        },
-        [availabilityInfo]
-    );
+            setAvailabilityInfo({ ...availabilityInfo });
+        } catch (error) {
+            setAlert(
+                "An error occured when changing availability",
+                "bg-red-400",
+                "exclamation-circle"
+            );
+            console.error(error.message);
+        }
+    };
+
+    const checkAvailability = (hour, date) => {
+        const dayInfo = splitDate(date);
+        const year = dayInfo[0];
+        const month = dayInfo[1];
+        const day = dayInfo[2];
+
+        return availabilityInfo[year]?.[month]?.[day]?.[hour] || "none";
+    };
 
     // Work out date line
     const currentHour = new Date().getHours();
@@ -214,9 +195,11 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
                                                     key={hour}
                                                     className={`h-10 justify-center items-center ${
                                                         hour != 0 && "border-t"
-                                                    } ${day != 0 && "border-l"} flex-1 ${findColour(
-                                                        availability
-                                                    )} ${timePassed && "opacity-20"} `}
+                                                    } ${
+                                                        day != 0 && "border-l"
+                                                    } flex-1 bg-${availability}-400 ${
+                                                        timePassed && "opacity-20"
+                                                    } `}
                                                     onPress={() => {
                                                         if (!timePassed) {
                                                             handleOnPress(hour, day);
