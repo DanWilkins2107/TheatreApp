@@ -45,12 +45,6 @@ export default function AvailabilityCalendar({ availabilityInfo, setAvailability
     const scrollRef = useRef(null);
     const { setAlert } = useContext(AlertContext);
 
-    const findColour = (colour) => {
-        if (colour != "none") {
-            return "bg-" + colour + "-400";
-        } else return "bg-white";
-    };
-
     const handleOnPress = (hour, daysToChange) => {
         try {
             const correctDate = editDate(date, daysToChange);
